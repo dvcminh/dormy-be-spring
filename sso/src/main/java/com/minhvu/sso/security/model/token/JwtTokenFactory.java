@@ -1,8 +1,8 @@
-package com.im.sso.security.model.token;
+package com.minhvu.sso.security.model.token;
 
-import com.im.sso.exception.JwtTokenMalformedException;
-import com.im.sso.exception.JwtTokenMissingException;
-import com.im.sso.security.model.SecurityUser;
+import com.minhvu.sso.exception.JwtTokenMalformedException;
+import com.minhvu.sso.exception.JwtTokenMissingException;
+import com.minhvu.sso.security.model.SecurityUser;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -15,7 +15,6 @@ import java.util.function.Function;
 public class JwtTokenFactory implements Serializable {
 
     private static final String USER_ID = "userId";
-    private static final String TENANT_ID = "tenantId";
     private static final String EMAIL = "email";
     private static final String FIRST_NAME = "firstName";
     private static final String LAST_NAME = "lastName";
@@ -43,7 +42,6 @@ public class JwtTokenFactory implements Serializable {
                 .signWith(SignatureAlgorithm.HS512, jwtSecret);
 
         jwtBuilder.claim(USER_ID, userDetails.getUser().getId())
-                .claim(TENANT_ID, userDetails.getUser().getTenantId())
                 .claim(EMAIL, userDetails.getUser().getEmail())
                 .claim(FIRST_NAME, userDetails.getUser().getFirstName())
                 .claim(LAST_NAME, userDetails.getUser().getLastName())

@@ -1,4 +1,4 @@
-package com.im.sso.config;
+package com.minhvu.sso.config;
 
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
@@ -32,15 +32,14 @@ public class OpenApiConfig {
     public OpenAPI openAPI() {
         return new OpenAPI()
                 .servers(Arrays.asList(
-                        new Server().url("https://erp.innovation.com.vn"),
                         new Server().url("http://localhost:" + port)
                 ))
                 .info(new Info()
                         .title("SSO Service API")
-                        .description("Single Sign-On Service for Industrial Management")
+                        .description("Single Sign-On Service")
                         .contact(new Contact()
-                                .email("ttuquang@tma.com.vn")
-                                .name("Tran Tu Quang")
+                                .email("a")
+                                .name("a")
                         ).license(new License()
                                 .name("Apache 2.0")
                                 .url("https://www.apache.org/licenses/LICENSE-2.0.html"))

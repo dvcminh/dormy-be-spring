@@ -24,6 +24,18 @@ public class GatewayRouteConfig {
                 .route("discovery-server-static",
                         r -> r.path("/eureka/**")
                                 .uri("http://localhost:8761"))
+                .route("sso-service",
+                        r -> r.path("/api/noauth/user/**",
+                                        "/api/noauth/info/**")
+                                .uri("lb://sso-service"))
+                .route("sso-service",
+                        r -> r.path("/api/user**", "/api/user/**",
+                                        "/api/component**", "/api/component/**",
+                                        "/api/permission/**", "/api/auth/**",
+                                        "/api/whiteLabel**", "/api/whiteLabel/**",
+                                        "/api/admin/whiteLabel**", "/api/admin/whiteLabel/**")
+                                .filters(f -> f.filter(filter))
+                                .uri("lb://sso-service"))
                 .build();
     }
 

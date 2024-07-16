@@ -1,9 +1,9 @@
-package com.im.sso.security.exception;
+package com.minhvu.sso.security.exception;
 
-import com.im.sso.security.model.SecurityUser;
-import com.im.sso.security.model.token.JwtTokenFactory;
-import com.im.sso.security.service.SecurityUserService;
-import com.im.sso.service.UserService;
+import com.minhvu.sso.security.model.SecurityUser;
+import com.minhvu.sso.security.model.token.JwtTokenFactory;
+import com.minhvu.sso.security.service.SecurityUserService;
+import com.minhvu.sso.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

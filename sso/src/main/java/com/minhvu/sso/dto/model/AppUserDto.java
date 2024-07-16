@@ -1,4 +1,4 @@
-package com.im.sso.dto.model;
+package com.minhvu.sso.dto.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,8 +24,6 @@ public class AppUserDto {
     private String authority;
     @NotEmpty(message = "Role may not be empty")
     private String role;
-    private UUID tenantId;
-    private UUID contactId;
     private String avatar;
     private Date createdAt;
     private Date updatedAt;

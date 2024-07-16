@@ -1,22 +1,19 @@
-package com.im.sso.controller;
+package com.minhvu.sso.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.im.sso.dto.model.AppUserDto;
-import com.im.sso.dto.model.DataKvDto;
-import com.im.sso.dto.model.LogDto;
-import com.im.sso.dto.request.ChangePasswordRequest;
-import com.im.sso.dto.request.SignUpRequest;
-import com.im.sso.dto.response.Response;
-import com.im.sso.dto.response.UserProfileResponse;
-import com.im.sso.exception.UnAuthorizedException;
-import com.im.sso.model.enums.ActionStatus;
-import com.im.sso.model.enums.ActionType;
-import com.im.sso.model.enums.AuthorityType;
-import com.im.sso.model.enums.EntityType;
-import com.im.sso.service.AppInfoService;
-import com.im.sso.service.LogService;
-import com.im.sso.service.UserCredentialsService;
-import com.im.sso.service.UserService;
+import com.minhvu.sso.dto.model.AppUserDto;
+import com.minhvu.sso.dto.model.LogDto;
+import com.minhvu.sso.dto.request.ChangePasswordRequest;
+import com.minhvu.sso.dto.request.SignUpRequest;
+import com.minhvu.sso.dto.response.Response;
+import com.minhvu.sso.dto.response.UserProfileResponse;
+import com.minhvu.sso.exception.UnAuthorizedException;
+import com.minhvu.sso.model.enums.ActionStatus;
+import com.minhvu.sso.model.enums.ActionType;
+import com.minhvu.sso.model.enums.AuthorityType;
+import com.minhvu.sso.service.LogService;
+import com.minhvu.sso.service.UserCredentialsService;
+import com.minhvu.sso.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.slf4j.Slf4j;
@@ -37,9 +34,6 @@ public class AuthController extends BaseController {
 
     @Autowired
     UserService userService;
-
-    @Autowired
-    AppInfoService appInfoService;
 
     @Autowired
     UserCredentialsService userCredentialsService;
@@ -74,25 +68,6 @@ public class AuthController extends BaseController {
         AppUserDto currentUser = getCurrentUser();
         userCredentialsService.changePassword(currentUser, changePasswordRequest);
         return ResponseEntity.ok(new Response("Password updated successfully"));
-    }
-
-    @PostMapping("info")
-    @Operation(summary = "Save Application Information")
-    public List<DataKvDto> saveAppInfo(
-            @Valid @RequestBody List<DataKvDto> dataKvDtoList
-    ) {
-        AppUserDto currentUser = getCurrentUser();
-        if (!AuthorityType.SYS_ADMIN.equals(AuthorityType.lookup(currentUser.getAuthority()))) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            logService.save(LogDto.builder()
-                    .entityType(EntityType.DATA_KV)
-                    .actionType(ActionType.CREATED)
-                    .actionStatus(ActionStatus.FAILURE)
-                    .actionData(objectMapper.valueToTree(dataKvDtoList))
-                    .actionFailureDetails("You do not have permission to do this action").build(), currentUser);
-            throw new UnAuthorizedException("You do not have permission to do this action");
-        }
-        return appInfoService.save(dataKvDtoList, currentUser);
     }
 
     @PostMapping("signup")

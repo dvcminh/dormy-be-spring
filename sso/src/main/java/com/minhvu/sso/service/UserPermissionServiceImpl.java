@@ -1,15 +1,12 @@
-package com.im.sso.service;
+package com.minhvu.sso.service;
 
-import com.im.sso.exception.BadRequestException;
-import com.im.sso.model.AppComponent;
-import com.im.sso.model.AppUser;
-import com.im.sso.model.UserComponent;
-import com.im.sso.model.UserSubPlan;
-import com.im.sso.model.enums.AccountPlanType;
-import com.im.sso.repository.AppComponentRepository;
-import com.im.sso.repository.AppUserRepository;
-import com.im.sso.repository.UserComponentRepository;
-import com.im.sso.repository.UserSubPlanRepository;
+import com.minhvu.sso.exception.BadRequestException;
+import com.minhvu.sso.model.AppComponent;
+import com.minhvu.sso.model.AppUser;
+import com.minhvu.sso.model.UserComponent;
+import com.minhvu.sso.repository.AppComponentRepository;
+import com.minhvu.sso.repository.AppUserRepository;
+import com.minhvu.sso.repository.UserComponentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,10 +25,8 @@ public class UserPermissionServiceImpl implements UserPermissionService {
     private final AppComponentRepository appComponentRepository;
 
     private final UserComponentRepository userComponentRepository;
-
     private final AppUserRepository userRepository;
 
-    private final UserSubPlanRepository userSubPlanRepository;
 
     public boolean validateUserPermission(UUID userId, String url, String method) {
         AppComponent component = appComponentRepository.findByUrlBase(url);
@@ -48,25 +43,6 @@ public class UserPermissionServiceImpl implements UserPermissionService {
             return !checklist.isEmpty();
         }
         return false;
-    }
-
-    @Override
-    public boolean checkUserPlan(UUID tenantId) {
-        AppUser tenantUser = userRepository.findById(tenantId)
-                .orElseThrow(() ->
-                        new BadRequestException(
-                                String.format(USER_NOT_FOUND, tenantId)
-                        ));
-        Optional<UserSubPlan> userSubPlan = userSubPlanRepository.findByUserId(tenantUser.getTenantId());
-        if (userSubPlan.isEmpty()) {
-            return false;
-        }
-        if (!userSubPlan.get().getAccountPlan()
-                .getName().equals(AccountPlanType.BASIC)
-        ) {
-            return checkExpiredIn(userSubPlan.get().getExpiredIn());
-        }
-        return true;
     }
 
     private boolean checkExpiredIn(LocalDateTime expired) {

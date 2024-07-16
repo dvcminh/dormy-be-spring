@@ -1,10 +1,10 @@
-package com.im.sso.security.service;
+package com.minhvu.sso.security.service;
 
-import com.im.sso.model.AppUser;
-import com.im.sso.repository.AppUserRepository;
-import com.im.sso.security.exception.TokenRefreshException;
-import com.im.sso.security.model.RefreshToken;
-import com.im.sso.security.repository.RefreshTokenRepository;
+import com.minhvu.sso.model.AppUser;
+import com.minhvu.sso.repository.AppUserRepository;
+import com.minhvu.sso.security.exception.TokenRefreshException;
+import com.minhvu.sso.security.model.RefreshToken;
+import com.minhvu.sso.security.repository.RefreshTokenRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

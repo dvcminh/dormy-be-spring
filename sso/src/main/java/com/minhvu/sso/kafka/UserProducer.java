@@ -1,8 +1,8 @@
-package com.im.sso.kafka;
+package com.minhvu.sso.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.im.sso.dto.model.AppUserDto;
+import com.minhvu.sso.dto.model.AppUserDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;

@@ -1,7 +1,7 @@
-package com.im.sso.repository;
+package com.minhvu.sso.repository;
 
-import com.im.sso.model.AppComponent;
-import com.im.sso.model.UserComponent;
+import com.minhvu.sso.model.AppComponent;
+import com.minhvu.sso.model.UserComponent;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

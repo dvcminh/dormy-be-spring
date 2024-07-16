@@ -1,6 +1,6 @@
-package com.im.sso.service;
+package com.minhvu.sso.service;
 
-import com.im.sso.dto.model.AppUserDto;
+import com.minhvu.sso.dto.model.AppUserDto;
 
 import java.util.UUID;
 

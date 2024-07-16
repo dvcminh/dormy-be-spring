@@ -1,4 +1,4 @@
-package com.im.sso.dto.response.page;
+package com.minhvu.sso.dto.response.page;
 
 import lombok.Data;
 

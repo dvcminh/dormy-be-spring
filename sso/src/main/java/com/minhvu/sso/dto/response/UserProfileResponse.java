@@ -1,7 +1,5 @@
-package com.im.sso.dto.response;
+package com.minhvu.sso.dto.response;
 
-import com.im.sso.dto.model.AppComponentDto;
-import com.im.sso.dto.model.ContactDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,12 +19,9 @@ public class UserProfileResponse {
     private String phone;
     private String authority;
     private String role;
-    private UUID tenantId;
     private String avatar;
     private Date createdAt;
     private Date updatedAt;
-    private ContactDto contact;
-    private Collection<AppComponentDto> components;
     private boolean isEnabled;
     private String planName;
     private Long planExpiredIn;

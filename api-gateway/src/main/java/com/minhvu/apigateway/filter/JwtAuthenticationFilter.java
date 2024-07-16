@@ -83,21 +83,6 @@ public class JwtAuthenticationFilter implements GatewayFilter {
                         .bodyToMono(Void.class)
                         .then(chain.filter(exchange));
             }
-
-            if (!claims.get("role").equals("SYS_ADMIN")) {
-                return webClientBuilder.build().get()
-                        .uri("lb://sso-service/api/permission/plan",
-                                uriBuilder -> uriBuilder
-                                        .queryParam("tenantId", claims.get("tenantId")).build())
-                        .retrieve()
-                        .onStatus(httpStatus -> httpStatus.is4xxClientError(),
-                                response -> Mono.error(
-                                        new UnAuthorizedException("You do not have permission to do this action.")))
-                        .onStatus(httpStatus -> httpStatus.is5xxServerError(),
-                                response -> Mono.error(new RuntimeException("Service timeout.")))
-                        .bodyToMono(Void.class)
-                        .then(chain.filter(exchange));
-            }
         }
 
         return chain.filter(exchange);

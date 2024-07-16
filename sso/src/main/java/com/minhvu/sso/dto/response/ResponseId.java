@@ -1,4 +1,4 @@
-package com.im.sso.dto.response;
+package com.minhvu.sso.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

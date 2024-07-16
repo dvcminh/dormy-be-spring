@@ -1,6 +1,6 @@
-package com.im.sso.repository;
+package com.minhvu.sso.repository;
 
-import com.im.sso.model.AppComponent;
+import com.minhvu.sso.model.AppComponent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

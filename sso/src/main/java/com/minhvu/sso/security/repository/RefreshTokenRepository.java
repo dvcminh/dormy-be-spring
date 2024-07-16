@@ -1,7 +1,7 @@
-package com.im.sso.security.repository;
+package com.minhvu.sso.security.repository;
 
-import com.im.sso.model.AppUser;
-import com.im.sso.security.model.RefreshToken;
+import com.minhvu.sso.model.AppUser;
+import com.minhvu.sso.security.model.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;

@@ -1,4 +1,4 @@
-package com.im.sso.exception;
+package com.minhvu.sso.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

@@ -1,8 +1,8 @@
-package com.im.sso.config;
+package com.minhvu.sso.config;
 
-import com.im.sso.security.exception.JwtAuthenticationEntryPoint;
-import com.im.sso.security.exception.JwtVerifierFilter;
-import com.im.sso.security.service.SecurityUserService;
+import com.minhvu.sso.security.exception.JwtAuthenticationEntryPoint;
+import com.minhvu.sso.security.exception.JwtVerifierFilter;
+import com.minhvu.sso.security.service.SecurityUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,15 +1,15 @@
-package com.im.sso.controller;
+package com.minhvu.sso.controller;
 
 
-import com.im.sso.dto.model.AppComponentDto;
-import com.im.sso.dto.model.AppUserDto;
-import com.im.sso.dto.response.page.PageLink;
-import com.im.sso.dto.response.page.SortOrder;
-import com.im.sso.exception.BadRequestException;
-import com.im.sso.exception.NotFoundException;
-import com.im.sso.model.enums.PermissionType;
-import com.im.sso.service.AppComponentService;
-import com.im.sso.service.UserService;
+import com.minhvu.sso.dto.model.AppComponentDto;
+import com.minhvu.sso.dto.model.AppUserDto;
+import com.minhvu.sso.dto.response.page.PageLink;
+import com.minhvu.sso.dto.response.page.SortOrder;
+import com.minhvu.sso.exception.BadRequestException;
+import com.minhvu.sso.exception.NotFoundException;
+import com.minhvu.sso.model.enums.PermissionType;
+import com.minhvu.sso.service.AppComponentService;
+import com.minhvu.sso.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,12 +48,6 @@ public abstract class BaseController {
             throw new BadRequestException("You aren't authorized to perform this operation.");
         }
         return currentUser;
-    }
-
-    AppUserDto checkUserId(UUID tenantId, UUID userId) {
-        AppUserDto userDto = userService.findUserById(tenantId, userId);
-        checkNotNull(userDto, String.format("User with id [%s] is not found", userId));
-        return userDto;
     }
 
     AppComponentDto checkComponentName(String name) {

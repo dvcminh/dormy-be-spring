@@ -15,6 +15,12 @@ spring:
             allowedMethods: "*"
             allowedHeaders: "*"
       routes:
+        - id: sso-service
+          uri: lb://sso-service
+          predicates:
+            - Path=/sso-service/**
+          filters:
+            - RewritePath=/sso-service/(?<path>.*), /$\{path}
 
 
 eureka:

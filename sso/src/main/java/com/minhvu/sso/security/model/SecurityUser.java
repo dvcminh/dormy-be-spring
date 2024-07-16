@@ -1,7 +1,7 @@
-package com.im.sso.security.model;
+package com.minhvu.sso.security.model;
 
-import com.im.sso.model.AppUser;
-import com.im.sso.model.UserCredential;
+import com.minhvu.sso.model.AppUser;
+import com.minhvu.sso.model.UserCredential;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;

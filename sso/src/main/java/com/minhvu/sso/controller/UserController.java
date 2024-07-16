@@ -1,19 +1,19 @@
-package com.im.sso.controller;
+package com.minhvu.sso.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.im.sso.dto.model.AppUserDto;
-import com.im.sso.dto.model.LogDto;
-import com.im.sso.dto.request.UserActivateRequest;
-import com.im.sso.dto.response.Response;
-import com.im.sso.dto.response.UserProfileResponse;
-import com.im.sso.dto.response.page.PageData;
-import com.im.sso.dto.response.page.PageLink;
-import com.im.sso.exception.BadRequestException;
-import com.im.sso.exception.ForbiddenException;
-import com.im.sso.model.enums.*;
-import com.im.sso.service.LogService;
-import com.im.sso.service.UserCredentialsService;
-import com.im.sso.service.UserService;
+import com.minhvu.sso.dto.model.AppUserDto;
+import com.minhvu.sso.dto.model.LogDto;
+import com.minhvu.sso.dto.request.UserActivateRequest;
+import com.minhvu.sso.dto.response.Response;
+import com.minhvu.sso.dto.response.UserProfileResponse;
+import com.minhvu.sso.dto.response.page.PageData;
+import com.minhvu.sso.dto.response.page.PageLink;
+import com.minhvu.sso.exception.BadRequestException;
+import com.minhvu.sso.exception.ForbiddenException;
+import com.minhvu.sso.model.enums.*;
+import com.minhvu.sso.service.LogService;
+import com.minhvu.sso.service.UserCredentialsService;
+import com.minhvu.sso.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -108,12 +108,9 @@ public class UserController extends BaseController {
             @PathVariable UUID userId
     ) {
         AppUserDto currentUser = getCurrentUser();
-        AppUserDto user = checkUserId(currentUser.getTenantId(), userId);
-        if (user.getAuthority().equals(AuthorityType.SYS_ADMIN.toString())
-                || currentUser.getId().equals(userId)) {
+        if (currentUser.getId().equals(userId)) {
             ObjectMapper objectMapper = new ObjectMapper();
             logService.save(LogDto.builder()
-                    .entityType(EntityType.USER)
                     .entityId(userId)
                     .actionStatus(ActionStatus.FAILURE)
                     .actionType(ActionType.ATTRIBUTES_UPDATED)
@@ -134,9 +131,7 @@ public class UserController extends BaseController {
             @PathVariable UUID userId
     ) {
         AppUserDto currentUser = getCurrentUser();
-        AppUserDto user = checkUserId(currentUser.getTenantId(), userId);
-        if (user.getAuthority().equals(AuthorityType.SYS_ADMIN.toString())
-                || currentUser.getId().equals(userId)) {
+        if (currentUser.getId().equals(userId)) {
             throw new ForbiddenException("SYS_ADMIN is not allowed to deactivate himself.");
         }
         return ResponseEntity.ok(
@@ -149,7 +144,6 @@ public class UserController extends BaseController {
     @Operation(summary = "Reset user password to default (resetUserPassword)")
     public ResponseEntity<Response> resetPassword(@PathVariable UUID userId) {
         AppUserDto currentUser = getCurrentUser();
-        checkUserId(currentUser.getTenantId(), userId);
         userCredentialsService.setPassword(userId);
         return ResponseEntity.ok(
                 new Response(String.format("User with id [%s] reset password successful", userId))

@@ -1,4 +1,4 @@
-package com.im.sso.dto.model;
+package com.minhvu.sso.dto.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;

@@ -1,7 +1,7 @@
-package com.im.sso.dto.mapper;
+package com.minhvu.sso.dto.mapper;
 
-import com.im.sso.dto.model.AppComponentDto;
-import com.im.sso.model.AppComponent;
+import com.minhvu.sso.dto.model.AppComponentDto;
+import com.minhvu.sso.model.AppComponent;
 import org.mapstruct.Mapper;
 
 @Mapper

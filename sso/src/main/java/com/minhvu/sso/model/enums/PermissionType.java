@@ -1,4 +1,4 @@
-package com.im.sso.model.enums;
+package com.minhvu.sso.model.enums;
 
 import java.util.Arrays;
 

@@ -1,4 +1,4 @@
-package com.im.sso.dto.request;
+package com.minhvu.sso.dto.request;
 
 import lombok.Data;
 

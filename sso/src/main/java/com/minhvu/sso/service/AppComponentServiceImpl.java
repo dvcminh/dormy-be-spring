@@ -1,11 +1,11 @@
-package com.im.sso.service;
+package com.minhvu.sso.service;
 
-import com.im.sso.dto.mapper.AppComponentMapper;
-import com.im.sso.dto.model.AppComponentDto;
-import com.im.sso.dto.response.page.PageData;
-import com.im.sso.dto.response.page.PageLink;
-import com.im.sso.model.AppComponent;
-import com.im.sso.repository.AppComponentRepository;
+import com.minhvu.sso.dto.mapper.AppComponentMapper;
+import com.minhvu.sso.dto.model.AppComponentDto;
+import com.minhvu.sso.dto.response.page.PageData;
+import com.minhvu.sso.dto.response.page.PageLink;
+import com.minhvu.sso.model.AppComponent;
+import com.minhvu.sso.repository.AppComponentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

@@ -1,6 +1,6 @@
-package com.im.sso.security.model;
+package com.minhvu.sso.security.model;
 
-import com.im.sso.model.AppUser;
+import com.minhvu.sso.model.AppUser;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,8 +1,6 @@
-package com.im.sso.controller;
+package com.minhvu.sso.controller;
 
-import com.im.sso.dto.response.DataResponse;
-import com.im.sso.service.AppInfoService;
-import com.im.sso.service.UserService;
+import com.minhvu.sso.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -22,15 +20,6 @@ public class NoAuthController extends BaseController {
 
     @Autowired
     UserService userService;
-
-    @Autowired
-    AppInfoService appInfoService;
-
-    @GetMapping("info")
-    @Operation(summary = "Get Application Information")
-    public DataResponse getAppInfo() {
-        return new DataResponse(appInfoService.findInfo());
-    }
 
 //    @GetMapping("user/{userId}/avatar")
 //    @Operation(summary = "Get Avatar User by id (getAvatarUserById)")

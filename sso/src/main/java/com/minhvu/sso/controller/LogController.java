@@ -1,14 +1,12 @@
-package com.im.sso.controller;
+package com.minhvu.sso.controller;
 
-import com.im.sso.dto.model.AppUserDto;
-import com.im.sso.dto.model.LogDto;
-import com.im.sso.dto.response.page.PageData;
-import com.im.sso.dto.response.page.PageLink;
-import com.im.sso.model.enums.ActionStatus;
-import com.im.sso.model.enums.ActionType;
-import com.im.sso.model.enums.EntityType;
-import com.im.sso.service.LogService;
-import io.swagger.v3.oas.annotations.Parameter;
+import com.minhvu.sso.dto.model.AppUserDto;
+import com.minhvu.sso.dto.model.LogDto;
+import com.minhvu.sso.dto.response.page.PageData;
+import com.minhvu.sso.dto.response.page.PageLink;
+import com.minhvu.sso.model.enums.ActionStatus;
+import com.minhvu.sso.model.enums.ActionType;
+import com.minhvu.sso.service.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,8 +26,6 @@ public class LogController extends BaseController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int pageSize,
             @RequestParam(required = false) String searchText,
-            @RequestParam(required = false) EntityType entityType,
-            @RequestParam(required = false) UUID entityId,
             @RequestParam(required = false) UUID userId,
             @RequestParam(required = false) ActionStatus actionStatus,
             @RequestParam(required = false) ActionType actionType,
@@ -45,14 +41,11 @@ public class LogController extends BaseController {
         AppUserDto currentUser = getCurrentUser();
         return logService.findLogs(
                 pageLink,
-                entityType,
-                entityId,
                 userId,
                 actionStatus,
                 actionType,
                 createdAtStartTs,
                 createdAtEndTs,
-                currentUser.getTenantId(),
                 isSearchMatchCase
         );
     }

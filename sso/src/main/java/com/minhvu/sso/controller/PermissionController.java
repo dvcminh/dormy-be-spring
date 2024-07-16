@@ -1,7 +1,7 @@
-package com.im.sso.controller;
+package com.minhvu.sso.controller;
 
-import com.im.sso.dto.response.Response;
-import com.im.sso.service.UserPermissionService;
+import com.minhvu.sso.dto.response.Response;
+import com.minhvu.sso.service.UserPermissionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
@@ -34,19 +34,6 @@ public class PermissionController {
         HttpStatus status = userPermissionService.validateUserPermission(userId, url, method) ?
                 HttpStatus.OK : HttpStatus.UNAUTHORIZED;
         Response response = status.is4xxClientError() ? new Response(status.value(), "You do not have permission to do this action.")
-                : new Response(status.value(), "OK");
-        return ResponseEntity.status(status).body(response);
-    }
-
-    @GetMapping("plan")
-    @Operation(hidden = true)
-    public ResponseEntity<?> validateSubscriptionPlan(
-            @Parameter(description = "Give tenantId to validate")
-            @RequestParam(required = false) UUID tenantId
-    ) {
-        HttpStatus status = userPermissionService.checkUserPlan(tenantId) ?
-                HttpStatus.OK : HttpStatus.UNAUTHORIZED;
-        Response response = status.is4xxClientError() ? new Response(status.value(), "You need to upgrade your plan")
                 : new Response(status.value(), "OK");
         return ResponseEntity.status(status).body(response);
     }

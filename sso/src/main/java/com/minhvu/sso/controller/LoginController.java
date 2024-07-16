@@ -1,24 +1,23 @@
-package com.im.sso.controller;
+package com.minhvu.sso.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.im.sso.dto.model.AppUserDto;
-import com.im.sso.dto.model.LogDto;
-import com.im.sso.dto.request.LoginRequest;
-import com.im.sso.dto.request.RefreshTokenRequest;
-import com.im.sso.dto.response.LoginResponse;
-import com.im.sso.dto.response.Response;
-import com.im.sso.exception.InvalidUsernameOrPassword;
-import com.im.sso.model.AppUser;
-import com.im.sso.model.enums.ActionStatus;
-import com.im.sso.model.enums.ActionType;
-import com.im.sso.model.enums.EntityType;
-import com.im.sso.security.exception.TokenRefreshException;
-import com.im.sso.security.model.RefreshToken;
-import com.im.sso.security.model.SecurityUser;
-import com.im.sso.security.model.token.JwtTokenFactory;
-import com.im.sso.security.service.RefreshTokenService;
-import com.im.sso.security.service.SecurityUserService;
-import com.im.sso.service.LogService;
+import com.minhvu.sso.dto.model.AppUserDto;
+import com.minhvu.sso.dto.model.LogDto;
+import com.minhvu.sso.dto.request.LoginRequest;
+import com.minhvu.sso.dto.request.RefreshTokenRequest;
+import com.minhvu.sso.dto.response.LoginResponse;
+import com.minhvu.sso.dto.response.Response;
+import com.minhvu.sso.exception.InvalidUsernameOrPassword;
+import com.minhvu.sso.model.AppUser;
+import com.minhvu.sso.model.enums.ActionStatus;
+import com.minhvu.sso.model.enums.ActionType;
+import com.minhvu.sso.security.exception.TokenRefreshException;
+import com.minhvu.sso.security.model.RefreshToken;
+import com.minhvu.sso.security.model.SecurityUser;
+import com.minhvu.sso.security.model.token.JwtTokenFactory;
+import com.minhvu.sso.security.service.RefreshTokenService;
+import com.minhvu.sso.security.service.SecurityUserService;
+import com.minhvu.sso.service.LogService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -79,19 +78,17 @@ public class LoginController {
             refreshTokenService.createRefreshToken(securityUser.getUser(), refreshToken);
             ObjectMapper objectMapper = new ObjectMapper();
             logService.save(LogDto.builder()
-                    .entityType(EntityType.USER)
                     .entityId(securityUser.getUser().getId())
                     .actionData(objectMapper.valueToTree(loginRequest))
                     .actionStatus(ActionStatus.SUCCESS)
                     .actionType(ActionType.LOGIN)
-                    .build(), securityUser.getUser().getId(), securityUser.getUser().getTenantId());
+                    .build(), securityUser.getUser().getId());
             return ResponseEntity.ok(
                     new LoginResponse(token, refreshToken, jwtExp)
             );
         } catch (AuthenticationException e) {
             ObjectMapper objectMapper = new ObjectMapper();
             logService.save(LogDto.builder()
-                    .entityType(EntityType.USER)
                     .actionData(objectMapper.valueToTree(loginRequest))
                     .actionStatus(ActionStatus.FAILURE)
                     .actionType(ActionType.LOGIN)
@@ -110,12 +107,11 @@ public class LoginController {
             refreshTokenService.deleteByUserId(userId);
             ObjectMapper objectMapper = new ObjectMapper();
             logService.save(LogDto.builder()
-                    .entityType(EntityType.USER)
                     .entityId(user.getId())
                     .actionData(objectMapper.valueToTree(null))
                     .actionType(ActionType.LOGOUT)
                     .actionStatus(ActionStatus.SUCCESS)
-                    .build(), user.getId(), user.getTenantId());
+                    .build(), user.getId());
         }
         return ResponseEntity.ok(new Response("You've been signed out!"));
     }
@@ -133,18 +129,16 @@ public class LoginController {
                     refreshTokenService.createRefreshToken(securityUser.getUser(), refreshToken);
                     ObjectMapper objectMapper = new ObjectMapper();
                     logService.save(LogDto.builder()
-                                    .entityType(EntityType.USER)
                                     .entityId(securityUser.getUser().getId())
                                     .actionStatus(ActionStatus.SUCCESS)
                                     .actionData(objectMapper.valueToTree(request))
                                     .actionType(ActionType.LOGIN).build(),
-                            securityUser.getUser().getId(), securityUser.getUser().getTenantId());
+                            securityUser.getUser().getId());
                     return ResponseEntity.ok(new LoginResponse(token, refreshToken, jwtExp));
                 })
                 .orElseThrow(() -> {
                     ObjectMapper objectMapper = new ObjectMapper();
                     logService.save(LogDto.builder()
-                            .entityType(EntityType.USER)
                             .actionData(objectMapper.valueToTree(request))
                             .actionStatus(ActionStatus.FAILURE)
                             .actionType(ActionType.LOGIN)

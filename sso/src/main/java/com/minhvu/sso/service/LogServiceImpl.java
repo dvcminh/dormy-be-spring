@@ -1,16 +1,15 @@
-package com.im.sso.service;
+package com.minhvu.sso.service;
 
-import com.im.sso.dto.mapper.LogMapper;
-import com.im.sso.dto.model.AppUserDto;
-import com.im.sso.dto.model.LogDto;
-import com.im.sso.dto.response.page.PageData;
-import com.im.sso.dto.response.page.PageLink;
-import com.im.sso.exception.BadRequestException;
-import com.im.sso.model.Log;
-import com.im.sso.model.enums.ActionStatus;
-import com.im.sso.model.enums.ActionType;
-import com.im.sso.model.enums.EntityType;
-import com.im.sso.repository.LogRepository;
+import com.minhvu.sso.dto.mapper.LogMapper;
+import com.minhvu.sso.dto.model.AppUserDto;
+import com.minhvu.sso.dto.model.LogDto;
+import com.minhvu.sso.dto.response.page.PageData;
+import com.minhvu.sso.dto.response.page.PageLink;
+import com.minhvu.sso.exception.BadRequestException;
+import com.minhvu.sso.model.Log;
+import com.minhvu.sso.model.enums.ActionStatus;
+import com.minhvu.sso.model.enums.ActionType;
+import com.minhvu.sso.repository.LogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
@@ -38,7 +37,6 @@ public class LogServiceImpl implements LogService {
         Log log = new Log();
         BeanUtils.copyProperties(logDto, log, "createdAt", "createdBy", "actionData");
         log.setCreatedBy(currentUser == null ? null : currentUser.getId());
-        log.setTenantId(currentUser == null ? null : currentUser.getTenantId());
         log.setActionData(logDto.getActionData().toString());
 
         Log savedLog = logRepository.save(log);
@@ -47,22 +45,19 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    public LogDto save(LogDto logDto, UUID currentUserId, UUID tenantId) {
+    public LogDto save(LogDto logDto, UUID currentUserId) {
         AppUserDto appUserDto = new AppUserDto();
         appUserDto.setId(currentUserId);
-        appUserDto.setTenantId(tenantId);
         return save(logDto, appUserDto);
     }
 
     @Override
     public PageData<LogDto> findLogs(
             PageLink pageLink,
-            EntityType entityType, UUID entityId,
             UUID userId, ActionStatus actionStatus,
             ActionType actionType,
             Long createdAtStartTs,
             Long createdAtEndTs,
-            UUID tenantId,
             Boolean isSearchMatchCase
     ) {
         Pageable pageable = PageRequest.of(pageLink.getPage(), pageLink.getPageSize(), pageLink.toSort(pageLink.getSortOrder()));
@@ -80,14 +75,11 @@ public class LogServiceImpl implements LogService {
         Page<Log> logPage = logRepository.findLogs(
                 searchText,
                 isSearchMatchCase,
-                entityType,
-                entityId,
                 userId,
                 actionStatus,
                 actionType,
                 convertTimestampToDateTime(createdAtStartTs),
                 convertTimestampToDateTime(createdAtEndTs),
-                tenantId,
                 pageable
         );
 

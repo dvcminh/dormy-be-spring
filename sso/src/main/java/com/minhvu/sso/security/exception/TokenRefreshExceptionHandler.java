@@ -1,6 +1,6 @@
-package com.im.sso.security.exception;
+package com.minhvu.sso.security.exception;
 
-import com.im.sso.dto.response.Response;
+import com.minhvu.sso.dto.response.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;

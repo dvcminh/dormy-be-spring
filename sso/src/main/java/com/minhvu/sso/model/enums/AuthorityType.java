@@ -1,10 +1,9 @@
-package com.im.sso.model.enums;
+package com.minhvu.sso.model.enums;
 
 import java.util.Arrays;
 
 public enum AuthorityType {
     SYS_ADMIN,
-    TENANT_ADMIN,
     CUSTOMER_USER;
 
     public static AuthorityType lookup(final String id) {

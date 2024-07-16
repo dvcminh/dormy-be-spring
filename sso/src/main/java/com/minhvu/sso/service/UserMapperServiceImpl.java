@@ -1,8 +1,8 @@
-package com.im.sso.service;
+package com.minhvu.sso.service;
 
-import com.im.sso.dto.mapper.AppUserMapper;
-import com.im.sso.dto.model.AppUserDto;
-import com.im.sso.repository.AppUserRepository;
+import com.minhvu.sso.dto.mapper.AppUserMapper;
+import com.minhvu.sso.dto.model.AppUserDto;
+import com.minhvu.sso.repository.AppUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

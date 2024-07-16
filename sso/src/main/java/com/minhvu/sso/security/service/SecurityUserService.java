@@ -1,10 +1,10 @@
-package com.im.sso.security.service;
+package com.minhvu.sso.security.service;
 
-import com.im.sso.model.AppUser;
-import com.im.sso.model.UserCredential;
-import com.im.sso.repository.AppUserRepository;
-import com.im.sso.repository.UserCredentialsRepository;
-import com.im.sso.security.model.SecurityUser;
+import com.minhvu.sso.model.AppUser;
+import com.minhvu.sso.model.UserCredential;
+import com.minhvu.sso.repository.AppUserRepository;
+import com.minhvu.sso.repository.UserCredentialsRepository;
+import com.minhvu.sso.security.model.SecurityUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

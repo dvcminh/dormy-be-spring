@@ -1,4 +1,4 @@
-package com.im.sso.model;
+package com.minhvu.sso.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;

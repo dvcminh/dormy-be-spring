@@ -1,9 +1,8 @@
-package com.im.sso.dto.model;
+package com.minhvu.sso.dto.model;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.im.sso.model.enums.ActionStatus;
-import com.im.sso.model.enums.ActionType;
-import com.im.sso.model.enums.EntityType;
+import com.minhvu.sso.model.enums.ActionStatus;
+import com.minhvu.sso.model.enums.ActionType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,9 +17,7 @@ import java.util.UUID;
 @Builder
 public class LogDto {
     private UUID id;
-    private UUID tenantId;
     private UUID entityId;
-    private EntityType entityType;
     private AppUserDto createdBy;
     private JsonNode actionData;
     private ActionStatus actionStatus;
