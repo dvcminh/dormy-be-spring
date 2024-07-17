@@ -25,6 +25,7 @@
         <module>api-gateway</module>
         <module>discorvery-server</module>
         <module>sso</module>
+        <module>review</module>
     </modules>
     <scm>
         <connection/>
