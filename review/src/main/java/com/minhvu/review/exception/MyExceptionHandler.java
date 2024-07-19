@@ -1,6 +1,6 @@
 package com.minhvu.review.exception;
 
-import com.minhvu.sso.dto.response.Response;
+import com.minhvu.review.dto.response.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;

@@ -80,6 +80,8 @@ services:
       - "5050:80"
     depends_on:
       - dormy-data
+    restart: on-failure
+
 
 volumes:
   pgadmin4_data: { }
