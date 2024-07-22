@@ -1,27 +1,25 @@
-package com.minhvu.review.model;
+package com.minhvu.review.dto.model;
 
-import lombok.*;
+import com.minhvu.review.model.ReviewPhoto;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
 import javax.persistence.OneToMany;
-import javax.persistence.Table;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-@Setter
-@Getter
-@Entity
-@Table(name = "reviews")
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
-@Builder
-public class Review extends BaseEntity{
+public class ReviewDto {
+    private UUID id;
+    private UUID reviewer;
     private String title;
     private Date date;
     private String content;
     private int rating;
-    private UUID reviewer;
     @OneToMany(mappedBy = "review")
     private List<ReviewPhoto> reviewPhotoList;
+    private Date createdAt;
 }
