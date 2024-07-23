@@ -27,6 +27,7 @@
         <module>sso</module>
         <module>review</module>
         <module>notification-server</module>
+        <module>interaction-server</module>
     </modules>
     <scm>
         <connection/>
