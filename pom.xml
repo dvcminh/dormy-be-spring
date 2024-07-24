@@ -26,8 +26,8 @@
         <module>discorvery-server</module>
         <module>sso</module>
         <module>review</module>
-        <module>notification-server</module>
-        <module>interaction-server</module>
+        <module>notification</module>
+        <module>interaction</module>
     </modules>
     <scm>
         <connection/>

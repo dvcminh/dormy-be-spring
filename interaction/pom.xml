@@ -9,7 +9,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>notification-server</artifactId>
+    <artifactId>interaction</artifactId>
 
     <properties>
         <maven.compiler.source>19</maven.compiler.source>
