@@ -28,6 +28,6 @@ public class AppUserDto implements Serializable {
     private UUID contactId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private LocalDateTime createdBy;
-    private LocalDateTime updatedBy;
+    private UUID createdBy;
+    private UUID updatedBy;
 }
