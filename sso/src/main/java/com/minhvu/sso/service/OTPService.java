@@ -2,6 +2,7 @@ package com.minhvu.sso.service;
 
 import com.minhvu.sso.model.OTP;
 import com.minhvu.sso.repository.OTPRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -14,6 +15,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class OTPService {
     private static final int OTP_LENGTH = 6;
     private static final int OTP_EXPIRATION_MINUTES = 5;
@@ -31,7 +33,7 @@ public class OTPService {
         OTP otpEntity = new OTP(email, otp, expirationTime);
         otpRepository.save(otpEntity);
 
-        emailService.sendOTPEmail(email.trim(), otp);
+        emailService.sendOTPEmail(email, otp);
 
         return otp;
     }
@@ -40,6 +42,8 @@ public class OTPService {
         if (email == null || otp == null || email.isEmpty() || otp.isEmpty()) {
             throw new IllegalArgumentException("Email and OTP must not be null or empty");
         }
+
+
 
         Optional<OTP> otpEntity = otpRepository.findByEmail(email);
         if (otpEntity.isEmpty()) {
