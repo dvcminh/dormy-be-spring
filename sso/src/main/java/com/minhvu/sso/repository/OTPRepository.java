@@ -10,5 +10,6 @@ import java.util.UUID;
 
 @Repository
 public interface OTPRepository extends CrudRepository<OTP, String> {
-    Optional<OTP> findByEmail(String email);
+
+    Optional<OTP> findByEmailIgnoreCase(String email);
 }

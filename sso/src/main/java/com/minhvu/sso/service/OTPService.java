@@ -30,8 +30,13 @@ public class OTPService {
         String otp = generateRandomOTP();
         LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(OTP_EXPIRATION_MINUTES);
 
-        OTP otpEntity = new OTP(email, otp, expirationTime);
+        OTP otpEntity = OTP.builder()
+                .email(email)
+                .otp(otp)
+                .expirationTime(expirationTime)
+                .build();
         otpRepository.save(otpEntity);
+        log.info("Saved OTP: " + otpEntity);
 
         emailService.sendOTPEmail(email, otp);
 
@@ -43,9 +48,8 @@ public class OTPService {
             throw new IllegalArgumentException("Email and OTP must not be null or empty");
         }
 
-
-
-        Optional<OTP> otpEntity = otpRepository.findByEmail(email);
+        Optional<OTP> otpEntity = otpRepository.findById(email);
+        log.info("Retrieved OTP: " + otpEntity);
         if (otpEntity.isEmpty()) {
             throw new IllegalArgumentException("OTP not found");
         }
