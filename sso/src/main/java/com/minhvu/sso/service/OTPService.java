@@ -1,5 +1,6 @@
 package com.minhvu.sso.service;
 
+import com.minhvu.sso.exception.NotFoundException;
 import com.minhvu.sso.model.OTP;
 import com.minhvu.sso.repository.OTPRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -48,24 +49,19 @@ public class OTPService {
             throw new IllegalArgumentException("Email and OTP must not be null or empty");
         }
 
-        Optional<OTP> otpEntity = otpRepository.findById(email);
+        OTP otpEntity = otpRepository.findById(email).orElseThrow(() -> new NotFoundException("OTP not found"));
         log.info("Retrieved OTP: " + otpEntity);
-        if (otpEntity.isEmpty()) {
-            throw new IllegalArgumentException("OTP not found");
-        }
 
-        OTP storedOTP = otpEntity.get();
-        if (LocalDateTime.now().isAfter(storedOTP.getExpirationTime())) {
-            otpRepository.delete(storedOTP);
+        if (LocalDateTime.now().isAfter(otpEntity.getExpirationTime())) {
+            otpRepository.delete(otpEntity);
             throw new IllegalArgumentException("OTP expired");
         }
 
-        if (!storedOTP.getOtp().equals(otp)) {
-            throw new IllegalArgumentException("Invalid OTP");
+        if (otpEntity.getOtp().equals(otp)) {
+            otpRepository.delete(otpEntity);
+            return true;
         }
-
-        otpRepository.delete(storedOTP);
-        return true;
+        return false;
     }
 
     private String generateRandomOTP() {
