@@ -35,12 +35,7 @@ public class ReviewServiceImpl implements ReviewService {
     public ReviewDto createReview(CreateReviewRequest createReviewRequest) {
         List<ReviewPhoto> reviewPhotoList = new ArrayList<>();
         for (CreateReviewPhotoRequest createReviewPhotoRequest : createReviewRequest.getReviewPhotoList()) {
-            reviewPhotoList.add(
-                    reviewPhotoService.createReviewPhoto(
-                            createReviewPhotoRequest.getPhotoUrl(),
-                            createReviewPhotoRequest.getPhotoDescription()
-                    )
-            );
+            reviewPhotoList.add(reviewPhotoService.createReviewPhoto(createReviewPhotoRequest));
 
         }
             Review createRevew = Review.builder()
@@ -56,12 +51,7 @@ public class ReviewServiceImpl implements ReviewService {
     public ReviewDto updateReview(UUID reviewId, CreateReviewRequest createReviewRequest) {
         List<ReviewPhoto> reviewPhotoList = new ArrayList<>();
         for (CreateReviewPhotoRequest createReviewPhotoRequest : createReviewRequest.getReviewPhotoList()) {
-            reviewPhotoList.add(
-                    reviewPhotoService.createReviewPhoto(
-                            createReviewPhotoRequest.getPhotoUrl(),
-                            createReviewPhotoRequest.getPhotoDescription()
-                    )
-            );
+            reviewPhotoList.add(reviewPhotoService.createReviewPhoto(createReviewPhotoRequest));
         }
         Review review = reviewRepository.findByReviewer(reviewId);
         review.setContent(createReviewRequest.getContent());
