@@ -2,18 +2,25 @@ package com.minhvu.review.service;
 
 import com.minhvu.review.dto.mapper.ReviewMapper;
 import com.minhvu.review.dto.model.ReviewDto;
+import com.minhvu.review.dto.request.CreateReviewPhotoRequest;
 import com.minhvu.review.dto.request.CreateReviewRequest;
 import com.minhvu.review.model.Review;
+import com.minhvu.review.model.ReviewPhoto;
 import com.minhvu.review.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+
 @RequiredArgsConstructor
 @Service
 public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
     private final ReviewMapper reviewMapper;
+    private final ReviewPhotoService reviewPhotoService;
+
     @Override
     public ReviewDto findByReviewId(UUID reviewId) {
         return reviewMapper.toDto(reviewRepository.findByReviewer(reviewId));
@@ -26,21 +33,40 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public ReviewDto createReview(CreateReviewRequest createReviewRequest) {
-        Review createRevew = Review.builder()
+        List<ReviewPhoto> reviewPhotoList = new ArrayList<>();
+        for (CreateReviewPhotoRequest createReviewPhotoRequest : createReviewRequest.getReviewPhotoList()) {
+            reviewPhotoList.add(
+                    reviewPhotoService.createReviewPhoto(
+                            createReviewPhotoRequest.getPhotoUrl(),
+                            createReviewPhotoRequest.getPhotoDescription()
+                    )
+            );
+
+        }
+            Review createRevew = Review.builder()
                 .reviewer(createReviewRequest.getReviewer())
                 .content(createReviewRequest.getContent())
                 .title(createReviewRequest.getTitle())
-                .reviewPhotoList(createReviewRequest.getReviewPhotoList())
+                .reviewPhotoList(reviewPhotoList)
                 .build();
         return reviewMapper.toDto(reviewRepository.save(createRevew));
     }
 
     @Override
     public ReviewDto updateReview(UUID reviewId, CreateReviewRequest createReviewRequest) {
+        List<ReviewPhoto> reviewPhotoList = new ArrayList<>();
+        for (CreateReviewPhotoRequest createReviewPhotoRequest : createReviewRequest.getReviewPhotoList()) {
+            reviewPhotoList.add(
+                    reviewPhotoService.createReviewPhoto(
+                            createReviewPhotoRequest.getPhotoUrl(),
+                            createReviewPhotoRequest.getPhotoDescription()
+                    )
+            );
+        }
         Review review = reviewRepository.findByReviewer(reviewId);
         review.setContent(createReviewRequest.getContent());
         review.setTitle(createReviewRequest.getTitle());
-        review.setReviewPhotoList(createReviewRequest.getReviewPhotoList());
+        review.setReviewPhotoList(reviewPhotoList);
         return reviewMapper.toDto(reviewRepository.save(review));
     }
 

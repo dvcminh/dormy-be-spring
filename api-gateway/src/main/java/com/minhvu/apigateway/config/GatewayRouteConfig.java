@@ -36,6 +36,10 @@ public class GatewayRouteConfig {
                                         "/api/admin/whiteLabel**", "/api/admin/whiteLabel/**")
                                 .filters(f -> f.filter(filter))
                                 .uri("lb://sso-service"))
+                .route("review-service",
+                        r -> r.path("/api/review/**")
+                                .filters(f -> f.filter(filter))
+                                .uri("lb://review-service"))
                 .build();
     }
 

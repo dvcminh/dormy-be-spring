@@ -1,6 +1,5 @@
 package com.minhvu.review.dto.request;
 
-import com.minhvu.review.model.ReviewPhoto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,5 +12,5 @@ public class CreateReviewRequest {
     private UUID reviewer;
     private String title;
     private String content;
-    private List<ReviewPhoto> reviewPhotoList;
+    private List<CreateReviewPhotoRequest> reviewPhotoList;
 }

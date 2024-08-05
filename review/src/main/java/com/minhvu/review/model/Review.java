@@ -17,6 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class Review extends BaseEntity{
+    private String imageUrl;
     private String title;
     private Date date;
     private String content;
