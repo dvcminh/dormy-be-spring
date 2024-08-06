@@ -2,9 +2,7 @@ package com.minhvu.review.model;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import jakarta.persistence.*;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;

@@ -2,11 +2,11 @@ package com.minhvu.notification.model;
 
 import com.minhvu.notification.model.enums.Authority;
 import com.minhvu.notification.model.enums.Role;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 

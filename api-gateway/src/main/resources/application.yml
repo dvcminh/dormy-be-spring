@@ -18,15 +18,14 @@ spring:
         - id: sso-service
           uri: lb://sso-service
           predicates:
-            - Path=/sso-service/**
-          filters:
-            - RewritePath=/sso-service/(?<path>.*), /$\{path}
+            - Path=/api/auth/**
+
         - id: review-service
           uri: lb://review-service
           predicates:
             - Path=/review-service/**
           filters:
-            - RewritePath=/review-service/(?<path>.*), /$\{path}
+            - AuthenticationFilter
 
 
 eureka:

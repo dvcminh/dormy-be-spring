@@ -48,7 +48,7 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
 
 
     private HttpStatus determineHttpStatus(Throwable error) {
-        return error instanceof ResponseStatusException err ? err.getStatus() : MergedAnnotations.from(error.getClass(),
+        return error instanceof ResponseStatusException err ? (HttpStatus) err.getStatusCode() : MergedAnnotations.from(error.getClass(),
                 MergedAnnotations.SearchStrategy.TYPE_HIERARCHY).get(ResponseStatus.class).getValue(ErrorAttributesKey.STATUS.getKey(),
                 HttpStatus.class).orElse(HttpStatus.INTERNAL_SERVER_ERROR);
     }

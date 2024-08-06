@@ -3,13 +3,18 @@ package com.minhvu.notification.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.minhvu.notification.dto.mapper.AppUserMapper;
 import com.minhvu.notification.dto.model.AppUserDto;
 import com.minhvu.notification.dto.page.PageLink;
+import com.minhvu.notification.exception.BadRequestException;
 import com.minhvu.notification.exception.UnauthorizedException;
+import com.minhvu.notification.model.AppUser;
+import com.minhvu.notification.repository.AppUserRepository;
 import com.minhvu.notification.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 
-import javax.servlet.http.HttpServletRequest;
+import java.net.http.HttpRequest;
 import java.util.Base64;
 import java.util.Map;
 import java.util.UUID;
@@ -24,17 +29,17 @@ public abstract class BaseController {
     public PageLink createPageLink(int page, int pageSize) {
         return new PageLink(page, pageSize);
     }
-
-    protected AppUserDto getCurrentUser(HttpServletRequest request) {
-        try {
-            Map<String, Object> jwt = parseJwt(request.getHeader("Authorization"));
-            AppUserDto currentUser = userService.findByUserId(UUID.fromString((String) jwt.get("userId")));
-            if (currentUser == null)
-                throw new UnauthorizedException("You aren't authorized to perform this operation.");
-            else return currentUser;
-        } catch (JsonProcessingException ex) {
-            throw new RuntimeException(ex);
+    @Autowired
+    private AppUserRepository appUserRepository;
+    @Autowired
+    private AppUserMapper appUserMapper;
+    protected AppUserDto getCurrentUser() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        AppUser currentUser = appUserRepository.findByUsername(username).get();
+        if (currentUser == null) {
+            throw new BadRequestException("You aren't authorized to perform this operation.");
         }
+        return appUserMapper.toDto(currentUser);
     }
 
     Map<String, Object> parseJwt(String token) throws JsonProcessingException {

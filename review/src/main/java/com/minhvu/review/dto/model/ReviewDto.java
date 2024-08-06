@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.OneToMany;
+import jakarta.persistence.OneToMany;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
