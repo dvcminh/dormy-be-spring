@@ -1,16 +1,25 @@
 package com.minhvu.authservice.service;
 
-import com.minhvu.authservice.dto.ChangePasswordRequest;
+import com.minhvu.authservice.dto.AppUserDto;
 import com.minhvu.authservice.dto.RegisterRequest;
 import com.minhvu.authservice.dto.UpdateUserInformationRequest;
-import com.minhvu.authservice.entity.User;
+import com.minhvu.authservice.entity.AppUser;
+import com.minhvu.authservice.entity.Role;
+import com.minhvu.authservice.entity.SecurityUser;
 import com.minhvu.authservice.exception.UserNotFoundException;
 import com.minhvu.authservice.exception.response.UserErrorResponse;
-import com.minhvu.authservice.repository.UserCredentialRepository;
-import com.minhvu.authservice.repository.UserRepository;
+import com.minhvu.authservice.mapper.UserMapper;
+import com.minhvu.authservice.repository.UserCredentialsRepository;
+import com.minhvu.authservice.repository.UserCredentialsService;
+import com.minhvu.authservice.repository.AppUserRepository;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import jakarta.ws.rs.BadRequestException;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -21,110 +30,62 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.security.Key;
+import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Data
 public class AuthService {
-
     @Autowired
-    private UserCredentialRepository repository;
+    private AppUserRepository appUserRepository;
+    @Autowired
+    private UserCredentialsService userCredentialService;
+    @Autowired
+    private UserMapper userMapper;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
     private JwtService jwtService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtService = jwtService;
+    @Value("${jwt.secret}")
+    private String jwtSecret;
+    private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+
+    public String generateToken(SecurityUser userDetails, Long time) {
+        String username = userDetails.getUsername();
+        Date currentDate = new Date();
+        Date expireDate = new Date(currentDate.getTime() + time);
+
+        String token = Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(expireDate)
+                .signWith(key, SignatureAlgorithm.HS512)
+                .compact();
+
+        return token;
     }
 
-    public String saveUser(RegisterRequest credential) {
-        if (userRepository.existsByNameAllIgnoreCase(credential.getName())) {
+    public AppUserDto signUp(RegisterRequest registerRequest) {
+        if (appUserRepository.existsByEmailIgnoreCase(registerRequest.getEmail())) {
             throw new BadRequestException("Username is already taken!");
         }
-        var user = User.builder()
-                .name(credential.getName())
-                .email(credential.getEmail())
-                .password(passwordEncoder.encode(credential.getPassword()))
-                .role(credential.getRole())
-                .address(credential.getAddress())
-                .phone_number(credential.getPhone_number())
-                .avatar(credential.getAvatar())
-                .build();
-        repository.save(user);
-        return "user added to the system";
+
+        AppUser newUser = appUserRepository.save(
+                AppUser.builder()
+                        .name(registerRequest.getName())
+                        .email(registerRequest.getEmail())
+                        .address(registerRequest.getAddress())
+                        .phone_number(registerRequest.getPhone_number())
+                        .avatar(registerRequest.getAvatar())
+                        .role(Role.CUSTOMER)
+                        .build()
+        );
+
+        userCredentialService.setPassword(newUser.getId(), registerRequest.getPassword());
+        return userMapper.toDto(newUser);
     }
 
-    public String generateToken(String username) {
-        return jwtService.generateToken(username);
-    }
-
-    public void validateToken(String token) {
-        jwtService.validateToken(token);
-    }
-
-    public User getUserByUserName(String name) {
-        return userRepository.findByName(name)
-                .orElseThrow(() -> new UserNotFoundException(String.format("User with email %s not found", name)));
-    }
-
-    public Optional<User> getAuthenticatedUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        return userRepository.findByName(username);
-    }
-
-    public Page<User> getAllUsers(Pageable pageable) {
-        return userRepository.findAll(pageable);
-    }
-
-    public String updateUser(UpdateUserInformationRequest userDto) {
-        Optional<User> user = userRepository.findById(userDto.getId());
-        if (user.isPresent()) {
-            user.get().setName(userDto.getName());
-            user.get().setEmail(userDto.getEmail());
-            user.get().setAddress(userDto.getAddress());
-            user.get().setPhone_number(userDto.getPhone());
-            user.get().setAvatar(userDto.getAvatar());
-            userRepository.save(user.get());
-            return "User updated successfully";
-        } else {
-            throw new UserNotFoundException("User not found");
-        }
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<UserErrorResponse> handleException(UserNotFoundException exception) {
-        UserErrorResponse userErrorResponse = new UserErrorResponse();
-        userErrorResponse.setStatus(HttpStatus.NOT_FOUND.value());
-        userErrorResponse.setMessage(exception.getMessage());
-        userErrorResponse.setTimeStamp(System.currentTimeMillis());
-        return new ResponseEntity<>(userErrorResponse, HttpStatus.NOT_FOUND);
-    }
-
-    public void updateUser(User user, String newPassword) {
-
-        user.setPassword(passwordEncoder.encode(newPassword));
-            userRepository.save(user);
-
-    }
-
-    public String changePassword(ChangePasswordRequest request) {
-        Optional<User> user = userRepository.findById(request.getId());
-        if (user.isPresent()) {
-            user.get().setPassword(passwordEncoder.encode(request.getNewPassword()));
-            userRepository.save(user.get());
-            return "Password changed successfully";
-        } else {
-            throw new UserNotFoundException("User not found");
-        }
-    }
-
-    public void deleteUser(String id) {
-        userRepository.deleteById(id);
-    }
 }

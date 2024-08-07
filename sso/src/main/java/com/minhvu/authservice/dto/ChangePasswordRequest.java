@@ -1,27 +1,19 @@
 package com.minhvu.authservice.dto;
 
-import lombok.Builder;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
-@Builder
+
 @Data
 public class ChangePasswordRequest {
-    private String id;
-    private String currentPassword;
+
+    @NotEmpty(message = "old password may not be empty")
+    @Size(min = 8, max = 255)
+    private String oldPassword;
+
+    @NotEmpty(message = "new password may not be empty")
+    @Size(min = 8, max = 255)
     private String newPassword;
-    private String confirmationPassword;
 
-    public ChangePasswordRequest() {
-    }
-
-    public ChangePasswordRequest(String id, String currentPassword, String newPassword, String confirmationPassword) {
-        this.id = id;
-        this.currentPassword = currentPassword;
-        this.newPassword = newPassword;
-        this.confirmationPassword = confirmationPassword;
-    }
 }

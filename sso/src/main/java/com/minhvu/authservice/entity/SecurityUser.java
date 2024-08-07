@@ -1,48 +1,43 @@
 package com.minhvu.authservice.entity;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
-@Table(name = "_users")
-@Entity
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 @Data
-public class User implements UserDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
-    private String password;
-    private String email;
-    private String name;
-    private String phone_number;
-    private String address;
-    private String avatar;
+@ToString
+@AllArgsConstructor
+public class SecurityUser implements UserDetails {
+    private AppUser user;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    private UserCredential userCredential;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return role.getAuthorities();
+        return getGrantedAuthorities(user.getRole().name());
+    }
+
+    private List<GrantedAuthority> getGrantedAuthorities(final String authority) {
+        final List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(authority));
+        return authorities;
     }
 
     @Override
     public String getPassword() {
-        return password;
+        return userCredential.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return name;
+        return user.getEmail();
     }
 
     @Override
@@ -62,6 +57,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return userCredential.isEnabled();
     }
+
 }

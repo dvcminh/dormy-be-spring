@@ -1,17 +1,29 @@
 package com.minhvu.authservice.controller;
 
-import com.minhvu.authservice.config.CustomUserDetailsService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.minhvu.authservice.service.SecurityUserService;
 import com.minhvu.authservice.dto.*;
-import com.minhvu.authservice.entity.User;
+import com.minhvu.authservice.dto.request.RefreshTokenRequest;
+import com.minhvu.authservice.dto.response.LoginResponse;
+import com.minhvu.authservice.dto.response.Response;
+import com.minhvu.authservice.entity.AppUser;
+import com.minhvu.authservice.entity.RefreshToken;
+import com.minhvu.authservice.entity.SecurityUser;
 import com.minhvu.authservice.event.ChangePasswordEvent;
+import com.minhvu.authservice.exception.TokenRefreshException;
 import com.minhvu.authservice.mapper.UserMapper;
+import com.minhvu.authservice.repository.UserCredentialsService;
 import com.minhvu.authservice.service.AuthService;
+import com.minhvu.authservice.service.RefreshTokenService;
+import com.minhvu.authservice.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,105 +32,104 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/auth")
 @Slf4j
-public class AuthController {
+public class AuthController extends BaseController{
     @Autowired
-    private AuthService service;
-
+    private AuthService authService;
+    @Autowired
+    private SecurityUserService securityUserService;
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
-    private UserMapper userMapper;
+    private UserService userService;
     @Autowired
-    private CustomUserDetailsService userDetailsService;
+    private UserCredentialsService userCredentialsService;
+    @Value(value = "${jwt.exp}")
+    private Long jwtExp;
+
+    @Value(value = "${jwt.refreshExp}")
+    private Long jwtRefreshExp;
     @Autowired
-    private KafkaTemplate<String, ChangePasswordEvent> kafkaTemplate;
+    private RefreshTokenService refreshTokenService;
 
-    public AuthController(AuthService authService) {
-        this.service = authService;
-    }
-
-    @PostMapping("/register")
-    public String addNewUser(@RequestBody RegisterRequest user) {
-        return service.saveUser(user);
+    @PostMapping("/signup")
+    @Operation(summary = "Sign Up Customer (signUp)")
+    public ResponseEntity<AppUserDto> signUp(
+            @RequestBody RegisterRequest registerRequest
+    ) {
+        return ResponseEntity.ok(
+                authService.signUp(registerRequest)
+        );
     }
 
     @PostMapping("/login")
-    public String getToken(@RequestBody AuthenticationRequest authRequest) {
-        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authenticate);
-        if (authenticate.isAuthenticated()) {
-            return service.generateToken(authRequest.getEmail());
-        } else {
+    public ResponseEntity<LoginResponse> getToken(@RequestBody AuthenticationRequest authRequest) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    authRequest.getEmail(),
+                    authRequest.getPassword()
+            ));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
+
+            String token = authService.generateToken(securityUser, jwtExp);
+            String refreshToken = authService.generateToken(securityUser, jwtRefreshExp);
+            refreshTokenService.createRefreshToken(securityUser.getUser(), refreshToken);
+            return ResponseEntity.ok(new LoginResponse(token, refreshToken, jwtExp));
+        } catch (Exception e) {
             throw new RuntimeException("invalid access");
         }
     }
+    @PostMapping("token")
+    @Operation(summary = "Refresh Token (refreshToken)")
+    public ResponseEntity<LoginResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
+        return refreshTokenService.findByToken(request.getRefreshToken())
+                .map(refreshTokenService::verifyExpiration)
+                .map(RefreshToken::getUser)
+                .map(user -> {
+                    SecurityUser securityUser = securityUserService.loadUserByUsername(user.getEmail());
+                    String token = authService.generateToken(securityUser, jwtExp);
+                    String refreshToken = authService.generateToken(securityUser, jwtRefreshExp);
+                    refreshTokenService.createRefreshToken(securityUser.getUser(), refreshToken);
 
-    @GetMapping("/validate")
-    public String validateToken(@RequestParam("token") String token) {
-        service.validateToken(token);
-        return "Token is valid";
-    }
-
-    @GetMapping("/me")
-    public UserDto getCurrentUser2(@RequestParam("name") String name) {
-        return userMapper.toUserDto(service.getUserByUserName(name));
+                    return ResponseEntity.ok(new LoginResponse(token, refreshToken, jwtExp));
+                })
+                .orElseThrow(() -> {
+                    return new TokenRefreshException(
+                            request.getRefreshToken(),
+                            "Refresh token is not found!"
+                    );
+                });
     }
 
     @GetMapping("/getAllUsers")
-    public ResponseEntity<Page<User>> getAllUsers(
+    public ResponseEntity<Page<AppUser>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") Sort.Direction direction
     ) {
-        Page<User> userPage = service.getAllUsers(PageRequest.of(page, size, Sort.by(direction, sortBy)));
+        Page<AppUser> userPage = userService.getAllUsers(PageRequest.of(page, size, Sort.by(direction, sortBy)));
         return ResponseEntity.ok(userPage);
     }
-    @PostMapping("/reset-password")
-    public ResponseEntity<String> resetPassword(@RequestParam("email") String email) {
-
-        System.out.println(email);
-
-        String newPassword = generateRandomPassword();
-        //        sendPasswordEmail(email, newPassword);
-
-        User user = service.getUserByUserName(email);
-
-        if (user == null) {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
-        }
-
-        service.updateUser(user, newPassword);
-        
-        kafkaTemplate.send("change-password", new ChangePasswordEvent(email, newPassword));
-
-        return new ResponseEntity<>(newPassword, HttpStatus.OK);
-    }
-
-
-
-    private String generateRandomPassword() {
-        int password = (int) (Math.random() * 900000) + 100000;
-        return String.valueOf(password);
+    @PostMapping("password/change")
+    @Operation(summary = "Change password for current user (changePassword)")
+    public ResponseEntity<Response> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
+        AppUserDto currentUser = getCurrentUser();
+        userCredentialsService.changePassword(currentUser, changePasswordRequest);
+        return ResponseEntity.ok(new Response("Password updated successfully"));
     }
     @PostMapping("/updateUser")
     public String updateUser(@RequestBody UpdateUserInformationRequest userDto) {
-        return service.updateUser(userDto);
+        return userService.updateUser(userDto);
     }
-
-    @PatchMapping("/changePassword")
-    public ResponseEntity<String> changePassword(
-            @RequestBody ChangePasswordRequest request
-    ) {
-        return ResponseEntity.ok(service.changePassword(request));
-    }
-
     @DeleteMapping("/deleteUser/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable String id) {
-        service.deleteUser(id);
+    public ResponseEntity<String> deleteUser(@PathVariable UUID id) {
+        userService.deleteUser(id);
         return ResponseEntity.ok("Delete User successfully");
     }
 }

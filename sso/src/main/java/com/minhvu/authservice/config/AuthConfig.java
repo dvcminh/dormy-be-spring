@@ -1,5 +1,6 @@
 package com.minhvu.authservice.config;
 
+import com.minhvu.authservice.service.SecurityUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +22,7 @@ public class AuthConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return new CustomUserDetailsService();
+        return new SecurityUserService();
     }
 
 
