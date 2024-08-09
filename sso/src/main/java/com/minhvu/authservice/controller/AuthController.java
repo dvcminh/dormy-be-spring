@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @Slf4j
 public class AuthController extends BaseController{
     @Autowired

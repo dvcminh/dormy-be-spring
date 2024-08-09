@@ -28,6 +28,9 @@
         <module>review</module>
         <module>notification</module>
         <module>interaction</module>
+        <module>media</module>
+        <module>friends</module>
+        <module>feed</module>
     </modules>
     <scm>
         <connection/>

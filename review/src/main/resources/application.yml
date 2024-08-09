@@ -1,44 +1,37 @@
 server:
-  port: 8002
+  port: 8074
 
 spring:
   application:
-    name: review-service
-  cloud:
-    discovery:
-      enabled: true
+    name: post-service
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
   datasource:
-    url: jdbc:postgresql://localhost:5430/review_service
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5430/notification_service
     username: postgres
     password: postgres
-    driverClassName: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
-    properties:
-      dialect: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: false
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
-  main:
-    allow-circular-references: true
-  kafka:
-    bootstrap-servers: localhost:9092
-    template:
-      default-topic:
-    consumer:
-      group-id:
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
 
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://eureka:password@localhost:8761/eureka
-  instance:
-    prefer-ip-address: true
-    hostname: localhost
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
 
-cloudinary:
-  cloud_name: ${CLOUDINARY_CLOUD_NAME}
-  api_key: ${CLOUDINARY_API_KEY}
-  api_secret: ${CLOUDINARY_API_SECRET}
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        automatic-transition-from-open-to-half-open-enabled: true
+        permittedNumberOfCallsInHalfOpenState: 4
+        waitDurationInOpenState: 10000
