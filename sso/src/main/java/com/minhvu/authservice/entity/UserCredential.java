@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
-import java.util.UUID;
 
 @Data
 @Entity
@@ -15,7 +14,7 @@ import java.util.UUID;
 public class UserCredential {
 
     @Id
-    private UUID userId;
+    private Long userId;
 
     private boolean enabled = true;
 

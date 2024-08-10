@@ -1,9 +1,16 @@
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    serviceUrl:
+      defaultZone: http://eureka:password@localhost:8761/eureka
+
+
 server:
   port: 8074
-
 spring:
   application:
-    name: post-service
+    name: review-service
   kafka:
     producer:
       bootstrap-servers: localhost:9092
@@ -12,7 +19,7 @@ spring:
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5430/notification_service
+    url: jdbc:postgresql://localhost:5430/review_service
     username: postgres
     password: postgres
   jpa:
@@ -22,9 +29,15 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
   cloud:
-    openfeign:
-      circuitbreaker:
-        enabled: true
+    config:
+      enabled: false
+feign:
+  client:
+    config:
+      default:
+        connect-timeout: 5000
+        read-timeout: 5000
+        logger-level: full
 
 resilience4j:
   circuitbreaker:

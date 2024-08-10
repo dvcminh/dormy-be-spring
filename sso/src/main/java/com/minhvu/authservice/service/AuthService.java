@@ -15,6 +15,7 @@ import com.minhvu.authservice.repository.AppUserRepository;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.ws.rs.BadRequestException;
 import lombok.Data;
@@ -32,8 +33,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.security.Key;
 import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
+
 
 @Service
 @Data
@@ -52,7 +52,10 @@ public class AuthService {
     @Value("${jwt.secret}")
     private String jwtSecret;
     private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
-
+    private Key getSignInKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
     public String generateToken(SecurityUser userDetails, Long time) {
         String username = userDetails.getUsername();
         Date currentDate = new Date();
@@ -62,7 +65,7 @@ public class AuthService {
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(expireDate)
-                .signWith(key, SignatureAlgorithm.HS512)
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
 
         return token;

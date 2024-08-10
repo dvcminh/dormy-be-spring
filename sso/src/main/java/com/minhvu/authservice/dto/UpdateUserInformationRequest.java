@@ -2,8 +2,6 @@ package com.minhvu.authservice.dto;
 
 import lombok.*;
 
-import java.util.UUID;
-
 @Data
 @Builder
 @Getter
@@ -11,7 +9,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateUserInformationRequest {
-    private UUID id;
+    private Long id;
     private String name;
     private String email;
     private String phone;

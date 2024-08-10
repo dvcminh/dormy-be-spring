@@ -11,12 +11,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class MediaDTO {
     Long id;
+    String mediaUuid;
     String filename;
     Long userId;
     String uri;
     Long postId;
     String fileType;
-    String mediaUuid;
     Long size;
     LocalDateTime createdDate;
 }

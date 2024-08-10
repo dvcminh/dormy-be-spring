@@ -1,4 +1,4 @@
-package com.minhvu.review;
+package com.minhvu.review.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

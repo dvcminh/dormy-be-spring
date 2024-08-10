@@ -3,6 +3,7 @@ package com.minhvu.friend.controller;
 import com.minhvu.friend.dto.FriendDto;
 import com.minhvu.friend.dto.UserDTO;
 import com.minhvu.friend.service.FriendService;
+import jakarta.ws.rs.Path;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +19,9 @@ public class FriendController {
     private final FriendService friendService;
 
 
-    @GetMapping("/profiles/all")
-    public ResponseEntity<List<UserDTO>> getAllFriendsProfile(@RequestHeader("id") String userId) {
-        return ResponseEntity.ok(friendService.getAllFriendsProfile(Long.valueOf(userId)));
+    @GetMapping("/profiles/all/{id}")
+    public ResponseEntity<List<UserDTO>> getAllFriendsProfile(@PathVariable("id") Long userId) {
+        return ResponseEntity.ok(friendService.getAllFriendsProfile(userId));
     }
 
 

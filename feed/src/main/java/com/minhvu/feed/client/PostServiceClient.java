@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
-@FeignClient(name = "post-service", fallback = PostClientFallback.class)
+@FeignClient(name = "REVIEW-SERVICE/api/v1/post")
 public interface PostServiceClient {
 
-    @GetMapping("/post-service/post/{postId}")
+    @GetMapping("/post/{postId}")
     PostDto getPost(@PathVariable("postId") Long postId);
 
     @GetMapping("/post-service/post/user/{userId}")

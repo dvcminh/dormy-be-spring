@@ -20,34 +20,41 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class FeedService {
 
-    FriendshipServiceClient friendshipServiceClient;
-    InteractionServiceClient interactionServiceClient;
-    PostServiceClient postServiceClient;
+    private final FriendshipServiceClient friendshipServiceClient;
+    private final InteractionServiceClient interactionServiceClient;
+    private final PostServiceClient postServiceClient;
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public HashMap<PostDto,List<CompletReaction>> getFeed(Long userId) {
-        if(redisTemplate.hasKey(Long.toString(userId))){
+    public HashMap<PostDto, List<CompletReaction>> getFeed(Long userId) {
+        if (redisTemplate.hasKey(Long.toString(userId))) {
             HashMap<PostDto, List<CompletReaction>> map = getHashMapFromRedis(Long.toString(userId));
-
-             return map;
+            return map;
         }
-        HashMap<PostDto,List<CompletReaction>> listHashMap = new HashMap<>();
-      List<FriendShip> friendShips =  friendshipServiceClient.getFriends(userId);
-      friendShips.forEach(friendShip -> {
-                List<PostDto> postDto =  postServiceClient.getPostByUser(friendShip.userId);
-                postDto.stream().forEach(postDto1 -> {
-                    List<CompletReaction> completReaction = interactionServiceClient.getReactionsByPostId(postDto1.id);
-                    listHashMap.put(postDto1,completReaction);
-                })
-            ;});
-        saveHashMapToRedis(Long.toString(userId),listHashMap);
+        HashMap<PostDto, List<CompletReaction>> listHashMap = new HashMap<>();
+//        List<FriendShip> friendShips = friendshipServiceClient.getFriends(userId);
+        // Check if the user has friends
+        List<FriendShip> friendShips = friendshipServiceClient.getFriends(userId);
+        if (friendShips == null || friendShips.isEmpty()) {
+            return null;
+        }
+        friendShips.forEach(friendShip -> {
+            List<PostDto> postDto = postServiceClient.getPostByUser(friendShip.userId);
+            postDto.stream().forEach(postDto1 -> {
+                List<CompletReaction> completReaction = interactionServiceClient.getReactionsByPostId(postDto1.id);
+                listHashMap.put(postDto1, completReaction);
+            })
+            ;
+        });
+        saveHashMapToRedis(Long.toString(userId), listHashMap);
         return listHashMap;
     }
+
     public void saveHashMapToRedis(String key, HashMap<PostDto, List<CompletReaction>> map) {
         ValueOperations<String, Object> ops = this.redisTemplate.opsForValue();
         ops.set(key, map);
         redisTemplate.expire(key, 10, TimeUnit.MINUTES);
     }
+
     public HashMap<PostDto, List<CompletReaction>> getHashMapFromRedis(String key) {
         ValueOperations<String, Object> ops = this.redisTemplate.opsForValue();
         return (HashMap<PostDto, List<CompletReaction>>) ops.get(key);

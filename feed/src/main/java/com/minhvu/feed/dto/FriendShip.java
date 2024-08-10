@@ -1,7 +1,9 @@
 package com.minhvu.feed.dto;
 
-import java.util.List;
+import lombok.AllArgsConstructor;
 
+import java.util.List;
+@AllArgsConstructor
 public class FriendShip {
 
     public Long userId;

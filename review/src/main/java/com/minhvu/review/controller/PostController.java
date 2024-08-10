@@ -1,12 +1,12 @@
-package com.minhvu.review;
+package com.minhvu.review.controller;
 
 
 
+import com.minhvu.review.service.PostService;
 import com.minhvu.review.dto.PostRequest;
 import com.minhvu.review.dto.PostResponse;
 import com.minhvu.review.dto.PostUpdateRequest;
 import com.minhvu.review.dto.PostWithInteractionResponse;
-import com.minhvu.review.producer.PostProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +22,7 @@ import java.util.List;
 @CrossOrigin("*")
 public class PostController {
 
-    private final  PostService postService;
+    private final PostService postService;
     @PostMapping
     public ResponseEntity<PostResponse> createPost(@RequestHeader("id") String userId ,@ModelAttribute PostRequest postRequest) {
 

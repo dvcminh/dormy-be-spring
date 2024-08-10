@@ -4,12 +4,13 @@ import com.minhvu.feed.dto.FriendShip;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.List;
 
-@FeignClient(name = "friendship-service", fallback = FriendshipClientFallback.class)
+@FeignClient(name = "FRIEND-SERVICE/api/friend")
 public interface  FriendshipServiceClient {
 
-    @GetMapping("/friendship-service/friendship/{userId}")
-    List<FriendShip> getFriends(@PathVariable("userId") Long userId);
+    @GetMapping("/profiles/all/{id}")
+    List<FriendShip> getFriends(@PathVariable("id") Long userId);
 }

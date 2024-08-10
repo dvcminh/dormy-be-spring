@@ -13,8 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.List;
-import java.util.UUID;
 
 @Slf4j
 public abstract class BaseController {

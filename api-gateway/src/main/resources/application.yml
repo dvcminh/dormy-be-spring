@@ -21,41 +21,41 @@ spring:
             allowedHeaders: "*"
       routes:
         - id: sso
-          uri: http://localhost:8001
+          uri: lb://sso-service
           predicates:
             - Path=/api/v1/auth/**
 
 
         - id: interactions
-          uri: http://localhost:8070
+          uri: lb://interactions
           predicates:
             - Path=/api/v1/interactions/**
           filters:
             - AuthenticationFilter
 
 
-        - id: comments
-          uri: http://localhost:8070
-          predicates:
-            - Path=/api/v1/comments/**
-          filters:
-            - AuthenticationFilter
+#        - id: comments
+#          uri: lb://comments
+#          predicates:
+#            - Path=/api/v1/comments/**
+#          filters:
+#            - AuthenticationFilter
+#
+#
+#        - id: shareds
+#          uri: lb://shareds
+#          predicates:
+#            - Path=/api/v1/shareds/**
+#          filters:
+#            - AuthenticationFilter
 
 
-        - id: shareds
-          uri: http://localhost:8070
-          predicates:
-            - Path=/api/v1/shareds/**
-          filters:
-            - AuthenticationFilter
-
-
-        - id: reactions
-          uri: http://localhost:8070
-          predicates:
-            - Path=/api/v1/reactions/**
-          filters:
-            - AuthenticationFilter
+#        - id: reactions
+#          uri: lb://reactions
+#          predicates:
+#            - Path=/api/v1/reactions/**
+#          filters:
+#            - AuthenticationFilter
 
 
         - id: users-auth
@@ -64,16 +64,16 @@ spring:
             - Path=/api/v1/auth/**
 
 
-        - id: users-data
-          uri: http://localhost:8083
-          predicates:
-            - Path=/api/v1/users/**
-          filters:
-            - AuthenticationFilter
+#        - id: users-data
+#          uri: http://localhost:8083
+#          predicates:
+#            - Path=/api/v1/users/**
+#          filters:
+#            - AuthenticationFilter
 
 
         - id: medias
-          uri: http://localhost:8016
+          uri: lb://media-service
           predicates:
             - Path=/api/v1/medias/**
           filters:
@@ -81,15 +81,15 @@ spring:
 
 
         - id: friend-services
-          uri: http://localhost:8078
+          uri: lb://friend-service
           predicates:
             - Path=/api/friend/**
           filters:
             - AuthenticationFilter
 
 
-        - id: post-services
-          uri: http://localhost:8074
+        - id: review-service
+          uri: lb://review-service
           predicates:
             - Path=/api/v1/post/**
           filters:
@@ -97,14 +97,14 @@ spring:
 
 
         - id: notification-service
-          uri: http://localhost:8111
+          uri: lb://notification-service
           predicates:
             - Path=/api/v1/notifications/**
           filters:
             - AuthenticationFilter
 
         - id: feed-service
-          uri: http://localhost:8085
+          uri: lb://feed-service
           predicates:
             - Path=/api/v1/feeds/**
           filters:

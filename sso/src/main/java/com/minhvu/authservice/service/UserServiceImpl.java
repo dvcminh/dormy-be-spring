@@ -17,7 +17,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.UUID;
 @Service
 public class UserServiceImpl implements UserService{
     @Autowired
@@ -70,7 +69,7 @@ public class UserServiceImpl implements UserService{
         }
     }
 
-    public void deleteUser(UUID id) {
+    public void deleteUser(Long id) {
         appUserRepository.deleteById(id);
     }
 }

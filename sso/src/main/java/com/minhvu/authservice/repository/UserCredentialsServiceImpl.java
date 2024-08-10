@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +24,7 @@ public class UserCredentialsServiceImpl implements UserCredentialsService {
     private String defaultPassword;
 
     @Override
-    public boolean isEnabled(UUID userId) {
+    public boolean isEnabled(Long userId) {
         return userCredentialsRepository.findByUserId(userId).orElse(new UserCredential()).isEnabled();
     }
 
@@ -36,7 +35,7 @@ public class UserCredentialsServiceImpl implements UserCredentialsService {
     }
 
     @Override
-    public void setPassword(UUID userId, String password) {
+    public void setPassword(Long userId, String password) {
         UserCredential userCredential = userCredentialsRepository.findById(userId).orElse(
                 new UserCredential()
         );
@@ -46,7 +45,7 @@ public class UserCredentialsServiceImpl implements UserCredentialsService {
     }
 
     @Override
-    public void setPassword(UUID userId) {
+    public void setPassword(Long userId) {
         setPassword(userId, defaultPassword);
     }
 

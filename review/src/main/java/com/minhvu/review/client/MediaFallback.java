@@ -12,21 +12,21 @@ import java.util.List;
 public class MediaFallback implements MediaClient{
     @Override
     public ResponseEntity<List<MediaDTO>> add(List<MultipartFile> files, Long postId, Long userId) {
-        throw new MediaException("Error lors de l ajout de medias.");
+        throw new MediaException("Error while adding media.");
     }
 
     @Override
     public List<MediaDTO> getMediaByPostId(Long postId) {
-        throw new MediaException("Erreur lors de la récupération des medias par ID de poste.");
+        throw new MediaException("Error while getting media by post id.");
     }
 
     @Override
     public ResponseEntity<Void> delete(String mediaUuid, Long userId, Long postId) {
-        throw new MediaException("Erreur lors de la suppression du media.");
+        throw new MediaException("Error while deleting media.");
     }
 
     @Override
     public void deleteMediaByPostId(Long postId) {
-        throw new MediaException("Erreur lors de la suppression de tous les medias lies à un poste.");
+        throw new MediaException("Error while deleting media by post id.");
     }
 }

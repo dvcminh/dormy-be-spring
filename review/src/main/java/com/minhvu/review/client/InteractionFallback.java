@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 public class InteractionFallback implements InteractionClient{
     @Override
     public ResponseEntity<InteractionDto> getInteractionsOfPost(Long postId) {
-        log.error("La recuperation des interaction a echoue", postId);
-        throw new InteractionFallbackException("La recuperation des interaction a echoue" + postId);
+        log.error("Error", postId);
+        throw new InteractionFallbackException("Error" + postId);
 
     }
 }

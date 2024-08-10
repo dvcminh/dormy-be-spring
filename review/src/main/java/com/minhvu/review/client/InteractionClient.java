@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(url = "http://localhost:8070/api/v1/interactions",name = "interactions-service",fallback = InteractionFallback.class)
+@FeignClient(name = "INTERACTIONS/api/v1/interactions")
 public interface InteractionClient {
 
     @GetMapping("/post/{postId}")

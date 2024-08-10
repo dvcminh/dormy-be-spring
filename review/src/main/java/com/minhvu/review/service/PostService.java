@@ -1,4 +1,4 @@
-package com.minhvu.review;
+package com.minhvu.review.service;
 
 import com.minhvu.review.client.InteractionClient;
 import com.minhvu.review.client.MediaClient;
@@ -6,7 +6,9 @@ import com.minhvu.review.dto.*;
 import com.minhvu.review.dto.inter.InteractionDto;
 import com.minhvu.review.exception.PostException;
 import com.minhvu.review.exception.PostNotFoundException;
+import com.minhvu.review.model.PostEntity;
 import com.minhvu.review.producer.PostProducer;
+import com.minhvu.review.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;

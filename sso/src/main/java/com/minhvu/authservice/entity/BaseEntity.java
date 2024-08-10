@@ -8,17 +8,14 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.*;
 import java.util.Date;
-import java.util.UUID;
 
 @Data
 @MappedSuperclass
 public abstract class BaseEntity {
 
     @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
-    @JsonIgnore
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -27,7 +24,7 @@ public abstract class BaseEntity {
     @UpdateTimestamp
     private Date updatedAt;
 
-    private UUID createdBy;
+    private Long createdBy;
 
-    private UUID updatedBy;
+    private Long updatedBy;
 }

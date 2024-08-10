@@ -9,7 +9,7 @@ server:
   port: 8016
 spring:
   application:
-    name: social-media-service
+    name: media-service
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5430/media_service
@@ -21,6 +21,13 @@ spring:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
+feign:
+  client:
+    config:
+      default:
+        connect-timeout: 5000
+        read-timeout: 5000
+        logger-level: full
 
   servlet:
     multipart:

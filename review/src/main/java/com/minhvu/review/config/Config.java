@@ -1,4 +1,4 @@
-package com.minhvu.review;
+package com.minhvu.review.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cloud.openfeign.EnableFeignClients;
