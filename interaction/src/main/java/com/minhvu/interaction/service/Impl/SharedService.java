@@ -78,6 +78,10 @@ public class SharedService implements IsharedService {
     @Override
     public void delete(Long id)
     {
+        if(!isharedRepository.existsById(id))
+        {
+            throw new NotFoundException(SHARED_NOT_FOUND + id);
+        }
         isharedRepository.deleteById(id);
     }
 }

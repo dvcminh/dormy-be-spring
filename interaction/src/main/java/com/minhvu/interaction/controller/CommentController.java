@@ -23,8 +23,8 @@ public class CommentController {
     private final IcommentService icommentService;
 
     @PostMapping("/post/{postId}")
-    public ResponseEntity<CommentDto> save(@PathVariable Long postId, @RequestBody CommentDto comment, @RequestHeader("id") String userId) {
-        log.info("post id {}", userId);
+    public ResponseEntity<CommentDto> save(@PathVariable Long postId, @RequestBody CommentDto comment) {
+        log.info("post id {}", comment.getUserId());
         return new ResponseEntity<>(icommentService.save(postId, comment), HttpStatus.CREATED);
     }
 

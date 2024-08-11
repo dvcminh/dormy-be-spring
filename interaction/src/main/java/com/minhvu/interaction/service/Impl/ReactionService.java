@@ -133,6 +133,11 @@ public class ReactionService implements IreactionService {
     @Override
     public void delete(Long id)
     {
-        ireactionRepository.deleteById(id);
+        if(ireactionRepository.existsById(id)){
+            ireactionRepository.deleteById(id);
+        }
+        else {
+            throw new NotFoundException(REACTION_NOT_FOUND + id);
+        }
     }
 }

@@ -34,8 +34,8 @@ public class ReactionController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Error> delete(@PathVariable Long id)
     {
-        Error error = new Error("Reaction deleted successfully");
         ireactionService.delete(id);
+        Error error = new Error("Reaction deleted successfully");
         return new ResponseEntity<>(error, HttpStatus.OK);
     }
 

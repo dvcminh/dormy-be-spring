@@ -9,7 +9,7 @@ server:
   port: 8070
 spring:
   application:
-    name: interactions
+    name: interactions-service
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5430/interaction_service
