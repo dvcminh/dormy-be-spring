@@ -19,7 +19,7 @@ import java.util.List;
 public class FriendService {
 
     private final FriendRepository friendRepository;
-    @Qualifier("com.minhvu.friend.openfeign.UserClient")
+    @Qualifier
     private final UserClient userClient;
 
     public FriendDto findFriendIdsByUserId(Long userId)
