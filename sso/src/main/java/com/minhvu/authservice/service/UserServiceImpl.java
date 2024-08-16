@@ -36,24 +36,28 @@ public class UserServiceImpl implements UserService{
         AppUser user = appUserRepository.findByEmail(email);
         return userMapper.toDto(user);
     }
-    private void checkIfEmailExist(String email) {
-        AppUser user = appUserRepository.findByEmail(email);
-        if (user != null) {
-            throw new BadRequestException(
-                    String.format("User with email [%s] is already exist", email)
-            );
-        }
+    @Override
+    public boolean checkIfUserExist(Long id) {
+        return appUserRepository.existsById(id);
     }
+    @Override
     public Optional<AppUser> getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         return appUserRepository.findByName(username);
     }
 
+    @Override
+    public AppUserDto getUserById(Long userId) {
+        return userMapper.toDto(appUserRepository.findById(userId)
+                .orElseThrow(() -> new BadRequestException("User not found")));
+    }
+
+    @Override
     public Page<AppUser> getAllUsers(Pageable pageable) {
         return appUserRepository.findAll(pageable);
     }
-
+    @Override
     public String updateUser(UpdateUserInformationRequest userDto) {
         Optional<AppUser> user = appUserRepository.findById(userDto.getId());
         if (user.isPresent()) {
@@ -68,7 +72,7 @@ public class UserServiceImpl implements UserService{
             throw new UserNotFoundException("User not found");
         }
     }
-
+    @Override
     public void deleteUser(Long id) {
         appUserRepository.deleteById(id);
     }

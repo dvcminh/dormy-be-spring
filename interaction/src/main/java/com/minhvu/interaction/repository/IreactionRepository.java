@@ -10,4 +10,7 @@ import java.util.List;
 public interface IreactionRepository extends JpaRepository<Reaction, Long> {
 
     List<Reaction> findByPostId(Long postId);
+
+    @Override
+    boolean existsById(Long aLong);
 }

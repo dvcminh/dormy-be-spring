@@ -24,7 +24,6 @@ spring:
   cloud:
     config:
       enabled: false
-
     openfeign:
       circuitbreaker:
         enabled: true

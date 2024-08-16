@@ -67,15 +67,15 @@ public class FriendRequestService {
         Optional<FriendRequest> friendRequest = getFriendRequest(userId, requestId);
         log.info("Optional Status friend request with id {}", friendRequest.isPresent());
         if (!friendRequest.isPresent()) {
-         throwFriendRequestException("Demande d'amis n'existe pas");
+         throwFriendRequestException("Friend request does not exist");
         }
 
         if(!userClient.userExists(friendRequest.get().getUserIdSender())) throwUserNotFoundException(friendRequest.get().getFriendId());
         log.info("UserClien Status friend request with id {}", requestId);
 
-        if(friendRepository.existsByUserIdAndFriendId(userId, friendRequest.get().getUserIdSender()))  throwFriendRequestException("Vous êtes déjà amis");
+        if(friendRepository.existsByUserIdAndFriendId(userId, friendRequest.get().getUserIdSender()))  throwFriendRequestException("Friend already exists");
         log.info("FriendRepository Status friend request with id {}", requestId);
-        if(!Objects.equals(userId, friendRequest.get().getFriendId())) throwFriendRequestException("Vous ne pouvez pas accepter une demande d'amis qui ne vous est pas destinée");
+        if(!Objects.equals(userId, friendRequest.get().getFriendId())) throwFriendRequestException("You can't accept a friend request that is not for you");
         friendRequest.get().setStatus(Status.ACCEPTED);
         friendRequest.get().setUpdatedAt(LocalDateTime.now());
         Friend friend = Friend.builder()
@@ -101,14 +101,16 @@ public class FriendRequestService {
         log.info("Rejecting friend request with id {}", requestId);
 
         Optional<FriendRequest> friendRequest = friendRequestRepository.findById(requestId);
+        if (!friendRequest.isPresent()) {
+            throwFriendRequestException("Friend request does not exist");
+        }
         if(!userClient.userExists(friendRequest.get().getFriendId())) throwUserNotFoundException(friendRequest.get().getFriendId());
-        checkIfUserIsSendingRequestToSelf(userId, friendRequest.get().getFriendId());
 
         Boolean isFriend = friendRepository.existsByUserIdAndFriendId(userId, friendRequest.get().getFriendId());
         if(isFriend){
-            throwFriendRequestException("Vous êtes déjà amis");
+            throwFriendRequestException("You are already friends");
         }
-        if(!Objects.equals(userId, friendRequest.get().getFriendId())) throwFriendRequestException("Vous ne pouvez pas accepter une demande d'amis qui ne vous est pas destinée");
+        if(!Objects.equals(userId, friendRequest.get().getFriendId())) throwFriendRequestException("You can't reject a friend request that is not for you");
 
         friendRequest.get().setStatus(Status.REJECTED);
         friendRequest.get().setUpdatedAt(LocalDateTime.now());
@@ -158,7 +160,14 @@ public class FriendRequestService {
     public void checkIfUserIsSendingRequestToSelf(Long loggedInUserId, Long senderId) {
         log.info("Checking if user is sending request to self {} {}", loggedInUserId, senderId);
         if (loggedInUserId.equals(senderId)) {
-            throwFriendRequestException("Vous ne pouvez pas envoyer une demande à vous-même");
+            throwFriendRequestException("You can't send a friend request to yourself");
         }
+    }
+
+    public void deleteFriendRequest(long l, Long requestId) {
+        log.info("Deleting friend request with id {}", requestId);
+        if(!friendRequestRepository.existsById(requestId)) throwFriendRequestException("Friend request does not exist");
+        if(!friendRequestRepository.findById(requestId).get().getUserIdSender().equals(l)) throwFriendRequestException("You can't delete a friend request that is not yours");
+        friendRequestRepository.deleteById(requestId);
     }
 }

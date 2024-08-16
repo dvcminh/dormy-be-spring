@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "user-service", url = "http://localhost:8083/api/v1/users", fallback = UserClientFallback.class)
+@FeignClient(name = "SSO-SERVICE/api/v1/users")
 public interface UserClient {
 
     @GetMapping("/exist/{userId}")
