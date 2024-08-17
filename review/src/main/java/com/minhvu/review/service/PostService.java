@@ -1,8 +1,10 @@
 package com.minhvu.review.service;
 
+import com.minhvu.review.client.FriendClient;
 import com.minhvu.review.client.InteractionClient;
 import com.minhvu.review.client.MediaClient;
 import com.minhvu.review.dto.*;
+import com.minhvu.review.dto.inter.FriendDto;
 import com.minhvu.review.dto.inter.InteractionDto;
 import com.minhvu.review.exception.PostException;
 import com.minhvu.review.exception.PostNotFoundException;
@@ -32,6 +34,7 @@ public class PostService {
     @Qualifier("com.minhvu.review.client.InteractionClient")
     private final InteractionClient interactionClient;
     private final PostProducer producer;
+    private final FriendClient friendClient;
 
     @Transactional
     public PostResponse createPost(Long userId, PostRequest postRequest) {
@@ -117,6 +120,28 @@ public class PostService {
             postWithInteractionResponse.setInteractionDto(intercationResponse);
             postWithInteractionResponses.add(postWithInteractionResponse);
 
+        });
+        return postWithInteractionResponses;
+    }
+
+    public List<PostWithInteractionResponse> getAllPostByUserId(Long userId) {
+        List<PostWithInteractionResponse> postWithInteractionResponses = new ArrayList<>();
+        //find friend of user
+        FriendDto friends =  friendClient.getFriendsOfUser(userId).getBody();
+        List<Long> friendIds = friends.getFriendId();
+        friendIds.forEach(friendId -> {
+            List<PostEntity> postEntities = postRepository.findPostEntitiesByUserId(friendId);
+            postEntities.forEach(postEntity -> {
+                List<MediaDTO> mediaDTOS = mediaClient.getMediaByPostId(postEntity.getId());
+                PostWithInteractionResponse postWithInteractionResponse = new PostWithInteractionResponse();
+                postWithInteractionResponse.setPostResponse(PostResponse.builder()
+                        .post(modelMapper.map(postEntity, PostEntityDto.class))
+                        .medias(mediaDTOS)
+                        .build());
+                InteractionDto intercationResponse = interactionClient.getInteractionsOfPost(postEntity.getId()).getBody();
+                postWithInteractionResponse.setInteractionDto(intercationResponse);
+                postWithInteractionResponses.add(postWithInteractionResponse);
+            });
         });
         return postWithInteractionResponses;
     }

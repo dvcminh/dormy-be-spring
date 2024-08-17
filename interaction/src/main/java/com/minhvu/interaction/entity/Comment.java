@@ -8,6 +8,7 @@ import org.hibernate.annotations.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Data
 @Table(name = "comments")
 @Getter
 @Setter

@@ -52,7 +52,6 @@ public class UserCredentialsServiceImpl implements UserCredentialsService {
     private void isValidOldPassword(AppUserDto currentUser, ChangePasswordRequest passwordRequest) {
         UserCredential userCredential = userCredentialsRepository.findByUserId(currentUser.getId()).orElse(new UserCredential());
         if (!passwordEncoder.matches(passwordRequest.getOldPassword(), userCredential.getPassword())) {
-            ObjectMapper objectMapper = new ObjectMapper();
 
             throw new InvalidOldPasswordException("Did not match current password");
         }

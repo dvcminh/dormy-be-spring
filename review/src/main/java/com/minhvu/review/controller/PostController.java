@@ -51,6 +51,11 @@ public class PostController {
         return ResponseEntity.ok(postService.getAllPost());
     }
 
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<PostWithInteractionResponse>> getPostByUserId(@PathVariable("userId") Long userId) {
+        return ResponseEntity.ok(postService.getAllPostByUserId(userId));
+    }
+
 
 
 }

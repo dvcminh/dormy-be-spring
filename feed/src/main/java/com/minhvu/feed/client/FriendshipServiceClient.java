@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.List;
 
-@FeignClient(name = "FRIEND-SERVICE/api/friend")
+@FeignClient(name = "FRIEND-SERVICE/api/v1/friend")
 public interface  FriendshipServiceClient {
 
     @GetMapping("/profiles/all/{id}")

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/friend")
+@RequestMapping("/api/v1/friend")
 @RequiredArgsConstructor
 @CrossOrigin("*")
 public class FriendController {
@@ -26,13 +26,13 @@ public class FriendController {
 
 
     // Get all friends
-    @GetMapping("/all")
-    public ResponseEntity<FriendDto> getFriends(@RequestHeader("id") String userId) {
+    @GetMapping("/user/all/{id}")
+    public ResponseEntity<FriendDto> getFriends(@PathVariable("id") String userId) {
         return ResponseEntity.ok(friendService.findFriendIdsByUserId(Long.valueOf(userId)));
     }
 
     // Get  friend by id
-    @GetMapping("/{friendId}")
+    @GetMapping("/user/{id}")
     public ResponseEntity<Long> getFriend(@RequestHeader("id") String userId, @PathVariable Long friendId) {
 
         return ResponseEntity.ok(friendService.findFriendByUserId(Long.valueOf(userId), friendId));

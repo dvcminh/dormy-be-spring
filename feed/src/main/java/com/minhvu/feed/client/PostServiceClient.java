@@ -10,10 +10,10 @@ import java.util.List;
 @FeignClient(name = "REVIEW-SERVICE/api/v1/post")
 public interface PostServiceClient {
 
-    @GetMapping("/post/{postId}")
+    @GetMapping("/{postId}")
     PostDto getPost(@PathVariable("postId") Long postId);
 
-    @GetMapping("/post-service/post/user/{userId}")
+    @GetMapping("/{userId}")
     List<PostDto> getPostByUser(@PathVariable("userId") Long userId);
     //TODO send list of user ids and get list of posts
 

@@ -1,6 +1,7 @@
 package com.minhvu.interaction.service.Impl;
 
 import com.minhvu.interaction.dto.ReactionDto;
+import com.minhvu.interaction.dto.mapper.ReactionMapper;
 import com.minhvu.interaction.entity.Reaction;
 import com.minhvu.interaction.entity.enums.ReactionType;
 import com.minhvu.interaction.exception.NotFoundException;
@@ -8,7 +9,6 @@ import com.minhvu.interaction.repository.IreactionRepository;
 import com.minhvu.interaction.service.IreactionService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,7 +20,7 @@ import java.util.List;
 public class ReactionService implements IreactionService {
 
     private final IreactionRepository ireactionRepository;
-    private final ModelMapper modelMapper;
+    private final ReactionMapper reactionMapper;
     private static final String REACTION_NOT_FOUND = "Reaction not found with this id : ";
 
     @Override
@@ -28,8 +28,8 @@ public class ReactionService implements IreactionService {
     {
         reactionDto.setCreatedAt(LocalDateTime.now());
         reactionDto.setPostId(postId);
-        Reaction reaction = ireactionRepository.save(modelMapper.map(reactionDto, Reaction.class));
-        return modelMapper.map(reaction, ReactionDto.class);
+        Reaction reaction = ireactionRepository.save(reactionMapper.toModel(reactionDto));
+        return reactionMapper.toDto(reaction);
     }
 
     @Override
@@ -38,14 +38,14 @@ public class ReactionService implements IreactionService {
         Reaction reaction = ireactionRepository.findById(id).orElseThrow(() -> new NotFoundException(REACTION_NOT_FOUND + id));
         reaction.setReactionType(reactionDto.getReactionType());
         Reaction reactionSaved = ireactionRepository.save(reaction);
-        return modelMapper.map(reactionSaved, ReactionDto.class);
+        return reactionMapper.toDto(reactionSaved);
     }
 
     @Override
     public ReactionDto getById(Long id)
     {
         Reaction reaction = ireactionRepository.findById(id).orElseThrow(() -> new NotFoundException(REACTION_NOT_FOUND + id));
-        return modelMapper.map(reaction, ReactionDto.class);
+        return reactionMapper.toDto(reaction);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class ReactionService implements IreactionService {
         List<Reaction> reactions = ireactionRepository.findByPostId(postId);
         return reactions
                 .stream()
-                .map(reaction ->modelMapper.map(reaction, ReactionDto.class))
+                .map(reactionMapper::toDto)
                 .toList();
     }
 
@@ -64,7 +64,7 @@ public class ReactionService implements IreactionService {
         List<Reaction> reactions = ireactionRepository.findAll();
         return reactions
                 .stream()
-                .map(reaction -> modelMapper.map(reaction, ReactionDto.class))
+                .map(reactionMapper::toDto)
                 .toList();
     }
 

@@ -1,13 +1,13 @@
 package com.minhvu.interaction.service.Impl;
 
 import com.minhvu.interaction.dto.SharedDto;
+import com.minhvu.interaction.dto.mapper.SharedMapper;
 import com.minhvu.interaction.entity.Shared;
 import com.minhvu.interaction.exception.NotFoundException;
 import com.minhvu.interaction.repository.IsharedRepository;
 import com.minhvu.interaction.service.IsharedService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,7 +19,7 @@ import java.util.List;
 public class SharedService implements IsharedService {
 
     private final IsharedRepository isharedRepository;
-    private final ModelMapper modelMapper;
+    private final SharedMapper sharedMapper;
     private final String SHARED_NOT_FOUND = "Shared not found with this id : ";
 
     @Override
@@ -27,8 +27,8 @@ public class SharedService implements IsharedService {
     {
         sharedDto.setSharedAt(LocalDateTime.now());
         sharedDto.setPostId(postId);
-        Shared sharedSaved = isharedRepository.save(modelMapper.map(sharedDto, Shared.class));
-        return modelMapper.map(sharedSaved, SharedDto.class);
+        Shared sharedSaved = isharedRepository.save(sharedMapper.toModel(sharedDto));
+        return sharedMapper.toDto(sharedSaved);
     }
 
     @Override
@@ -38,14 +38,14 @@ public class SharedService implements IsharedService {
         shared.setPostId(sharedDto.getPostId());
         shared.setUserId(sharedDto.getUserId());
         Shared sharedUpdated = isharedRepository.save(shared);
-        return modelMapper.map(sharedUpdated, SharedDto.class);
+        return sharedMapper.toDto(sharedUpdated);
     }
 
     @Override
     public SharedDto getById(Long id)
     {
         Shared shared = isharedRepository.findById(id).orElseThrow(() -> new NotFoundException(SHARED_NOT_FOUND + id));
-        return modelMapper.map(shared, SharedDto.class);
+        return sharedMapper.toDto(shared);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class SharedService implements IsharedService {
         List<Shared> shareds = isharedRepository.findByPostId(postId);
         return shareds
                 .stream()
-                .map(shared ->modelMapper.map(shared, SharedDto.class))
+                .map(sharedMapper::toDto)
                 .toList();
     }
 
@@ -71,7 +71,7 @@ public class SharedService implements IsharedService {
         List<Shared> shareds = isharedRepository.findAll();
         return shareds
                 .stream()
-                .map(shared -> modelMapper.map(shared, SharedDto.class))
+                .map(sharedMapper::toDto)
                 .toList();
     }
 

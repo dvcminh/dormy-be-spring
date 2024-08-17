@@ -90,7 +90,7 @@ spring:
         - id: friend-services
           uri: lb://friend-service
           predicates:
-            - Path=/api/friend/**
+            - Path=/api/v1/friend/**
           filters:
             - AuthenticationFilter
 
