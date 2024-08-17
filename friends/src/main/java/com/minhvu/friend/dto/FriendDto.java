@@ -12,7 +12,6 @@ import java.util.List;
 public class FriendDto {
 
     private Long userId;
-
     private List<Long> friendId;
 
 }

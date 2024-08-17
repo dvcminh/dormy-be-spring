@@ -1,7 +1,9 @@
 package com.minhvu.feed.dto;
 
-import java.util.List;
+import lombok.Data;
 
+import java.util.List;
+@Data
 public class CompletReaction {
 
     public List<CommentDto> comment;

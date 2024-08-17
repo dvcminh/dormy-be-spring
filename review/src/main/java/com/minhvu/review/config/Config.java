@@ -8,9 +8,4 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableFeignClients
 public class Config {
-
-    @Bean
-    public ModelMapper modelMapper() {
-        return new ModelMapper();
-    }
 }

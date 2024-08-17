@@ -2,6 +2,7 @@ package com.minhvu.feed.controller;
 
 import com.minhvu.feed.dto.CompletReaction;
 import com.minhvu.feed.dto.PostDto;
+import com.minhvu.feed.dto.PostWithInteractionResponse;
 import com.minhvu.feed.service.FeedService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +20,7 @@ public class FeedsController {
 	private FeedService feedService;
 
 	@GetMapping("/{userId}")
-	public HashMap<PostDto, List<CompletReaction>> getFeed(@PathVariable Long userId) {
+	public HashMap<String, List<PostWithInteractionResponse>> getFeed(@PathVariable("userId") Long userId) {
 		return feedService.getFeed(userId);
 	}
 }

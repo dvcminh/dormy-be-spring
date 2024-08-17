@@ -1,7 +1,9 @@
 package com.minhvu.feed.dto;
 
-import java.time.LocalDateTime;
+import lombok.Data;
 
+import java.time.LocalDateTime;
+@Data
 public class SharedDto {
     private Long id;
     private Long postId;

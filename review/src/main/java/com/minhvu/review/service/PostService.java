@@ -6,6 +6,7 @@ import com.minhvu.review.client.MediaClient;
 import com.minhvu.review.dto.*;
 import com.minhvu.review.dto.inter.FriendDto;
 import com.minhvu.review.dto.inter.InteractionDto;
+import com.minhvu.review.dto.mapper.PostMapper;
 import com.minhvu.review.exception.PostException;
 import com.minhvu.review.exception.PostNotFoundException;
 import com.minhvu.review.model.PostEntity;
@@ -13,7 +14,6 @@ import com.minhvu.review.producer.PostProducer;
 import com.minhvu.review.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +28,7 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final ModelMapper modelMapper;
+    private final PostMapper postMapper;
     @Qualifier("com.minhvu.review.client.MediaClient")
     private final MediaClient mediaClient;
     @Qualifier("com.minhvu.review.client.InteractionClient")
@@ -44,7 +44,7 @@ public class PostService {
                 .updatedAt(LocalDateTime.now())
                 .userId(userId)
                 .build();
-        PostEntity postEntity = modelMapper.map(postEntityDto, PostEntity.class);
+        PostEntity postEntity = postMapper.toModel(postEntityDto);
         postEntity = postRepository.save(postEntity);
         PostResponse postResponse = new PostResponse();
         postResponse.setPost(postEntityDto);
@@ -86,7 +86,7 @@ public class PostService {
         postEntity.setBody(postUpdateRequest.getBody());
         postEntity = postRepository.save(postEntity);
         PostResponse postResponse = new PostResponse();
-        postResponse.setPost(modelMapper.map(postEntity, PostEntityDto.class));
+        postResponse.setPost(postMapper.toDto(postEntity));
         postResponse.setMedias(mediaDTOS);
         return postResponse;
     }
@@ -102,18 +102,18 @@ public class PostService {
     public List<PostEntityDto> getPostsByUserId(Long id) {
         log.info("id: {}", id);
         return postRepository.findPostEntitiesByUserId(id).stream()
-                .map(postEntity -> modelMapper.map(postEntity, PostEntityDto.class))
+                .map(postMapper::toDto)
                 .toList();
     }
 
-    public List<PostWithInteractionResponse> getAllPost() {
+    public List<PostWithInteractionResponse> getAllPost(Long userId) {
         List<PostWithInteractionResponse> postWithInteractionResponses = new ArrayList<>();
-        List<PostEntity> postEntities = postRepository.findAll();
+        List<PostEntity> postEntities = postRepository.findPostEntitiesByUserId(userId);
         postEntities.forEach(postEntity -> {
             List<MediaDTO> mediaDTOS = mediaClient.getMediaByPostId(postEntity.getId());
             PostWithInteractionResponse postWithInteractionResponse = new PostWithInteractionResponse();
             postWithInteractionResponse.setPostResponse(PostResponse.builder()
-                    .post(modelMapper.map(postEntity, PostEntityDto.class))
+                    .post(postMapper.toDto(postEntity))
                     .medias(mediaDTOS)
                     .build());
             InteractionDto intercationResponse = interactionClient.getInteractionsOfPost(postEntity.getId()).getBody();
@@ -135,7 +135,7 @@ public class PostService {
                 List<MediaDTO> mediaDTOS = mediaClient.getMediaByPostId(postEntity.getId());
                 PostWithInteractionResponse postWithInteractionResponse = new PostWithInteractionResponse();
                 postWithInteractionResponse.setPostResponse(PostResponse.builder()
-                        .post(modelMapper.map(postEntity, PostEntityDto.class))
+                        .post(postMapper.toDto(postEntity))
                         .medias(mediaDTOS)
                         .build());
                 InteractionDto intercationResponse = interactionClient.getInteractionsOfPost(postEntity.getId()).getBody();

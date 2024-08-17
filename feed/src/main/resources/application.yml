@@ -36,11 +36,11 @@ resilience4j:
   circuitbreaker:
     configs:
       default:
-        slidingWindowSize: 10
-        failureRateThreshold: 50
+        slidingWindowSize: 20
+        failureRateThreshold: 80
         automaticTransitionFromOpenToHalfOpenEnabled: true
         permittedNumberOfCallsInHalfOpenState: 4
-        waitDurationInOpenState: 10000
+        waitDurationInOpenState: 20000
 
 server:
   port: 8085

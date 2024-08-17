@@ -1,11 +1,13 @@
 package com.minhvu.feed.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 
 import java.util.List;
 @AllArgsConstructor
-public class FriendShip {
+@Data
+public class FriendDto {
 
     public Long userId;
-    public List<Long> friendsIds;
+    public List<Long> friendId;
 }

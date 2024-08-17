@@ -5,10 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Builder
+import java.util.List;
+
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class PostDto {
-    public Long id;
+@NoArgsConstructor
+@Builder
+public class PostResponse {
+    private PostEntityDto post;
+    private List<MediaDTO> medias;
 }

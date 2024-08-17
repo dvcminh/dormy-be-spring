@@ -2,11 +2,8 @@ package com.minhvu.review.controller;
 
 
 
+import com.minhvu.review.dto.*;
 import com.minhvu.review.service.PostService;
-import com.minhvu.review.dto.PostRequest;
-import com.minhvu.review.dto.PostResponse;
-import com.minhvu.review.dto.PostUpdateRequest;
-import com.minhvu.review.dto.PostWithInteractionResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/post")
+@RequestMapping("/api/v1/post")
 @Slf4j
 @CrossOrigin("*")
 public class PostController {
@@ -46,15 +43,17 @@ public class PostController {
     private Long getUserId(String userId) {
         return Long.parseLong(userId);
     }
-    @GetMapping("/all")
-    public ResponseEntity<List<PostWithInteractionResponse>> getPost(@RequestHeader("id") String userId) {
-        return ResponseEntity.ok(postService.getAllPost());
+    @GetMapping("/all/{userId}")
+    public ResponseEntity<List<PostWithInteractionResponse>> getPost(@PathVariable("userId") Long userId) {
+        return ResponseEntity.ok(postService.getAllPost(userId));
     }
 
     @GetMapping("/{userId}")
     public ResponseEntity<List<PostWithInteractionResponse>> getPostByUserId(@PathVariable("userId") Long userId) {
         return ResponseEntity.ok(postService.getAllPostByUserId(userId));
     }
+
+
 
 
 
