@@ -2,6 +2,31 @@ server:
   port: 8001
 
 spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: test
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        max.poll.records: 500
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      retries: 3
+      linger-ms: 10
+      batch-size: 16384
+      properties:
+        enable.idempotence: true
+    listener:
+      concurrency: 3
+      ack-mode: manual
+    template:
+      default-topic: saveUserTopic
+
   application:
     name: sso-service
     security:
@@ -44,12 +69,7 @@ spring:
       matching-strategy: ant_path_matcher
   main:
     allow-circular-references: true
-  kafka:
-    bootstrap-servers: localhost:9092
-    template:
-      default-topic: saveUserTopic
-    consumer:
-      group-id: saveContactId
+
 
 eureka:
   client:
