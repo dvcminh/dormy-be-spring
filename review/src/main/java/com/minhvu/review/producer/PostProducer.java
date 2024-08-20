@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PostProducer {
 
-    private final KafkaTemplate<String, PostProducerDto> kafkaTemplate;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
     public void sendMessage(PostProducerDto post)
     {

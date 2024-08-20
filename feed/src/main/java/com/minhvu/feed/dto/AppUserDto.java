@@ -1,20 +1,22 @@
-package com.minhvu.feed.model;
+package com.minhvu.feed.dto;
 
-import jakarta.persistence.*;
+import com.minhvu.feed.model.Role;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+
+@Builder
 @Data
-@Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "app_user")
-public class AppUser {
-    @Id
+public class AppUserDto {
     private UUID id;
     private String email;
     private String name;
@@ -28,4 +30,3 @@ public class AppUser {
     private UUID createdBy;
     private UUID updatedBy;
 }
-

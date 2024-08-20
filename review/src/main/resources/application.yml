@@ -12,6 +12,11 @@ spring:
   application:
     name: review-service
   kafka:
+    bootstrap-servers: localhost:9092
+    template:
+      user-topic: saveUserTopic
+    consumer:
+      user-group-id: userTopicId
     producer:
       bootstrap-servers: localhost:9092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer

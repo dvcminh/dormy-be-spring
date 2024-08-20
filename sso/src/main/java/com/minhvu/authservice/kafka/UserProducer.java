@@ -1,5 +1,7 @@
 package com.minhvu.authservice.kafka;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.minhvu.authservice.dto.AppUserDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,22 +21,25 @@ public class UserProducer {
 
     private static final String TOPIC = "saveUserTopic";
 
-    @Autowired
-    private KafkaTemplate<String, AppUserDto> kafkaTemplate;
-
-    @Autowired
-    private KafkaTransactionManager<String, AppUserDto> transactionManager;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
     @Transactional
-    public void sendOrder(String userId, AppUserDto orderEvent) {
-        CompletableFuture<SendResult<String, AppUserDto>> future = kafkaTemplate.send(TOPIC, userId, orderEvent);
+    public void sendOrder(AppUserDto appUserDto) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            CompletableFuture<SendResult<String, String>> future =
+                    kafkaTemplate.send(TOPIC, objectMapper.writeValueAsString(appUserDto));
 
-        future.whenComplete((result, ex) -> {
-            if (ex != null) {
-                System.err.println("Failed to send message: " + ex.getMessage());
-            } else {
-                System.out.println("Message sent successfully: " + result.getRecordMetadata());
-            }
-        });
+            future.whenComplete((result, ex) -> {
+                if (ex != null) {
+                    System.err.println("Failed to send message: " + ex.getMessage());
+                } else {
+                    System.out.println("Message sent successfully: " + result.getRecordMetadata());
+                }
+            });
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }

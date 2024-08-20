@@ -8,6 +8,12 @@ eureka:
 server:
   port: 8070
 spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    template:
+      user-topic: saveUserTopic
+    consumer:
+      user-group-id: userTopicId
   application:
     name: interactions-service
   datasource:

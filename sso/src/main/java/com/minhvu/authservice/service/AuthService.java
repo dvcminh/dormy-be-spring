@@ -9,6 +9,7 @@ import com.minhvu.authservice.entity.SecurityUser;
 import com.minhvu.authservice.exception.BadRequestException;
 import com.minhvu.authservice.exception.UserNotFoundException;
 import com.minhvu.authservice.exception.response.UserErrorResponse;
+import com.minhvu.authservice.kafka.UserProducer;
 import com.minhvu.authservice.mapper.UserMapper;
 import com.minhvu.authservice.repository.UserCredentialsRepository;
 import com.minhvu.authservice.repository.UserCredentialsService;
@@ -48,6 +49,8 @@ public class AuthService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private JwtService jwtService;
+    @Autowired
+    private UserProducer userProducer;
 
     @Value("${jwt.secret}")
     private String jwtSecret;
@@ -88,6 +91,7 @@ public class AuthService {
         );
 
         userCredentialService.setPassword(newUser.getId(), registerRequest.getPassword());
+        userProducer.sendOrder(userMapper.toDto(newUser));
         return userMapper.toDto(newUser);
     }
 

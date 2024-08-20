@@ -3,9 +3,14 @@ server:
 spring:
   application:
     name: notification-service
+
   kafka:
+    bootstrap-servers: localhost:9092
+    template:
+      user-topic: saveUserTopic
     consumer:
       bootstrap-servers: localhost:9092
+      user-group-id: userTopicId
       group-id: myGroup
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer

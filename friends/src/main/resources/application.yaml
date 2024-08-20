@@ -9,6 +9,12 @@ server:
   port: 8078
 
 spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    template:
+      user-topic: saveUserTopic
+    consumer:
+      user-group-id: userTopicId
   application:
     name: friend-service
   datasource:
