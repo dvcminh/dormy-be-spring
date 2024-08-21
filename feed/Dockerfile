@@ -1,7 +1,11 @@
-# Use the official Redis image as a base
-FROM redis:latest
+FROM openjdk:8-jdk-alpine
 
+LABEL maintainer="dvcminh@example.com"
 
+EXPOSE 8080
 
-# Command to run when the container starts
-CMD [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+ARG JAR_FILE=target/*.jar
+
+ADD ${JAR_FILE} app.jar
+
+ENTRYPOINT ["java","-jar","/app.jar"]
