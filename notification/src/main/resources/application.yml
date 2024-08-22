@@ -1,9 +1,11 @@
 server:
   port: 8111
+socket-server:
+  host: localhost
+  port: 8013
 spring:
   application:
     name: notification-service
-
   kafka:
     bootstrap-servers: localhost:9092
     template:
