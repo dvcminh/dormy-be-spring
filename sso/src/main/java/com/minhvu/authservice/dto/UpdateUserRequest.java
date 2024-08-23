@@ -2,14 +2,16 @@ package com.minhvu.authservice.dto;
 
 import lombok.*;
 
+import java.util.UUID;
+
 @Data
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateUserInformationRequest {
-    private Long id;
+public class UpdateUserRequest {
+    private UUID id;
     private String name;
     private String email;
     private String phone;

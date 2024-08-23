@@ -1,6 +1,5 @@
 package com.minhvu.authservice.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.minhvu.authservice.service.SecurityUserService;
 import com.minhvu.authservice.dto.*;
 import com.minhvu.authservice.dto.request.RefreshTokenRequest;
@@ -9,9 +8,7 @@ import com.minhvu.authservice.dto.response.Response;
 import com.minhvu.authservice.entity.AppUser;
 import com.minhvu.authservice.entity.RefreshToken;
 import com.minhvu.authservice.entity.SecurityUser;
-import com.minhvu.authservice.event.ChangePasswordEvent;
 import com.minhvu.authservice.exception.TokenRefreshException;
-import com.minhvu.authservice.mapper.UserMapper;
 import com.minhvu.authservice.repository.UserCredentialsService;
 import com.minhvu.authservice.service.AuthService;
 import com.minhvu.authservice.service.RefreshTokenService;
@@ -25,12 +22,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 
 @RestController
@@ -60,9 +58,8 @@ public class AuthController extends BaseController{
     public ResponseEntity<AppUserDto> signUp(
             @RequestBody RegisterRequest registerRequest
     ) {
-        return ResponseEntity.ok(
-                authService.signUp(registerRequest)
-        );
+        AppUserDto appUserDto= authService.signUp(registerRequest);
+        return ResponseEntity.ok(appUserDto);
     }
 
     @PostMapping("/login")
@@ -123,11 +120,11 @@ public class AuthController extends BaseController{
         return ResponseEntity.ok(new Response("Password updated successfully"));
     }
     @PostMapping("/updateUser")
-    public String updateUser(@RequestBody UpdateUserInformationRequest userDto) {
+    public String updateUser(@RequestBody UpdateUserRequest userDto) {
         return userService.updateUser(userDto);
     }
     @DeleteMapping("/deleteUser/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<String> deleteUser(@PathVariable UUID id) {
         userService.deleteUser(id);
         return ResponseEntity.ok("Delete User successfully");
     }

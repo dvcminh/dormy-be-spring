@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -25,7 +26,7 @@ public class FeedService {
     private final PostServiceClient postServiceClient;
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public HashMap<String, List<PostWithInteractionResponse>> getFeed(Long userId) {
+    public HashMap<String, List<PostWithInteractionResponse>> getFeed(UUID userId) {
         if (redisTemplate.hasKey(String.valueOf(userId))) {
             HashMap<String, List<PostWithInteractionResponse>> map = getHashMapFromRedis(String.valueOf(userId));
             return map;

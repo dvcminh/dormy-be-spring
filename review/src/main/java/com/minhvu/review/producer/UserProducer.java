@@ -1,16 +1,12 @@
-package com.minhvu.authservice.kafka;
+package com.minhvu.review.producer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.minhvu.authservice.dto.AppUserDto;
+import com.minhvu.review.dto.inter.AppUserDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
-import org.springframework.kafka.transaction.KafkaTransactionManager;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.CompletableFuture;

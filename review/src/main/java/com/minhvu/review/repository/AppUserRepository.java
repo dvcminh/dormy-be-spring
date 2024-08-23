@@ -1,12 +1,12 @@
-package com.minhvu.authservice.repository;
+package com.minhvu.review.repository;
 
-import com.minhvu.authservice.entity.AppUser;
+
+import com.minhvu.review.model.AppUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
-import java.util.UUID;
 
-public interface AppUserRepository extends JpaRepository<AppUser, UUID> {
+public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     Optional<AppUser> findByName(String name);
 
     boolean existsByNameAllIgnoreCase(String name);
@@ -14,5 +14,8 @@ public interface AppUserRepository extends JpaRepository<AppUser, UUID> {
     AppUser findByEmail(String email);
 
     boolean existsByEmailIgnoreCase(String email);
-    boolean existsById(UUID id);
+
+
+    @Override
+    boolean existsById(Long id);
 }

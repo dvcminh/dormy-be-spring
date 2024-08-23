@@ -1,7 +1,7 @@
 package com.minhvu.authservice.service;
 
 import com.minhvu.authservice.dto.AppUserDto;
-import com.minhvu.authservice.dto.UpdateUserInformationRequest;
+import com.minhvu.authservice.dto.UpdateUserRequest;
 import com.minhvu.authservice.entity.AppUser;
 import com.minhvu.authservice.exception.UserNotFoundException;
 import com.minhvu.authservice.mapper.UserMapper;
@@ -17,6 +17,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
+
 @Service
 public class UserServiceImpl implements UserService{
     @Autowired
@@ -37,7 +39,7 @@ public class UserServiceImpl implements UserService{
         return userMapper.toDto(user);
     }
     @Override
-    public boolean checkIfUserExist(Long id) {
+    public boolean checkIfUserExist(UUID id) {
         return appUserRepository.existsById(id);
     }
     @Override
@@ -48,7 +50,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public AppUserDto getUserById(Long userId) {
+    public AppUserDto getUserById(UUID userId) {
         return userMapper.toDto(appUserRepository.findById(userId)
                 .orElseThrow(() -> new BadRequestException("User not found")));
     }
@@ -58,7 +60,7 @@ public class UserServiceImpl implements UserService{
         return appUserRepository.findAll(pageable);
     }
     @Override
-    public String updateUser(UpdateUserInformationRequest userDto) {
+    public String updateUser(UpdateUserRequest userDto) {
         Optional<AppUser> user = appUserRepository.findById(userDto.getId());
         if (user.isPresent()) {
             user.get().setName(userDto.getName());
@@ -73,7 +75,7 @@ public class UserServiceImpl implements UserService{
         }
     }
     @Override
-    public void deleteUser(Long id) {
+    public void deleteUser(UUID id) {
         appUserRepository.deleteById(id);
     }
 }

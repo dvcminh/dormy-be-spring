@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Cascade;
+
+import java.util.UUID;
 
 @Data
 @Entity
@@ -14,7 +17,7 @@ import jakarta.persistence.*;
 public class UserCredential {
 
     @Id
-    private Long userId;
+    private UUID userId;
 
     private boolean enabled = true;
 
@@ -22,7 +25,6 @@ public class UserCredential {
     private String password;
 
     @OneToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "appuser_id")
     private AppUser user;
-
 }

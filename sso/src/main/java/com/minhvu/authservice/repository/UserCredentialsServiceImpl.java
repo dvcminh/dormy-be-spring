@@ -5,11 +5,14 @@ import com.minhvu.authservice.dto.AppUserDto;
 import com.minhvu.authservice.dto.ChangePasswordRequest;
 import com.minhvu.authservice.entity.UserCredential;
 import com.minhvu.authservice.exception.InvalidOldPasswordException;
+import com.minhvu.authservice.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 
 @Service
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
 public class UserCredentialsServiceImpl implements UserCredentialsService {
 
     private final UserCredentialsRepository userCredentialsRepository;
+    private final UserMapper userMapper;
 
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -24,7 +28,7 @@ public class UserCredentialsServiceImpl implements UserCredentialsService {
     private String defaultPassword;
 
     @Override
-    public boolean isEnabled(Long userId) {
+    public boolean isEnabled(UUID userId) {
         return userCredentialsRepository.findByUserId(userId).orElse(new UserCredential()).isEnabled();
     }
 
@@ -35,18 +39,13 @@ public class UserCredentialsServiceImpl implements UserCredentialsService {
     }
 
     @Override
-    public void setPassword(Long userId, String password) {
-        UserCredential userCredential = userCredentialsRepository.findById(userId).orElse(
+    public void setPassword(UUID uuid, String password) {
+        UserCredential userCredential = userCredentialsRepository.findById(uuid).orElse(
                 new UserCredential()
         );
-        userCredential.setUserId(userId);
+        userCredential.setUserId(uuid);
         userCredential.setPassword(passwordEncoder.encode(password));
         userCredentialsRepository.saveAndFlush(userCredential);
-    }
-
-    @Override
-    public void setPassword(Long userId) {
-        setPassword(userId, defaultPassword);
     }
 
     private void isValidOldPassword(AppUserDto currentUser, ChangePasswordRequest passwordRequest) {

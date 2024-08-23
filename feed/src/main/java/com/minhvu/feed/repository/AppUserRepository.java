@@ -5,8 +5,9 @@ import com.minhvu.feed.model.AppUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
+import java.util.UUID;
 
-public interface AppUserRepository extends JpaRepository<AppUser, Long> {
+public interface AppUserRepository extends JpaRepository<AppUser, UUID> {
     Optional<AppUser> findByName(String name);
 
     boolean existsByNameAllIgnoreCase(String name);
@@ -15,7 +16,4 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
 
     boolean existsByEmailIgnoreCase(String email);
 
-
-    @Override
-    boolean existsById(Long id);
 }

@@ -2,19 +2,14 @@ package com.minhvu.authservice.service;
 
 import com.minhvu.authservice.dto.AppUserDto;
 import com.minhvu.authservice.dto.RegisterRequest;
-import com.minhvu.authservice.dto.UpdateUserInformationRequest;
 import com.minhvu.authservice.entity.AppUser;
 import com.minhvu.authservice.entity.Role;
 import com.minhvu.authservice.entity.SecurityUser;
 import com.minhvu.authservice.exception.BadRequestException;
-import com.minhvu.authservice.exception.UserNotFoundException;
-import com.minhvu.authservice.exception.response.UserErrorResponse;
 import com.minhvu.authservice.kafka.UserProducer;
 import com.minhvu.authservice.mapper.UserMapper;
-import com.minhvu.authservice.repository.UserCredentialsRepository;
 import com.minhvu.authservice.repository.UserCredentialsService;
 import com.minhvu.authservice.repository.AppUserRepository;
-import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -22,15 +17,9 @@ import io.jsonwebtoken.security.Keys;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Key;
 import java.util.Date;
@@ -73,7 +62,7 @@ public class AuthService {
 
         return token;
     }
-
+    @Transactional
     public AppUserDto signUp(RegisterRequest registerRequest) {
         if (appUserRepository.existsByEmailIgnoreCase(registerRequest.getEmail())) {
             throw new BadRequestException("Username is already taken!");
@@ -90,8 +79,8 @@ public class AuthService {
                         .build()
         );
 
+        userProducer.sendMessage(userMapper.toDto(newUser));
         userCredentialService.setPassword(newUser.getId(), registerRequest.getPassword());
-        userProducer.sendOrder(userMapper.toDto(newUser));
         return userMapper.toDto(newUser);
     }
 

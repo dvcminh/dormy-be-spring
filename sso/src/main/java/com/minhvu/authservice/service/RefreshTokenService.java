@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -49,8 +50,8 @@ public class RefreshTokenService {
     }
 
     @Transactional
-    public int deleteByUserId(Long userId) {
-        return refreshTokenRepository.deleteByUser(appUserRepository.findById(userId).get());
+    public int deleteByUserId(UUID userId) {
+         return refreshTokenRepository.deleteByUser(appUserRepository.findById(userId).get());
     }
 
 }

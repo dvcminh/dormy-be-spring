@@ -1,6 +1,5 @@
-package com.minhvu.authservice.dto;
+package com.minhvu.friend.dto;
 
-import com.minhvu.authservice.entity.Role;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
@@ -9,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.UUID;
 
 
@@ -26,8 +24,8 @@ public class AppUserDto {
     private String avatar;
     @Enumerated(EnumType.STRING)
     private Role role;
-    private Date createdAt;
-    private Date updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private UUID createdBy;
     private UUID updatedBy;
 }

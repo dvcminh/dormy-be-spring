@@ -2,8 +2,6 @@ package com.minhvu.notification.socket;
 
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
-import com.im.notification.dto.model.NotificationUserResponseDto;
-import com.im.notification.model.NotificationUser;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
