@@ -1,10 +1,12 @@
-package com.minhvu.friend.model.entities;
+package com.minhvu.feed.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -20,12 +22,13 @@ public class Friend extends BaseEntity {
     private UUID userId;
     private UUID friendId;
     @Column(name = "accepted_at")
-    private Date acceptedAt;
+    private LocalDateTime acceptedAt;
 
 
     @PrePersist
     protected void onCreate() {
-        acceptedAt = Date.from(LocalDateTime.now().toInstant(java.time.ZoneOffset.UTC));
+        acceptedAt = LocalDateTime.now();
     }
+
 
 }

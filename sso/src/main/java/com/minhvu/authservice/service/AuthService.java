@@ -10,6 +10,7 @@ import com.minhvu.authservice.kafka.UserProducer;
 import com.minhvu.authservice.mapper.UserMapper;
 import com.minhvu.authservice.repository.UserCredentialsService;
 import com.minhvu.authservice.repository.AppUserRepository;
+import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -28,6 +29,11 @@ import java.util.Date;
 @Service
 @Data
 public class AuthService {
+    private static final String USER_ID = "userId";
+    private static final String EMAIL = "email";
+    private static final String FIRST_NAME = "name";
+    private static final String PHONE = "phone";
+    private static final String ROLE = "role";
     @Autowired
     private AppUserRepository appUserRepository;
     @Autowired
@@ -53,14 +59,19 @@ public class AuthService {
         Date currentDate = new Date();
         Date expireDate = new Date(currentDate.getTime() + time);
 
-        String token = Jwts.builder()
+        JwtBuilder token = Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(expireDate)
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-                .compact();
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256);
 
-        return token;
+        token.claim(USER_ID, userDetails.getUser().getId())
+                .claim(EMAIL, userDetails.getUser().getEmail())
+                .claim(FIRST_NAME, userDetails.getUser().getName())
+                .claim(PHONE, userDetails.getUser().getPhone())
+                .claim(ROLE, userDetails.getUser().getRole());
+
+        return token.compact();
     }
     @Transactional
     public AppUserDto signUp(RegisterRequest registerRequest) {
@@ -73,7 +84,7 @@ public class AuthService {
                         .name(registerRequest.getName())
                         .email(registerRequest.getEmail())
                         .address(registerRequest.getAddress())
-                        .phone_number(registerRequest.getPhone_number())
+                        .phone(registerRequest.getPhone_number())
                         .avatar(registerRequest.getAvatar())
                         .role(Role.CUSTOMER)
                         .build()

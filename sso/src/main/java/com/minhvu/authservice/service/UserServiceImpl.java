@@ -4,6 +4,7 @@ import com.minhvu.authservice.dto.AppUserDto;
 import com.minhvu.authservice.dto.UpdateUserRequest;
 import com.minhvu.authservice.entity.AppUser;
 import com.minhvu.authservice.exception.UserNotFoundException;
+import com.minhvu.authservice.kafka.UserProducer;
 import com.minhvu.authservice.mapper.UserMapper;
 import com.minhvu.authservice.repository.AppUserRepository;
 import com.minhvu.authservice.repository.UserCredentialsRepository;
@@ -29,6 +30,8 @@ public class UserServiceImpl implements UserService{
     private AppUserRepository appUserRepository;
     @Autowired
     private UserCredentialsRepository repository;
+    @Autowired
+    private UserProducer userProducer;
     public AppUser getUserByUserName(String name) {
         return appUserRepository.findByName(name)
                 .orElseThrow(() -> new UserNotFoundException(String.format("User with email %s not found", name)));
@@ -50,6 +53,14 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    public String syncUsers() {
+        appUserRepository.findAll().forEach(appUser -> {
+            userProducer.sendMessage(userMapper.toDto(appUser));
+        });
+        return "Sync users successfully";
+    }
+
+    @Override
     public AppUserDto getUserById(UUID userId) {
         return userMapper.toDto(appUserRepository.findById(userId)
                 .orElseThrow(() -> new BadRequestException("User not found")));
@@ -66,7 +77,7 @@ public class UserServiceImpl implements UserService{
             user.get().setName(userDto.getName());
             user.get().setEmail(userDto.getEmail());
             user.get().setAddress(userDto.getAddress());
-            user.get().setPhone_number(userDto.getPhone());
+            user.get().setPhone(userDto.getPhone());
             user.get().setAvatar(userDto.getAvatar());
             appUserRepository.save(user.get());
             return "User updated successfully";

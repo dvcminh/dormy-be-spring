@@ -1,11 +1,15 @@
-package com.minhvu.friend.kafka;
+package com.minhvu.feed.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.minhvu.friend.dto.AppUserDto;
-import com.minhvu.friend.dto.mapper.AppUserMapper;
-import com.minhvu.friend.model.entities.AppUser;
-import com.minhvu.friend.repository.AppUserRepository;
+import com.minhvu.feed.dto.AppUserDto;
+import com.minhvu.feed.dto.FriendDto;
+import com.minhvu.feed.dto.mapper.AppUserMapper;
+import com.minhvu.feed.dto.mapper.FriendMapper;
+import com.minhvu.feed.model.AppUser;
+import com.minhvu.feed.model.Friend;
+import com.minhvu.feed.repository.AppUserRepository;
+import com.minhvu.feed.repository.FriendRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,22 +20,21 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class UserConsumer {
+public class FriendConsumer {
     @Autowired
-    AppUserRepository userRepository;
+    FriendRepository friendRepository;
     @Autowired
-    AppUserMapper userMapper;
+    FriendMapper friendMapper;
     @Value(value = "${spring.kafka.bootstrap-servers}")
     private String bootstrapAddress;
 
-    @KafkaListener(topicPartitions = {@TopicPartition(topic = "saveUserTopic",
+    @KafkaListener(topicPartitions = {@TopicPartition(topic = "saveFriendTopic",
             partitionOffsets = @PartitionOffset(partition = "0", initialOffset = "0"))})
     public void receive(String message) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        AppUserDto userDto = mapper.readValue(message, AppUserDto.class);
-        log.info("** Saving user to repository payload: '{}'", userDto.toString());
-        AppUser user = userMapper.toModel(userDto);
-        userRepository.save(user);
+        FriendDto userDto = mapper.readValue(message, FriendDto.class);
+        log.info("** Saving friend to repository payload: '{}'", userDto.toString());
+        Friend user = friendMapper.toModel(userDto);
+        friendRepository.save(user);
     }
-
 }

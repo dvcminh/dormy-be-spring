@@ -5,16 +5,18 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class FriendRequestDto implements Serializable {
-    Long id;
-    Long userIdSender;
-    Long friendId;
+    UUID id;
+    UUID userIdSender;
+    UUID friendId;
     Status status;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
+    Date createdAt;
+    Date updatedAt;
 }

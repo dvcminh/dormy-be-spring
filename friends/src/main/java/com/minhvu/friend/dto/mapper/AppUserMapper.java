@@ -1,7 +1,7 @@
 package com.minhvu.friend.dto.mapper;
 
 import com.minhvu.friend.dto.AppUserDto;
-import com.minhvu.friend.model.AppUser;
+import com.minhvu.friend.model.entities.AppUser;
 import org.mapstruct.Mapper;
 import org.springframework.stereotype.Component;
 

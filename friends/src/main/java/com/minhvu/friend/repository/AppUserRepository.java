@@ -1,21 +1,12 @@
 package com.minhvu.friend.repository;
 
 
-import com.minhvu.friend.model.AppUser;
+import com.minhvu.friend.model.entities.AppUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
+import java.util.UUID;
 
-public interface AppUserRepository extends JpaRepository<AppUser, Long> {
-    Optional<AppUser> findByName(String name);
+public interface AppUserRepository extends JpaRepository<AppUser, UUID> {
 
-    boolean existsByNameAllIgnoreCase(String name);
-
-    AppUser findByEmail(String email);
-
-    boolean existsByEmailIgnoreCase(String email);
-
-
-    @Override
-    boolean existsById(Long id);
 }

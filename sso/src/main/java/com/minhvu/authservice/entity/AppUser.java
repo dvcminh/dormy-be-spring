@@ -17,7 +17,7 @@ public class AppUser extends BaseEntity {
 
     private String email;
     private String name;
-    private String phone_number;
+    private String phone;
     private String address;
     private String avatar;
 

@@ -8,15 +8,16 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
-public interface FriendRepository extends JpaRepository<Friend, Long> {
+public interface FriendRepository extends JpaRepository<Friend, UUID> {
 
     @Query("SELECT f.friendId FROM Friend f WHERE f.userId = :userId")
-    List<Long> findFriendIdsByUserId(@Param("userId") Long userId);
-    void deleteByUserIdAndFriendId(Long userId, Long friendId);
-    Boolean existsByUserIdAndFriendId(Long userId, Long friendId);
-    Long countByUserId(Long userId);
+    List<UUID> findFriendIdsByUserId(@Param("userId") UUID userId);
+    void deleteByUserIdAndFriendId(UUID userId, UUID friendId);
+    Boolean existsByUserIdAndFriendId(UUID userId, UUID friendId);
+    UUID countByUserId(UUID userId);
     @Query("SELECT f.friendId FROM Friend f WHERE f.userId = :userId AND f.friendId = :friendId")
-    Long findFriendIdByUserIdAndFriendId(@Param("userId") Long userId, @Param("friendId") Long friendId);
+    UUID findFriendIdByUserIdAndFriendId(@Param("userId") UUID userId, @Param("friendId") UUID friendId);
 
 }

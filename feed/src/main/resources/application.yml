@@ -12,6 +12,7 @@ spring:
       user-topic: saveUserTopic
     consumer:
       user-group-id: userTopicId
+      friend-group-id: friendTopicId
   data:
     redis:
       host: localhost

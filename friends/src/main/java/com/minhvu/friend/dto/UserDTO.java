@@ -1,19 +1,17 @@
 package com.minhvu.friend.dto;
 
-import com.minhvu.friend.model.entities.Role;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.*;
 
-import java.time.LocalDateTime;
-import java.util.Date;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO {
 
-    private Long id;
+    private UUID id;
     private String email;
     private String name;
     private String phone_number;

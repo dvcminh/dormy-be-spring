@@ -16,6 +16,6 @@ public interface UserService {
     void deleteUser(UUID id);
     boolean checkIfUserExist(UUID id);
     public Optional<AppUser> getAuthenticatedUser();
-
+    String syncUsers();
     AppUserDto getUserById(UUID userId);
 }

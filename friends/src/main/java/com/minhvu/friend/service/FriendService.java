@@ -1,6 +1,6 @@
 package com.minhvu.friend.service;
 
-import com.minhvu.friend.dto.FriendDto;
+import com.minhvu.friend.dto.UserFriendDto;
 import com.minhvu.friend.dto.UserDTO;
 import com.minhvu.friend.openfeign.UserClient;
 import com.minhvu.friend.repository.FriendRepository;
@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -22,19 +23,17 @@ public class FriendService {
     @Qualifier("com.minhvu.friend.openfeign.UserClient")
     private final UserClient userClient;
 
-    public FriendDto findFriendIdsByUserId(Long userId)
-    {
+    public UserFriendDto findFriendIdsByUserId(UUID userId) {
 
-        List<Long> friendIds = friendRepository.findFriendIdsByUserId(userId);
-        return FriendDto.builder()
+        List<UUID> friendIds = friendRepository.findFriendIdsByUserId(userId);
+        return UserFriendDto.builder()
                 .userId(userId)
                 .friendId(friendIds)
                 .build();
     }
 
-    public List<UserDTO> getAllFriendsProfile(Long userId)
-    {
-        List<Long> friendIds = friendRepository.findFriendIdsByUserId(userId);
+    public List<UserDTO> getAllFriendsProfile(UUID userId) {
+        List<UUID> friendIds = friendRepository.findFriendIdsByUserId(userId);
         List<UserDTO> userDTOs = new ArrayList<>();
         friendIds.forEach(friendId -> {
             userDTOs.add(userClient.getUserById(friendId).getBody());
@@ -43,23 +42,23 @@ public class FriendService {
     }
 
     @Transactional
-    public void deleteFriend(Long userId, Long friendId)
-    {
+    public void deleteFriend(UUID userId, UUID friendId) {
         log.info("user with id {}  friend with id {} ", userId, friendId);
-      friendRepository.deleteByUserIdAndFriendId(userId, friendId);
-      log.info("Friend with id {} ", findFriendByUserId(userId, friendId));
-      friendRepository.deleteByUserIdAndFriendId(friendId, userId);
+        friendRepository.deleteByUserIdAndFriendId(userId, friendId);
+        log.info("Friend with id {} ", findFriendByUserId(userId, friendId));
+        friendRepository.deleteByUserIdAndFriendId(friendId, userId);
         log.info("Friend with id {} ", findFriendByUserId(friendId, userId));
     }
 
-    public Boolean existsByUserIdAndFriendId(Long userId, Long friendId) {
+    public Boolean existsByUserIdAndFriendId(UUID userId, UUID friendId) {
         return friendRepository.existsByUserIdAndFriendId(userId, friendId);
     }
 
-    public Long countByUserId(Long userId) {
+    public UUID countByUserId(UUID userId) {
         return friendRepository.countByUserId(userId);
     }
-    public Long findFriendByUserId(Long userId, Long friendId) {
+
+    public UUID findFriendByUserId(UUID userId, UUID friendId) {
         return friendRepository.findFriendIdByUserIdAndFriendId(userId, friendId);
     }
 

@@ -1,7 +1,9 @@
 package com.minhvu.authservice.controller;
 
 import com.minhvu.authservice.dto.AppUserDto;
+import com.minhvu.authservice.dto.response.Response;
 import com.minhvu.authservice.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,5 +25,11 @@ public class UserController {
     @GetMapping("/{userId}")
     ResponseEntity<AppUserDto> getUserById(@PathVariable UUID userId) {
         return ResponseEntity.ok(userService.getUserById(userId));
+    }
+
+    @GetMapping("/sync")
+    @Operation(summary = "Sync User Database (syncUsers)", hidden = true)
+    public ResponseEntity<Response> syncUsers() {
+        return ResponseEntity.ok(new Response(userService.syncUsers()));
     }
 }

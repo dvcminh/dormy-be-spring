@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 
@@ -25,8 +26,8 @@ public class AppUserDto {
     private String avatar;
     @Enumerated(EnumType.STRING)
     private Role role;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private Date createdAt;
+    private Date updatedAt;
     private UUID createdBy;
     private UUID updatedBy;
 }

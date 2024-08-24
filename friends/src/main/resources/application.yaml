@@ -33,6 +33,9 @@ spring:
     openfeign:
       circuitbreaker:
         enabled: true
+  cache:
+    caffeine:
+      spec: maximumSize=2000
 
 resilience4j:
   circuitbreaker:

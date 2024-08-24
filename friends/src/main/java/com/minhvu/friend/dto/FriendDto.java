@@ -1,17 +1,20 @@
 package com.minhvu.friend.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import lombok.*;
-
-import java.util.List;
-
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class FriendDto {
-
-    private Long userId;
-    private List<Long> friendId;
-
+    private UUID id;
+    private UUID userId;
+    private UUID friendId;
+    private Date acceptedAt;
 }

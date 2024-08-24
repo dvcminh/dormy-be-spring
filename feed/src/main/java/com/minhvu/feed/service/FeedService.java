@@ -3,9 +3,7 @@ package com.minhvu.feed.service;
 import com.minhvu.feed.client.FriendshipServiceClient;
 import com.minhvu.feed.client.InteractionServiceClient;
 import com.minhvu.feed.client.PostServiceClient;
-import com.minhvu.feed.dto.CompletReaction;
-import com.minhvu.feed.dto.FriendDto;
-import com.minhvu.feed.dto.PostDto;
+import com.minhvu.feed.dto.UserFriendDto;
 import com.minhvu.feed.dto.PostWithInteractionResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -34,7 +32,7 @@ public class FeedService {
         HashMap<String, List<PostWithInteractionResponse>> listHashMap = new HashMap<>();
 //        List<FriendShip> friendShips = friendshipServiceClient.getFriends(userId);
         // Check if the user has friends
-        FriendDto friendShips = friendshipServiceClient.getFriends(userId).getBody();
+        UserFriendDto friendShips = friendshipServiceClient.getFriends(userId).getBody();
         if (friendShips == null) {
             return null;
         }
