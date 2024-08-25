@@ -2,6 +2,7 @@ package com.minhvu.friend.service;
 
 import com.minhvu.friend.dto.FriendRequestDto;
 import com.minhvu.friend.dto.mapper.FriendMapper;
+import com.minhvu.friend.exception.BadRequestException;
 import com.minhvu.friend.exception.FriendRequestException;
 import com.minhvu.friend.exception.UserNotFoundException;
 import com.minhvu.friend.kafka.FriendProducer;
@@ -40,11 +41,17 @@ public class FriendRequestService {
     public FriendRequestDto createFriendRequest(UUID userIdSender, UUID friendId) {
         log.info("Creating friend request for user {} and friend {}", userIdSender, friendId);
 //        if(!userClient.userExists(friendId)) throw new RuntimeException(friendId);
-        if(!userService.existsById(friendId)) throw new RuntimeException("error");
+        if(!userService.existsById(friendId)) {
+            throw new RuntimeException("User does not exist");
+        }
 
-        if(friendRepository.existsByUserIdAndFriendId(userIdSender, friendId))  throw new RuntimeException("You are already friends");
+        if(friendRepository.existsByUserIdAndFriendId(userIdSender, friendId)) {
+            throw new RuntimeException("You are already friends");
+        }
         checkIfUserIsSendingRequestToSelf(userIdSender, friendId);
-        if(friendRequestRepository.existsByUserIdSenderAndFriendId(userIdSender, friendId)) throw new RuntimeException("Friend request already exists");
+        if(friendRequestRepository.existsByUserIdSenderAndFriendId(userIdSender, friendId)) {
+            throw new RuntimeException("Friend request already exists");
+        }
         FriendRequest friendRequest = FriendRequest.builder()
                 .userIdSender(userIdSender)
                 .friendId(friendId)
@@ -61,23 +68,26 @@ public class FriendRequestService {
         FriendRequest friendRequest = friendRequestRepository.findByUserIdSenderAndFriendId(userId, requestId);
         log.info("Optional Status friend request with id {}", friendRequest);
         if (friendRequest == null) {
-            throw new RuntimeException("Friend request does not exist");
+            throw new FriendRequestException("Friend request does not exist");
         }
 
-//        if(!userClient.userExists(friendRequest.get().getUserIdSender())) throw new RuntimeException(friendRequest.get().getFriendId());
-        if(userService.existsById(friendRequest.getUserIdSender())) throw new RuntimeException("error");
+        if(!userService.existsById(friendRequest.getUserIdSender())) {
+            throw new FriendRequestException("User does not exist");
+        }
         log.info("UserClien Status friend request with id {}", requestId);
 
-        if(friendRepository.existsByUserIdAndFriendId(userId, friendRequest.getUserIdSender()))  throw new RuntimeException("Friend already exists");
+        if(friendRepository.existsByUserIdAndFriendId(userId, friendRequest.getUserIdSender()))  {
+            throw new FriendRequestException("Friend already exists");
+        }
         log.info("FriendRepository Status friend request with id {}", requestId);
-        if(!Objects.equals(userId, friendRequest.getFriendId())) throw new RuntimeException("You can't accept a friend request that is not for you");
+
         friendRequest.setStatus(Status.ACCEPTED);
         Friend friend = Friend.builder()
                 .userId(userId)
-                .friendId(friendRequest.getUserIdSender())
+                .friendId(requestId)
                 .build();
         Friend friend1 = Friend.builder()
-                .userId(friendRequest.getUserIdSender())
+                .userId(requestId)
                 .friendId(userId)
                 .build();
         friendRepository.save(friend);
@@ -96,22 +106,27 @@ public class FriendRequestService {
     public FriendRequestDto rejectFriendRequest(UUID userId, UUID requestId) {
         log.info("Rejecting friend request with id {}", requestId);
 
-        Optional<FriendRequest> friendRequest = friendRequestRepository.findById(requestId);
-        if (!friendRequest.isPresent()) {
-            throw new RuntimeException("Friend request does not exist");
+        FriendRequest friendRequest = friendRequestRepository.findByUserIdSenderAndFriendId(userId, requestId);
+        log.info("Optional Status friend request with id {}", friendRequest);
+        if (friendRequest == null) {
+            throw new FriendRequestException("Friend request does not exist");
         }
 //        if(!userClient.userExists(friendRequest.get().getFriendId())) throw new RuntimeException(friendRequest.get().getFriendId());
 
-        if(userService.existsById(friendRequest.get().getFriendId())) throw new RuntimeException("error");
+        if(userService.existsById(friendRequest.getFriendId())){
+            throw new RuntimeException("User does not exist");
+        }
 
-        Boolean isFriend = friendRepository.existsByUserIdAndFriendId(userId, friendRequest.get().getFriendId());
+        Boolean isFriend = friendRepository.existsByUserIdAndFriendId(userId, friendRequest.getFriendId());
         if(isFriend){
             throw new RuntimeException("You are already friends");
         }
-        if(!Objects.equals(userId, friendRequest.get().getFriendId())) throw new RuntimeException("You can't reject a friend request that is not for you");
+        if(!Objects.equals(userId, friendRequest.getFriendId())){
+            throw new RuntimeException("You can't reject a friend request that is not for you");
+        }
 
-        friendRequest.get().setStatus(Status.REJECTED);
-        return  modelMapper.map(friendRequestRepository.save(friendRequest.get()), FriendRequestDto.class);
+        friendRequest.setStatus(Status.REJECTED);
+        return  modelMapper.map(friendRequestRepository.save(friendRequest), FriendRequestDto.class);
     }
 
     public List<FriendRequestDto> getAllFriendRequestByIdSender(UUID idSender) {

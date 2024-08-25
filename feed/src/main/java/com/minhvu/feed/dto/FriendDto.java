@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 @Data
@@ -16,5 +17,5 @@ public class FriendDto {
     private UUID id;
     private UUID userId;
     private UUID friendId;
-    private LocalDateTime acceptedAt;
+    private Date acceptedAt;
 }

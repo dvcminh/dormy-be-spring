@@ -86,18 +86,10 @@ spring:
           filters:
             - AuthenticationFilter
 
-
-        - id: friend-profile-services
-          uri: lb://friend-service
-          predicates:
-            - Path=/api/v1/friends/user/**
-          filters:
-            - AuthenticationFilter
-
         - id: friend-requests
           uri: lb://friend-service
           predicates:
-            - Path=/api/v1/friends/requests/**
+            - Path=/api/v1/friends/**
           filters:
             - AuthenticationFilter
 
