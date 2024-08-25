@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -14,10 +15,10 @@ import java.util.List;
 @Getter
 public class PostEntityDto implements Serializable {
 
-    Long id;
+    UUID id;
     String body;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     boolean isDeleted;
-    Long userId;
+    UUID userId;
 }

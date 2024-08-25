@@ -1,38 +1,39 @@
-package com.minhvu.interaction.service.Impl;
+package com.minhvu.interaction.service;
 
 import com.minhvu.interaction.dto.SharedDto;
 import com.minhvu.interaction.dto.mapper.SharedMapper;
 import com.minhvu.interaction.entity.Shared;
 import com.minhvu.interaction.exception.NotFoundException;
 import com.minhvu.interaction.repository.IsharedRepository;
-import com.minhvu.interaction.service.IsharedService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class SharedService implements IsharedService {
+public class SharedServiceImpl implements SharedService {
 
     private final IsharedRepository isharedRepository;
     private final SharedMapper sharedMapper;
     private final String SHARED_NOT_FOUND = "Shared not found with this id : ";
 
     @Override
-    public SharedDto save(Long postId, SharedDto sharedDto)
+    public SharedDto save(UUID postId, SharedDto sharedDto)
     {
-        sharedDto.setSharedAt(LocalDateTime.now());
+        sharedDto.setSharedAt(Date.from(LocalDateTime.now().toInstant(java.time.ZoneOffset.UTC)));
         sharedDto.setPostId(postId);
         Shared sharedSaved = isharedRepository.save(sharedMapper.toModel(sharedDto));
         return sharedMapper.toDto(sharedSaved);
     }
 
     @Override
-    public SharedDto update(Long id, SharedDto sharedDto)
+    public SharedDto update(UUID id, SharedDto sharedDto)
     {
         Shared shared = isharedRepository.findById(id).orElseThrow(() -> new NotFoundException(SHARED_NOT_FOUND + id));
         shared.setPostId(sharedDto.getPostId());
@@ -42,14 +43,14 @@ public class SharedService implements IsharedService {
     }
 
     @Override
-    public SharedDto getById(Long id)
+    public SharedDto getById(UUID id)
     {
         Shared shared = isharedRepository.findById(id).orElseThrow(() -> new NotFoundException(SHARED_NOT_FOUND + id));
         return sharedMapper.toDto(shared);
     }
 
     @Override
-    public List<SharedDto> getAllSharedByPostId(Long postId)
+    public List<SharedDto> getAllSharedByPostId(UUID postId)
     {
         List<Shared> shareds = isharedRepository.findByPostId(postId);
         return shareds
@@ -59,7 +60,7 @@ public class SharedService implements IsharedService {
     }
 
     @Override
-    public int getCountSharedsOfPost(Long postId)
+    public int getCountSharedsOfPost(UUID postId)
     {
         List<Shared> shareds = isharedRepository.findByPostId(postId);
         return shareds.size();
@@ -76,7 +77,7 @@ public class SharedService implements IsharedService {
     }
 
     @Override
-    public void delete(Long id)
+    public void delete(UUID id)
     {
         if(!isharedRepository.existsById(id))
         {

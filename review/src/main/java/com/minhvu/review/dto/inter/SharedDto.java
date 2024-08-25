@@ -3,6 +3,7 @@ package com.minhvu.review.dto.inter;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -11,8 +12,8 @@ import java.time.LocalDateTime;
 @ToString
 public class SharedDto {
 
-    private Long id;
-    private Long postId;
-    private Long userId;
+    private UUID id;
+    private UUID postId;
+    private UUID userId;
     private LocalDateTime sharedAt;
 }

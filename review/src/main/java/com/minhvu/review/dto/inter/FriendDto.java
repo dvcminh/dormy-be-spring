@@ -4,6 +4,7 @@ package com.minhvu.review.dto.inter;
 import lombok.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -11,8 +12,8 @@ import java.util.List;
 @Builder
 public class FriendDto {
 
-    private Long userId;
+    private UUID userId;
 
-    private List<Long> friendId;
+    private List<UUID> friendId;
 
 }

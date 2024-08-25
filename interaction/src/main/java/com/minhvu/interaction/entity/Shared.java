@@ -6,6 +6,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "shareds")
@@ -16,13 +17,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @SQLDelete(sql = "UPDATE shareds SET is_delete = true WHERE id=?")
 @Where(clause = "is_delete = false")
-public class Shared {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private Long postId;
-    private Long userId;
+public class Shared extends BaseEntity{
+    private UUID postId;
+    private UUID userId;
     private boolean isDelete = Boolean.FALSE;
-    private LocalDateTime sharedAt;
 }

@@ -5,18 +5,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class MediaDTO {
-    Long id;
+    UUID id;
     String mediaUuid;
     String filename;
-    Long userId;
+    UUID userId;
     String uri;
-    Long postId;
+    UUID postId;
     String fileType;
-    Long size;
+    UUID size;
     LocalDateTime createdDate;
 }

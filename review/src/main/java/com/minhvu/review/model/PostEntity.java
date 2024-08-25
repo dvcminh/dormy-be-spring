@@ -6,22 +6,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class PostEntity extends BaseEntity{
 
     private String body;
 
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
-    private Long userId;
+    private UUID userId;
     private boolean isDeleted;
 }

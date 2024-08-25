@@ -24,7 +24,15 @@ public class KafkaTopicConfig {
     }
 
     @Bean
-    public NewTopic inputTopic() {
-        return new NewTopic("editFileInfoTopic", 1, (short) 1);
+    public NewTopic inputTopic1() {
+        return new NewTopic("saveCommentTopic", 1, (short) 1);
+    }
+    @Bean
+    public NewTopic inputTopic2() {
+        return new NewTopic("saveReactionTopic", 1, (short) 1);
+    }
+    @Bean
+    public NewTopic inputTopic3() {
+        return new NewTopic("saveSharedTopic", 1, (short) 1);
     }
 }

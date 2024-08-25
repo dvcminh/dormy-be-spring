@@ -1,4 +1,4 @@
-package com.minhvu.interaction.service.Impl;
+package com.minhvu.interaction.service;
 
 import com.minhvu.interaction.dto.ReactionDto;
 import com.minhvu.interaction.dto.mapper.ReactionMapper;
@@ -6,25 +6,25 @@ import com.minhvu.interaction.entity.Reaction;
 import com.minhvu.interaction.entity.enums.ReactionType;
 import com.minhvu.interaction.exception.NotFoundException;
 import com.minhvu.interaction.repository.IreactionRepository;
-import com.minhvu.interaction.service.IreactionService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class ReactionService implements IreactionService {
+public class ReactionServiceImpl implements ReactionService {
 
     private final IreactionRepository ireactionRepository;
     private final ReactionMapper reactionMapper;
     private static final String REACTION_NOT_FOUND = "Reaction not found with this id : ";
 
     @Override
-    public ReactionDto save(Long postId, ReactionDto reactionDto)
+    public ReactionDto save(UUID postId, ReactionDto reactionDto)
     {
         reactionDto.setCreatedAt(LocalDateTime.now());
         reactionDto.setPostId(postId);
@@ -33,7 +33,7 @@ public class ReactionService implements IreactionService {
     }
 
     @Override
-    public ReactionDto update(Long id, ReactionDto reactionDto)
+    public ReactionDto update(UUID id, ReactionDto reactionDto)
     {
         Reaction reaction = ireactionRepository.findById(id).orElseThrow(() -> new NotFoundException(REACTION_NOT_FOUND + id));
         reaction.setReactionType(reactionDto.getReactionType());
@@ -42,14 +42,14 @@ public class ReactionService implements IreactionService {
     }
 
     @Override
-    public ReactionDto getById(Long id)
+    public ReactionDto getById(UUID id)
     {
         Reaction reaction = ireactionRepository.findById(id).orElseThrow(() -> new NotFoundException(REACTION_NOT_FOUND + id));
         return reactionMapper.toDto(reaction);
     }
 
     @Override
-    public List<ReactionDto> getAllReactionsByPostId(Long postId)
+    public List<ReactionDto> getAllReactionsByPostId(UUID postId)
     {
         List<Reaction> reactions = ireactionRepository.findByPostId(postId);
         return reactions
@@ -69,7 +69,7 @@ public class ReactionService implements IreactionService {
     }
 
     @Override
-    public int getLikeCountOfPost(Long postId)
+    public int getLikeCountOfPost(UUID postId)
     {
         List<Reaction> reactions = ireactionRepository.findByPostId(postId);
         return (int) reactions.stream()
@@ -78,7 +78,7 @@ public class ReactionService implements IreactionService {
     }
 
     @Override
-    public int getLoveCountOfPost(Long postId)
+    public int getLoveCountOfPost(UUID postId)
     {
         List<Reaction> reactions = ireactionRepository.findByPostId(postId);
         return (int) reactions.stream()
@@ -87,7 +87,7 @@ public class ReactionService implements IreactionService {
     }
 
     @Override
-    public int getWowCountOfPost(Long postId)
+    public int getWowCountOfPost(UUID postId)
     {
         List<Reaction> reactions = ireactionRepository.findByPostId(postId);
         return (int) reactions.stream()
@@ -96,7 +96,7 @@ public class ReactionService implements IreactionService {
     }
 
     @Override
-    public int getHahahCountOfPost(Long postId)
+    public int getHahahCountOfPost(UUID postId)
     {
         List<Reaction> reactions = ireactionRepository.findByPostId(postId);
         return (int) reactions.stream()
@@ -105,7 +105,7 @@ public class ReactionService implements IreactionService {
     }
 
     @Override
-    public int getSadCountOfPost(Long postId)
+    public int getSadCountOfPost(UUID postId)
     {
 
         List<Reaction> reactions = ireactionRepository.findByPostId(postId);
@@ -115,7 +115,7 @@ public class ReactionService implements IreactionService {
     }
 
     @Override
-    public int getAngryCountOfPost(Long postId)
+    public int getAngryCountOfPost(UUID postId)
     {
         List<Reaction> reactions = ireactionRepository.findByPostId(postId);
         return (int) reactions.stream()
@@ -124,14 +124,14 @@ public class ReactionService implements IreactionService {
     }
 
     @Override
-    public int getCountReactionsOfPost(Long postId)
+    public int getCountReactionsOfPost(UUID postId)
     {
         List<Reaction> reactions = ireactionRepository.findByPostId(postId);
         return reactions.size();
     }
 
     @Override
-    public void delete(Long id)
+    public void delete(UUID id)
     {
         if(ireactionRepository.existsById(id)){
             ireactionRepository.deleteById(id);

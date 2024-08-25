@@ -4,6 +4,8 @@ import com.minhvu.interaction.entity.enums.ReactionType;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -12,9 +14,9 @@ import java.time.LocalDateTime;
 @ToString
 public class ReactionDto {
 
-    private Long id;
-    private Long postId;
-    private Long userId;
+    private UUID id;
+    private UUID postId;
+    private UUID userId;
     private ReactionType reactionType;
-    private LocalDateTime createdAt;
+    private Date createdAt;
 }

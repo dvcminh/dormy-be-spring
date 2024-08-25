@@ -1,12 +1,11 @@
 package com.minhvu.review.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Data
@@ -22,5 +21,11 @@ public class AppUser {
     private String phone_number;
     private String address;
     private String avatar;
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
+    private Date createdAt;
+    private Date updatedAt;
+    private UUID createdBy;
+    private UUID updatedBy;
 }
+

@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +38,7 @@ public class PostService {
     private final FriendClient friendClient;
 
     @Transactional
-    public PostResponse createPost(Long userId, PostRequest postRequest) {
+    public PostResponse createPost(UUID userId, PostRequest postRequest) {
         PostEntityDto postEntityDto = PostEntityDto.builder()
                 .body(postRequest.getBody())
                 .createdAt(LocalDateTime.now())
@@ -58,7 +59,7 @@ public class PostService {
     }
 
 
-    public PostResponse updatePost(Long userId, Long id, PostUpdateRequest postUpdateRequest) {
+    public PostResponse updatePost(UUID userId, UUID id, PostUpdateRequest postUpdateRequest) {
 
         //check if the post exist
         PostEntity postEntity = postRepository.findById(id).orElseThrow(() -> new PostNotFoundException("Post not found"));
@@ -82,7 +83,6 @@ public class PostService {
             mediaDTOS.addAll(mediaDTOS1);
         }
 
-        postEntity.setUpdatedAt(LocalDateTime.now());
         postEntity.setBody(postUpdateRequest.getBody());
         postEntity = postRepository.save(postEntity);
         PostResponse postResponse = new PostResponse();
@@ -91,7 +91,7 @@ public class PostService {
         return postResponse;
     }
 
-  public void deletePost(Long userId, Long id) {
+  public void deletePost(UUID userId, UUID id) {
         PostEntity postEntity = postRepository.findById(id).orElseThrow(() -> new PostNotFoundException("Post not found"));
         if (!postEntity.getUserId().equals(userId)) throw new PostException("You are not the owner of the post");
         mediaClient.deleteMediaByPostId(id);
@@ -99,14 +99,14 @@ public class PostService {
 
     }
 
-    public List<PostEntityDto> getPostsByUserId(Long id) {
+    public List<PostEntityDto> getPostsByUserId(UUID id) {
         log.info("id: {}", id);
         return postRepository.findPostEntitiesByUserId(id).stream()
                 .map(postMapper::toDto)
                 .toList();
     }
 
-    public List<PostWithInteractionResponse> getAllPost(Long userId) {
+    public List<PostWithInteractionResponse> getAllPost(UUID userId) {
         List<PostWithInteractionResponse> postWithInteractionResponses = new ArrayList<>();
         List<PostEntity> postEntities = postRepository.findPostEntitiesByUserId(userId);
         postEntities.forEach(postEntity -> {
@@ -124,11 +124,11 @@ public class PostService {
         return postWithInteractionResponses;
     }
 
-    public List<PostWithInteractionResponse> getAllPostByUserId(Long userId) {
+    public List<PostWithInteractionResponse> getAllPostByUserId(UUID userId) {
         List<PostWithInteractionResponse> postWithInteractionResponses = new ArrayList<>();
         //find friend of user
         FriendDto friends =  friendClient.getFriendsOfUser(userId).getBody();
-        List<Long> friendIds = friends.getFriendId();
+        List<UUID> friendIds = friends.getFriendId();
         friendIds.forEach(friendId -> {
             List<PostEntity> postEntities = postRepository.findPostEntitiesByUserId(friendId);
             postEntities.forEach(postEntity -> {

@@ -4,13 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostProducerDto {
 
-    private Long relatedId;
+    private UUID relatedId;
     private String body;
-    private Long senderId;
-    private Long receivedId;
+    private UUID senderId;
+    private UUID receivedId;
 }

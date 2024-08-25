@@ -1,11 +1,13 @@
 package com.minhvu.interaction.controller;
 
 import com.minhvu.interaction.dto.InteractionDto;
-import com.minhvu.interaction.service.IinteractionService;
+import com.minhvu.interaction.service.InteractionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
@@ -13,11 +15,11 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin("*")
 public class InteractionController {
 
-    private final IinteractionService iinteractionService;
+    private final InteractionService interactionService;
 
     @GetMapping("/post/{postId}")
-    public ResponseEntity<InteractionDto> getInteractionsOfPost(@PathVariable Long postId)
+    public ResponseEntity<InteractionDto> getInteractionsOfPost(@PathVariable UUID postId)
     {
-        return new ResponseEntity<>(iinteractionService.getInteractionsOfPost(postId), HttpStatus.OK);
+        return new ResponseEntity<>(interactionService.getInteractionsOfPost(postId), HttpStatus.OK);
     }
 }

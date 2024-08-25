@@ -1,8 +1,10 @@
 package com.minhvu.friend.controller;
 
+import com.minhvu.friend.dto.AppUserDto;
 import com.minhvu.friend.dto.UserFriendDto;
 import com.minhvu.friend.dto.UserDTO;
 import com.minhvu.friend.service.FriendService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +23,7 @@ public class FriendController extends BaseController{
 
     @GetMapping("/profiles/all/{id}")
     public ResponseEntity<List<UserDTO>> getAllFriendsProfile(@PathVariable("id") UUID userId) {
+
         return ResponseEntity.ok(friendService.getAllFriendsProfile(userId));
     }
 
@@ -40,7 +43,9 @@ public class FriendController extends BaseController{
     // Delete a friend
 
     @DeleteMapping("/{friendId}")
-    public ResponseEntity<Void> deleteFriend(@RequestHeader("id") UUID userId,@PathVariable UUID friendId) {
+    public ResponseEntity<Void> deleteFriend( @PathVariable UUID friendId, HttpServletRequest request) {
+        AppUserDto currentUser = getCurrentUser(request);
+        UUID userId = currentUser.getId();
         friendService.deleteFriend(userId, friendId);
         return ResponseEntity.noContent().build();
     }

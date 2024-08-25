@@ -6,11 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 @Slf4j
 public class InteractionFallback implements InteractionClient{
     @Override
-    public ResponseEntity<InteractionDto> getInteractionsOfPost(Long postId) {
+    public ResponseEntity<InteractionDto> getInteractionsOfPost(UUID postId) {
         log.error("Error", postId);
         throw new InteractionFallbackException("Error" + postId);
 

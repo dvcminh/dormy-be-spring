@@ -3,13 +3,14 @@ package com.minhvu.interaction.controller;
 
 import com.minhvu.interaction.dto.ReactionDto;
 import com.minhvu.interaction.exception.Error;
-import com.minhvu.interaction.service.IreactionService;
+import com.minhvu.interaction.service.ReactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,24 +18,24 @@ import java.util.List;
 @CrossOrigin("*")
 public class ReactionController {
 
-    private final IreactionService ireactionService;
+    private final ReactionService reactionService;
 
     @PostMapping("/post/{postId}")
-    public ResponseEntity<ReactionDto> save(@PathVariable Long postId, @RequestBody ReactionDto reactionDto)
+    public ResponseEntity<ReactionDto> save(@PathVariable UUID postId, @RequestBody ReactionDto reactionDto)
     {
-        return new ResponseEntity<>(ireactionService.save(postId, reactionDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(reactionService.save(postId, reactionDto), HttpStatus.CREATED);
     }
 
     @GetMapping("/post/{postId}")
-    public ResponseEntity<List<ReactionDto>> getByPostId(@PathVariable Long postId)
+    public ResponseEntity<List<ReactionDto>> getByPostId(@PathVariable UUID postId)
     {
-        return new ResponseEntity<>(ireactionService.getAllReactionsByPostId(postId), HttpStatus.OK);
+        return new ResponseEntity<>(reactionService.getAllReactionsByPostId(postId), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Error> delete(@PathVariable Long id)
+    public ResponseEntity<Error> delete(@PathVariable UUID id)
     {
-        ireactionService.delete(id);
+        reactionService.delete(id);
         Error error = new Error("Reaction deleted successfully");
         return new ResponseEntity<>(error, HttpStatus.OK);
     }
@@ -42,12 +43,12 @@ public class ReactionController {
     @GetMapping
     public ResponseEntity<List<ReactionDto>> all()
     {
-        return new ResponseEntity<>(ireactionService.getAll(), HttpStatus.OK);
+        return new ResponseEntity<>(reactionService.getAll(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ReactionDto> byId(@PathVariable Long id)
+    public ResponseEntity<ReactionDto> byId(@PathVariable UUID id)
     {
-        return new ResponseEntity<>(ireactionService.getById(id), HttpStatus.OK);
+        return new ResponseEntity<>(reactionService.getById(id), HttpStatus.OK);
     }
 }
