@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.PartitionOffset;
 import org.springframework.kafka.annotation.TopicPartition;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -27,12 +28,13 @@ public class UserConsumer {
 
     @KafkaListener(topicPartitions = {@TopicPartition(topic = "saveUserTopic",
             partitionOffsets = @PartitionOffset(partition = "0", initialOffset = "0"))})
-    public void receive(String message) throws JsonProcessingException {
+    public void receive(String message, Acknowledgment acknowledgment) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         AppUserDto userDto = mapper.readValue(message, AppUserDto.class);
         log.info("** Saving user to repository payload: '{}'", userDto.toString());
         AppUser user = userMapper.toModel(userDto);
         userRepository.save(user);
+        acknowledgment.acknowledge();
     }
 
 }

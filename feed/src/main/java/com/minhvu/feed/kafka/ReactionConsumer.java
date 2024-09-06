@@ -1,19 +1,22 @@
-package com.minhvu.friend.kafka;
+package com.minhvu.feed.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.minhvu.friend.dto.AppUserDto;
-import com.minhvu.friend.dto.ReactionDto;
-import com.minhvu.friend.dto.mapper.ReactionMapper;
-import com.minhvu.friend.model.entities.AppUser;
-import com.minhvu.friend.model.entities.Reaction;
-import com.minhvu.friend.repository.ReactionRepository;
+import com.minhvu.feed.dto.AppUserDto;
+import com.minhvu.feed.dto.ReactionDto;
+import com.minhvu.feed.dto.mapper.AppUserMapper;
+import com.minhvu.feed.dto.mapper.ReactionMapper;
+import com.minhvu.feed.model.AppUser;
+import com.minhvu.feed.model.Reaction;
+import com.minhvu.feed.repository.AppUserRepository;
+import com.minhvu.feed.repository.ReactionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.PartitionOffset;
 import org.springframework.kafka.annotation.TopicPartition;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -28,12 +31,13 @@ public class ReactionConsumer {
 
     @KafkaListener(topicPartitions = {@TopicPartition(topic = "saveReactionTopic",
             partitionOffsets = @PartitionOffset(partition = "0", initialOffset = "0"))})
-    public void receive(String message) throws JsonProcessingException {
+    public void receive(String message, Acknowledgment acknowledgment) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        ReactionDto reactionDto = mapper.readValue(message, ReactionDto.class);
-        log.info("** Saving user to repository payload: '{}'", reactionDto.toString());
-        Reaction user = reactionMapper.toModel(reactionDto);
-        reactionRepository.save(user);
+        ReactionDto userDto = mapper.readValue(message, ReactionDto.class);
+        log.info("** Saving reaction to repository payload: '{}'", userDto.toString());
+        Reaction reaction = reactionMapper.toModel(userDto);
+        reactionRepository.save(reaction);
+        acknowledgment.acknowledge();
     }
 
 }

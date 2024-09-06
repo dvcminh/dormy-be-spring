@@ -26,15 +26,16 @@ public class CommentServiceImpl implements CommentService {
     private static final String COMMENT_NOT_FOUND = "Comment not found with this id : ";
 
     @Override
-    public CommentDto save(UUID postId, CreateCommentRequest createCommentRequest)
+    public CommentDto save(UUID userId, CreateCommentRequest createCommentRequest)
     {
         Comment comment = Comment.builder()
-                .postId(postId)
+                .postId(createCommentRequest.getPostId())
                 .commentText(createCommentRequest.getCommentText())
+                .userId(userId)
                 .build();
         CommentDto commentDto = commentMapper.toDto(comment);
         icommentRepository.save(comment);
-        commentProducer.send(commentDto);
+//        commentProducer.send(commentDto);
         return commentDto;
     }
 

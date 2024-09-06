@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -41,7 +42,6 @@ public class NotificationService implements INotificationService {
                             .relatedId(postNotif.getRelatedId())
                             .message(postNotif.getBody())
                             .userReceiver(receivedFriend.getId())
-                            .createdAt(LocalDateTime.now())
                             .build()
             );
         }
@@ -54,7 +54,7 @@ public class NotificationService implements INotificationService {
     }
 
     @Override
-    public List<NotificationDto> getUnseenNotifications(Long userReceiver)
+    public List<NotificationDto> getUnseenNotifications(UUID userReceiver)
     {
        List<Notification> notifications = iNotificationRepository.findByUserReceiverAndSeenIsFalse(userReceiver);
         return notifications
@@ -64,7 +64,7 @@ public class NotificationService implements INotificationService {
     }
 
     @Override
-    public void markNotificationAsSeen(Long notificationId)
+    public void markNotificationAsSeen(UUID notificationId)
     {
         Notification notification = iNotificationRepository.findById(notificationId).orElseThrow(() -> new NotFoundException(NOTIFICATION_NOT_FOUND + notificationId));
         notification.setSeen(true);

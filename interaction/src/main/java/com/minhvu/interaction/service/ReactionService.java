@@ -1,14 +1,16 @@
 package com.minhvu.interaction.service;
 
+import com.minhvu.interaction.dto.CreateReactionRequest;
 import com.minhvu.interaction.dto.ReactionDto;
+import com.minhvu.interaction.dto.UpdateReactionRequest;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface ReactionService {
 
-    ReactionDto save(UUID postId, ReactionDto reactionDto);
-    ReactionDto update(UUID id, ReactionDto reactionDto);
+    ReactionDto save(UUID userId, CreateReactionRequest createReactionRequest);
+    ReactionDto update(UUID id, UpdateReactionRequest reactionDto);
     ReactionDto getById(UUID id);
     List<ReactionDto> getAllReactionsByPostId(UUID postId);
     List<ReactionDto> getAll();
@@ -20,5 +22,5 @@ public interface ReactionService {
     int getAngryCountOfPost(UUID postId);
 
     int getCountReactionsOfPost(UUID postId);
-    void delete(UUID id);
+    void delete(UUID id, UUID uuid);
 }

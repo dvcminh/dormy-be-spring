@@ -7,6 +7,7 @@ import org.hibernate.annotations.Where;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @AllArgsConstructor
@@ -18,16 +19,11 @@ import java.time.LocalDateTime;
 @SQLDelete(sql = "UPDATE notifications SET is_delete = true WHERE id=?")
 @Where(clause = "is_delete = false")
 @Builder
-public class Notification {
+public class Notification extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private Long relatedId;
+    private UUID relatedId;
     private String message;
-    @CreatedDate
-    private LocalDateTime createdAt;
     private boolean seen;
-    private Long userReceiver;
+    private UUID userReceiver;
     private boolean isDelete = Boolean.FALSE;
 }

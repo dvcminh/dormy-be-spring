@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.UUID;
 
 /**
  * DTO for {@link Media}
@@ -14,13 +16,16 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 public class MediaDto implements Serializable {
-    Long id;
+    UUID id;
+    UUID userId;
+    UUID postId;
     String mediaUuid;
     String filename;
-    Long userId;
     String uri;
-    Long postId;
     String fileType;
     Long size;
-    LocalDateTime createdDate;
+    Date createdAt;
+    Date updatedAt;
+    UUID createdBy;
+    UUID updatedBy;
 }

@@ -1,16 +1,18 @@
 package com.minhvu.interaction.service;
 
+import com.minhvu.interaction.dto.CreateReactionRequest;
 import com.minhvu.interaction.dto.ReactionDto;
+import com.minhvu.interaction.dto.UpdateReactionRequest;
 import com.minhvu.interaction.dto.mapper.ReactionMapper;
 import com.minhvu.interaction.entity.Reaction;
 import com.minhvu.interaction.entity.enums.ReactionType;
 import com.minhvu.interaction.exception.NotFoundException;
+import com.minhvu.interaction.kafka.ReactionProducer;
 import com.minhvu.interaction.repository.IreactionRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,21 +23,30 @@ public class ReactionServiceImpl implements ReactionService {
 
     private final IreactionRepository ireactionRepository;
     private final ReactionMapper reactionMapper;
+    private final ReactionProducer reactionProducer;
     private static final String REACTION_NOT_FOUND = "Reaction not found with this id : ";
 
     @Override
-    public ReactionDto save(UUID postId, ReactionDto reactionDto)
+    public ReactionDto save(UUID userId, CreateReactionRequest createReactionRequest)
     {
-        reactionDto.setCreatedAt(LocalDateTime.now());
-        reactionDto.setPostId(postId);
-        Reaction reaction = ireactionRepository.save(reactionMapper.toModel(reactionDto));
-        return reactionMapper.toDto(reaction);
+        Reaction reaction = Reaction.builder()
+                .postId(createReactionRequest.getPostId())
+                .reactionType(createReactionRequest.getReactionType())
+                .userId(userId)
+                .build();
+        ReactionDto reactionDto = reactionMapper.toDto(reaction);
+        ireactionRepository.save(reaction);
+        reactionProducer.send(reactionDto);
+        return reactionDto;
     }
 
     @Override
-    public ReactionDto update(UUID id, ReactionDto reactionDto)
+    public ReactionDto update(UUID id, UpdateReactionRequest reactionDto)
     {
         Reaction reaction = ireactionRepository.findById(id).orElseThrow(() -> new NotFoundException(REACTION_NOT_FOUND + id));
+        if (!reaction.getUserId().equals(id)) {
+            throw new NotFoundException("You are not allowed to update this reaction");
+        }
         reaction.setReactionType(reactionDto.getReactionType());
         Reaction reactionSaved = ireactionRepository.save(reaction);
         return reactionMapper.toDto(reactionSaved);
@@ -131,9 +142,12 @@ public class ReactionServiceImpl implements ReactionService {
     }
 
     @Override
-    public void delete(UUID id)
+    public void delete(UUID id, UUID uuid)
     {
         if(ireactionRepository.existsById(id)){
+            if (!ireactionRepository.findById(id).get().getUserId().equals(uuid)) {
+                throw new NotFoundException("You are not allowed to delete this reaction");
+            }
             ireactionRepository.deleteById(id);
         }
         else {

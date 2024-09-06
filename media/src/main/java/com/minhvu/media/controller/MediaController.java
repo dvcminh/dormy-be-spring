@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/v1/medias")
@@ -25,7 +26,7 @@ public class MediaController {
 
     @PostMapping
     public ResponseEntity<List<MediaDto>> add(@RequestParam("files") List<MultipartFile> files,
-                                              @RequestParam("postId") Long postId,@RequestParam("userId") Long userId) throws IOException {
+                                              @RequestParam("postId") UUID postId, @RequestParam("userId") UUID userId) throws IOException {
         List<MediaDto> mediaList = new ArrayList<>();
         for (MultipartFile file : files) {
             MediaDto media = mediaService.upload(file, userId,postId);
@@ -35,18 +36,18 @@ public class MediaController {
     }
 
     @DeleteMapping("/{mediaUuid}")
-    public ResponseEntity<Void> delete(@PathVariable String mediaUuid,@RequestParam("userId") Long userId,@RequestParam("postId") Long postId) {
+    public ResponseEntity<Void> delete(@PathVariable String mediaUuid,@RequestParam("userId") UUID userId,@RequestParam("postId") UUID postId) {
         mediaService.delete(mediaUuid);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/post/{postId}")
-    public List<MediaDto> getMediaByPostId(@PathVariable("postId") Long postId) {
+    public List<MediaDto> getMediaByPostId(@PathVariable("postId") UUID postId) {
         return mediaService.getMediaByPostId(postId);
     }
 
     @DeleteMapping("/post/{postId}")
-    public void deleteMediaByPostId(@PathVariable("postId") Long postId) {
+    public void deleteMediaByPostId(@PathVariable("postId") UUID postId) {
         mediaService.deleteMediaByPostId(postId);
     }
 

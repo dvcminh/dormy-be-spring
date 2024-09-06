@@ -2,6 +2,8 @@ package com.minhvu.friend.service;
 
 import com.minhvu.friend.dto.UserFriendDto;
 import com.minhvu.friend.dto.UserDTO;
+import com.minhvu.friend.dto.mapper.FriendMapper;
+import com.minhvu.friend.kafka.FriendProducer;
 import com.minhvu.friend.openfeign.UserClient;
 import com.minhvu.friend.repository.FriendRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,9 @@ public class FriendService {
     private final FriendRepository friendRepository;
     @Qualifier("com.minhvu.friend.openfeign.UserClient")
     private final UserClient userClient;
+
+    private final FriendProducer friendProducer;
+    private final FriendMapper friendMapper;
 
     public UserFriendDto findFriendIdsByUserId(UUID userId) {
 
@@ -62,5 +67,10 @@ public class FriendService {
         return friendRepository.findFriendIdByUserIdAndFriendId(userId, friendId);
     }
 
-
+    public String syncFriend() {
+        friendRepository.findAll().forEach(appUser -> {
+            friendProducer.sendMessage(friendMapper.toDto(appUser));
+        });
+        return "Sync users successfully";
+    }
 }

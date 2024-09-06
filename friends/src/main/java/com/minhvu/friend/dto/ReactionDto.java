@@ -18,4 +18,7 @@ public class ReactionDto {
     private UUID userId;
     private ReactionType reactionType;
     private Date createdAt;
+    private Date updatedAt;
+    private UUID createdBy;
+    private UUID updatedBy;
 }

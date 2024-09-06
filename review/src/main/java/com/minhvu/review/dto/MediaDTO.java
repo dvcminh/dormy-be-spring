@@ -12,12 +12,12 @@ import java.util.UUID;
 @AllArgsConstructor
 public class MediaDTO {
     UUID id;
+    UUID postId;
+    UUID userId;
     String mediaUuid;
     String filename;
-    UUID userId;
     String uri;
-    UUID postId;
     String fileType;
-    UUID size;
+    long size;
     LocalDateTime createdDate;
 }

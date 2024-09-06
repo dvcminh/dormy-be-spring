@@ -1,7 +1,10 @@
 package com.minhvu.media.service;
 
+import com.minhvu.media.dto.FeedEvent;
 import com.minhvu.media.dto.MediaDto;
+import com.minhvu.media.dto.mapper.MediaMapper;
 import com.minhvu.media.exception.MediaException;
+import com.minhvu.media.kafka.MediaProducer;
 import com.minhvu.media.model.Media;
 import com.minhvu.media.repository.MediaRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +15,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -23,11 +28,11 @@ public class ImageService {
     private final FileStorageService fileStorageService;
 
     private final MediaRepository mediaRepository;
-    private final ModelMapper modelMapper;
+    private final MediaMapper mediaMapper;
     private final CloudinaryService cloudinaryService;
+    private final MediaProducer mediaProducer;
 
-
-    public MediaDto upload(MultipartFile file, Long userId,Long postId) {
+    public MediaDto upload(MultipartFile file, UUID userId, UUID postId) {
         String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
 
         log.info("storing file {}", filename);
@@ -64,11 +69,12 @@ public class ImageService {
         metadata.setUserId(userId);
         metadata.setPostId(postId);
 
+        mediaProducer.sendFeedEvent(metadata);
+
 //        MediaDto metadata = fileStorageService.store(file, userId, postId);
         log.info("metadata: {}", metadata);
-        Media media = mediaRepository.save(modelMapper.map(metadata, Media.class));
+        Media media = mediaRepository.save(mediaMapper.toModel(metadata));
         metadata.setId(media.getId());
-        metadata.setCreatedDate(media.getCreatedDate());
 
         return metadata;
     }
@@ -79,12 +85,14 @@ public class ImageService {
         mediaRepository.delete(media);
     }
 
-    public List<MediaDto> getMediaByPostId(Long postId) {
+    public List<MediaDto> getMediaByPostId(UUID postId) {
         List<Media> mediaList = mediaRepository.findByPostId(postId);
-        return modelMapper.map(mediaList, List.class);
+        List<MediaDto> mediaDtoList = new ArrayList<>();
+        mediaList.forEach(media -> mediaDtoList.add(mediaMapper.toDto(media)));
+        return mediaDtoList;
     }
 
-    public void deleteMediaByPostId(Long postId) {
+    public void deleteMediaByPostId(UUID postId) {
         mediaRepository.findByPostId(postId).forEach(media -> {
             fileStorageService.delete(media.getFilename());
             mediaRepository.delete(media);

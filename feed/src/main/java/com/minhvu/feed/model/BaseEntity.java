@@ -18,16 +18,10 @@ import java.util.UUID;
 public abstract class BaseEntity {
 
     @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
-    @JsonIgnore
     private UUID id;
 
-    @CreationTimestamp
-    @Column(updatable = false)
     private Date createdAt;
 
-    @UpdateTimestamp
     private Date updatedAt;
 
     private UUID createdBy;

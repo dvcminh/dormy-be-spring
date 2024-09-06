@@ -1,9 +1,12 @@
 package com.minhvu.interaction.controller;
 
 
+import com.minhvu.interaction.dto.CreateReactionRequest;
 import com.minhvu.interaction.dto.ReactionDto;
+import com.minhvu.interaction.dto.UpdateReactionRequest;
 import com.minhvu.interaction.exception.Error;
 import com.minhvu.interaction.service.ReactionService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,26 +19,26 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/reactions")
 @CrossOrigin("*")
-public class ReactionController {
+public class ReactionController extends BaseController{
 
     private final ReactionService reactionService;
 
-    @PostMapping("/post/{postId}")
-    public ResponseEntity<ReactionDto> save(@PathVariable UUID postId, @RequestBody ReactionDto reactionDto)
+    @PostMapping("/post")
+    public ResponseEntity<ReactionDto> save(HttpServletRequest request, @RequestBody CreateReactionRequest createReactionRequest)
     {
-        return new ResponseEntity<>(reactionService.save(postId, reactionDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(reactionService.save(getCurrentUser(request).getId(), createReactionRequest), HttpStatus.CREATED);
     }
 
     @GetMapping("/post/{postId}")
-    public ResponseEntity<List<ReactionDto>> getByPostId(@PathVariable UUID postId)
+    public ResponseEntity<List<ReactionDto>> getReactionByPostId(@PathVariable UUID postId)
     {
         return new ResponseEntity<>(reactionService.getAllReactionsByPostId(postId), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Error> delete(@PathVariable UUID id)
+    public ResponseEntity<Error> delete(HttpServletRequest request, @PathVariable UUID id)
     {
-        reactionService.delete(id);
+        reactionService.delete(getCurrentUser(request).getId(), id);
         Error error = new Error("Reaction deleted successfully");
         return new ResponseEntity<>(error, HttpStatus.OK);
     }
@@ -50,5 +53,11 @@ public class ReactionController {
     public ResponseEntity<ReactionDto> byId(@PathVariable UUID id)
     {
         return new ResponseEntity<>(reactionService.getById(id), HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ReactionDto> update(@PathVariable UUID id, @RequestBody UpdateReactionRequest updateReactionRequest)
+    {
+        return new ResponseEntity<>(reactionService.update(id, updateReactionRequest), HttpStatus.OK);
     }
 }

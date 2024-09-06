@@ -1,7 +1,7 @@
-package com.minhvu.friend.dto.mapper;
+package com.minhvu.feed.dto.mapper;
 
-import com.minhvu.friend.dto.CommentDto;
-import com.minhvu.friend.model.entities.Comment;
+import com.minhvu.feed.dto.CommentDto;
+import com.minhvu.feed.model.Comment;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

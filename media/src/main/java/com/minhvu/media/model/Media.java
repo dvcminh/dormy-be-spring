@@ -10,6 +10,7 @@ import org.springframework.data.annotation.CreatedDate;
 
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @Entity
@@ -17,18 +18,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class Media {
+public class Media extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
     private String filename;
     private String mediaUuid;
-    private Long userId;
+    private UUID userId;
     private String uri;
-    private Long postId;
+    private UUID postId;
     private String fileType;
-    private Long size;
-    @CreatedDate
-    private LocalDateTime createdDate;
+    private long size;
+
 }

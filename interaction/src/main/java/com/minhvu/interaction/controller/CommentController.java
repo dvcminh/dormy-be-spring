@@ -26,17 +26,16 @@ public class CommentController extends BaseController {
     private final CommentService commentService;
 
     // create comment
-    @PostMapping("/post/{postId}")
-    public ResponseEntity<CommentDto> save(@PathVariable("postId") UUID postId,
-                                           @RequestBody CreateCommentRequest createCommentRequest,
+    @PostMapping("/post")
+    public ResponseEntity<CommentDto> save(@RequestBody CreateCommentRequest createCommentRequest,
                                            HttpServletRequest request) {
         AppUserDto user = getCurrentUser(request);
         log.info("post id {}", user.getId());
-        return new ResponseEntity<>(commentService.save(postId, createCommentRequest), HttpStatus.CREATED);
+        return new ResponseEntity<>(commentService.save(user.getId(), createCommentRequest), HttpStatus.CREATED);
     }
 
     @GetMapping("/post/{postId}")
-    public ResponseEntity<List<CommentDto>> getByPostId(@PathVariable UUID postId) {
+    public ResponseEntity<List<CommentDto>> getCommentByPostId(@PathVariable UUID postId) {
         return new ResponseEntity<>(commentService.getAllCommentsByPostId(postId), HttpStatus.OK);
     }
 
@@ -44,8 +43,7 @@ public class CommentController extends BaseController {
     public ResponseEntity<Error> delete(@PathVariable UUID id, HttpServletRequest request) {
         Error error = new Error("Comment deleted successfully");
         AppUserDto user = getCurrentUser(request);
-        UUID userId = user.getId();
-        commentService.delete(userId, id);
+        commentService.delete(user.getId(), id);
         return new ResponseEntity<>(error, HttpStatus.OK);
     }
 
@@ -63,7 +61,6 @@ public class CommentController extends BaseController {
     public ResponseEntity<CommentDto> update(HttpServletRequest request, @RequestBody UpdateCommentRequest updateCommentRequest)
     {
         AppUserDto user = getCurrentUser(request);
-        UUID id = user.getId();
-        return new ResponseEntity<>(commentService.update(id, updateCommentRequest), HttpStatus.OK);
+        return new ResponseEntity<>(commentService.update(user.getId(), updateCommentRequest), HttpStatus.OK);
     }
 }

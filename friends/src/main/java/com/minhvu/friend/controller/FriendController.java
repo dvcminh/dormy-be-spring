@@ -3,6 +3,7 @@ package com.minhvu.friend.controller;
 import com.minhvu.friend.dto.AppUserDto;
 import com.minhvu.friend.dto.UserFriendDto;
 import com.minhvu.friend.dto.UserDTO;
+import com.minhvu.friend.exception.response.Response;
 import com.minhvu.friend.service.FriendService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -49,4 +50,10 @@ public class FriendController extends BaseController{
         friendService.deleteFriend(userId, friendId);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/sync")
+    public ResponseEntity<Response> syncFriend() {
+        return ResponseEntity.ok(new Response(friendService.syncFriend()));
+    }
+
 }

@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -42,7 +43,7 @@ public class FileStorageService {
     private final Environment environment;
     private final  WebApplicationContext webApplicationContext;
 
-    public MediaDto store(MultipartFile file, Long userId, Long postId) {
+    public MediaDto store(MultipartFile file, UUID userId, UUID postId) {
         String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
 
         log.info("storing file {}", filename);
@@ -74,11 +75,10 @@ public class FileStorageService {
                         StandardCopyOption.REPLACE_EXISTING);
             }
 
-            String gatewayHostName = "localhost"; // replace with your gateway's hostname
-            String gatewayPort = "8222"; // replace with your gateway's port
-            String mediaServicePath = "/api/v1/medias/images"; // path to the media service in your gateway configuration
-            // create the file URL using the gateway hostname, port, media service path, user ID, post ID, and new filename
-            // (use the UTF-8 charset) and store it in the fileUrl variable
+            String gatewayHostName = "localhost";
+            String gatewayPort = "8222";
+            String mediaServicePath = "/api/v1/medias/images";
+
             String fileUrl = String.format("http://%s:%s%s/%s",
                     gatewayHostName, gatewayPort, mediaServicePath,  encodedFilename);
 
@@ -92,7 +92,7 @@ public class FileStorageService {
                 .fileType(file.getContentType())
                 .size(file.getSize())
                 .uri(fileUrl)
-                .createdDate(LocalDateTime.now())
+                .createdAt(new Date())
                 .build();
         }
         catch (IOException e) {

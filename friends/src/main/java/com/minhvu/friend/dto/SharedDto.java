@@ -16,5 +16,8 @@ public class SharedDto {
     private UUID id;
     private UUID postId;
     private UUID userId;
-    private Date sharedAt;
+    private Date createdAt;
+    private Date updatedAt;
+    private UUID createdBy;
+    private UUID updatedBy;
 }

@@ -10,6 +10,7 @@ import com.minhvu.review.dto.mapper.PostMapper;
 import com.minhvu.review.exception.PostException;
 import com.minhvu.review.exception.PostNotFoundException;
 import com.minhvu.review.model.PostEntity;
+import com.minhvu.review.producer.MediaProducer;
 import com.minhvu.review.producer.PostProducer;
 import com.minhvu.review.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,7 @@ public class PostService {
     private final InteractionClient interactionClient;
     private final PostProducer producer;
     private final FriendClient friendClient;
+    private final MediaProducer mediaProducer;
 
     @Transactional
     public PostResponse createPost(UUID userId, PostRequest postRequest) {
@@ -50,11 +52,13 @@ public class PostService {
         PostResponse postResponse = new PostResponse();
         postResponse.setPost(postEntityDto);
         postResponse.getPost().setId(postEntity.getId());
-        if (postRequest.getMultipartFiles() != null && !postRequest.getMultipartFiles().isEmpty()) {
-            postResponse.setMedias(mediaClient.add(postRequest.getMultipartFiles(), postEntity.getId(), userId).getBody());
 
+        if (postRequest.getMultipartFiles() != null && !postRequest.getMultipartFiles().isEmpty()) {
+            MediaEvent mediaEvent = new MediaEvent(postEntity.getId(), userId, postRequest.getMultipartFiles());
+            mediaProducer.sendMediaEvent(mediaEvent);
         }
-        producer.sendMessage(new PostProducerDto(postResponse.getPost().getId(), postResponse.getPost().getBody(), postResponse.getPost().getUserId(), null));
+
+        producer.send(postEntityDto);
         return postResponse;
     }
 
@@ -142,6 +146,24 @@ public class PostService {
                 postWithInteractionResponse.setInteractionDto(intercationResponse);
                 postWithInteractionResponses.add(postWithInteractionResponse);
             });
+        });
+        return postWithInteractionResponses;
+    }
+
+    public List<PostWithInteractionResponse> syncPost(UUID userId) {
+        List<PostWithInteractionResponse> postWithInteractionResponses = new ArrayList<>();
+        List<PostEntity> postEntities = postRepository.findPostEntitiesByUserId(userId);
+        postEntities.forEach(postEntity -> {
+            List<MediaDTO> mediaDTOS = mediaClient.getMediaByPostId(postEntity.getId());
+            PostWithInteractionResponse postWithInteractionResponse = new PostWithInteractionResponse();
+            postWithInteractionResponse.setPostResponse(PostResponse.builder()
+                    .post(postMapper.toDto(postEntity))
+                    .medias(mediaDTOS)
+                    .build());
+            InteractionDto intercationResponse = interactionClient.getInteractionsOfPost(postEntity.getId()).getBody();
+            postWithInteractionResponse.setInteractionDto(intercationResponse);
+            postWithInteractionResponses.add(postWithInteractionResponse);
+
         });
         return postWithInteractionResponses;
     }

@@ -3,11 +3,17 @@ package com.minhvu.feed.dto;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.UUID;
+
 @Data
 public class ReactionDto {
-    private Long id;
-    private Long postId;
-    private Long userId;
+    private UUID id;
+    private UUID postId;
+    private UUID userId;
     private ReactionTypeDto reactionType;
-    private LocalDateTime createdAt;
+    private Date createdAt;
+    private Date updatedAt;
+    private UUID createdBy;
+    private UUID updatedBy;
 }

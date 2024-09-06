@@ -1,6 +1,8 @@
 package com.minhvu.interaction.controller;
 
+import com.minhvu.interaction.dto.CreateSharedRequest;
 import com.minhvu.interaction.dto.SharedDto;
+import com.minhvu.interaction.dto.UpdateSharedRequest;
 import com.minhvu.interaction.exception.Error;
 import com.minhvu.interaction.service.SharedService;
 import lombok.RequiredArgsConstructor;
@@ -27,9 +29,9 @@ public class SharedController {
     }
 
     @PostMapping("/post/{postId}")
-    public ResponseEntity<SharedDto> save(@PathVariable UUID postId, @RequestBody SharedDto sharedDto)
+    public ResponseEntity<SharedDto> save(@PathVariable UUID postId, @RequestBody CreateSharedRequest createSharedRequest)
     {
-        return new ResponseEntity<>(sharedService.save(postId, sharedDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(sharedService.save(postId, createSharedRequest), HttpStatus.CREATED);
     }
 
     @GetMapping("/post/{postId}")
@@ -47,9 +49,9 @@ public class SharedController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SharedDto> update(@PathVariable UUID id, @RequestBody SharedDto sharedDto)
+    public ResponseEntity<SharedDto> update(@PathVariable UUID id, @RequestBody UpdateSharedRequest updateSharedRequest)
     {
-        return new ResponseEntity<>(sharedService.update(id, sharedDto), HttpStatus.OK);
+        return new ResponseEntity<>(sharedService.update(id, updateSharedRequest), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

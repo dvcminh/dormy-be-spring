@@ -23,6 +23,14 @@ public class KafkaConsumerConfig {
     private String userGroupId;
     @Value(value = "${spring.kafka.consumer.friend-group-id}")
     private String friendGroupId;
+    @Value(value = "${spring.kafka.consumer.post-group-id}")
+    private String postGroupId;
+    @Value(value = "${spring.kafka.consumer.comment-group-id}")
+    private String commentGroupId;
+    @Value(value = "${spring.kafka.consumer.reaction-group-id}")
+    private String reactionGroupId;
+    @Value(value = "${spring.kafka.consumer.shared-group-id}")
+    private String shareGroupId;
 
     @Bean
     public ConsumerFactory<String, String> consumerFactory() {
@@ -30,6 +38,12 @@ public class KafkaConsumerConfig {
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, userGroupId);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, friendGroupId);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, postGroupId);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, commentGroupId);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, reactionGroupId);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, shareGroupId);
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         return new DefaultKafkaConsumerFactory<>(props);

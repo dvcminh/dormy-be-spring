@@ -1,11 +1,11 @@
 package com.minhvu.interaction.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -13,13 +13,14 @@ import java.util.UUID;
 @Table(name = "comments")
 @Getter
 @Setter
+@Builder
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @SQLDelete(sql = "UPDATE comments SET is_delete = true WHERE id=?")
 @Where(clause = "is_delete = false")
 public class Comment extends BaseEntity {
+    
     private UUID postId;
     private UUID userId;
     private String commentText;

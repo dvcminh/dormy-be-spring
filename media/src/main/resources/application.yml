@@ -10,6 +10,10 @@ server:
 spring:
   application:
     name: media-service
+  kafka:
+    bootstrap-servers: localhost:9092
+    template:
+      default-topic: saveImageTopic
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5430/media_service

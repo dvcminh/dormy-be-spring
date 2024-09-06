@@ -1,4 +1,4 @@
-package com.minhvu.review.dto.page;
+package com.minhvu.review.dto.response.page;
 
 import lombok.Data;
 

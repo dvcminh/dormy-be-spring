@@ -1,9 +1,11 @@
 package com.minhvu.review.controller;
 
 
-
 import com.minhvu.review.dto.*;
 import com.minhvu.review.dto.inter.AppUserDto;
+import com.minhvu.review.dto.mapper.PostMapper;
+import com.minhvu.review.producer.PostProducer;
+import com.minhvu.review.repository.PostRepository;
 import com.minhvu.review.service.PostService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +22,15 @@ import java.util.UUID;
 @RequestMapping("/api/v1/post")
 @Slf4j
 @CrossOrigin("*")
-public class PostController extends BaseController{
+public class PostController extends BaseController {
 
     private final PostService postService;
+    private final PostRepository postRepository;
+    private final PostProducer producer;
+    private final PostMapper postMapper;
+
     @PostMapping
-    public ResponseEntity<PostResponse> createPost(@RequestBody PostRequest postRequest, HttpServletRequest request) {
+    public ResponseEntity<PostResponse> createPost(@ModelAttribute PostRequest postRequest, HttpServletRequest request) {
         AppUserDto user = getCurrentUser(request);
         return ResponseEntity.ok(postService.createPost(user.getId(), postRequest));
     }
@@ -42,6 +48,7 @@ public class PostController extends BaseController{
         postService.deletePost(userId, postId);
         return ResponseEntity.noContent().build();
     }
+
     @GetMapping("/all/{userId}")
     public ResponseEntity<List<PostWithInteractionResponse>> getPost(@PathVariable("userId") UUID userId) {
         return ResponseEntity.ok(postService.getAllPost(userId));
@@ -52,8 +59,13 @@ public class PostController extends BaseController{
         return ResponseEntity.ok(postService.getAllPostByUserId(userId));
     }
 
-
-
+    @GetMapping("/sync")
+    public ResponseEntity<String> syncPost(HttpServletRequest request) {
+        postRepository.findAll().forEach(post -> {
+            producer.send(postMapper.toDto(post));
+        });
+        return ResponseEntity.ok("Sync post successfully");
+    }
 
 
 }

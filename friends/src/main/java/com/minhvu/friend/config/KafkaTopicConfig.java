@@ -25,6 +25,6 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic inputTopic() {
-        return new NewTopic("saveFriendTopic", 1, (short) 1);
+        return new NewTopic("FriendTopic", 1, (short) 1);
     }
 }
