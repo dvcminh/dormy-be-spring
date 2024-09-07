@@ -10,8 +10,8 @@ import com.minhvu.review.dto.mapper.PostMapper;
 import com.minhvu.review.exception.PostException;
 import com.minhvu.review.exception.PostNotFoundException;
 import com.minhvu.review.model.PostEntity;
-import com.minhvu.review.producer.MediaProducer;
-import com.minhvu.review.producer.PostProducer;
+import com.minhvu.review.kafka.MediaProducer;
+import com.minhvu.review.kafka.PostProducer;
 import com.minhvu.review.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,8 +45,8 @@ public class PostService {
     public PostResponse createPost(UUID userId, PostRequest postRequest) {
         PostEntityDto postEntityDto = PostEntityDto.builder()
                 .body(postRequest.getBody())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(Date.from(LocalDateTime.now().toInstant(ZoneOffset.UTC)))
+                .updatedAt(Date.from(LocalDateTime.now().toInstant(ZoneOffset.UTC)))
                 .userId(userId)
                 .build();
         PostEntity postEntity = postMapper.toModel(postEntityDto);

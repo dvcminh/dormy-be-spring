@@ -2,6 +2,9 @@ package com.minhvu.media.controller;
 
 
 import com.minhvu.media.dto.MediaDto;
+import com.minhvu.media.dto.mapper.MediaMapper;
+import com.minhvu.media.kafka.MediaProducer;
+import com.minhvu.media.repository.MediaRepository;
 import com.minhvu.media.service.ImageService;
 import lombok.RequiredArgsConstructor;
 
@@ -20,9 +23,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @CrossOrigin("*")
 public class MediaController {
-
-
     private final ImageService mediaService;
+    private final MediaRepository mediaRepository;
+    private final MediaProducer mediaProducer;
+    private final MediaMapper mediaMapper;
 
     @PostMapping
     public ResponseEntity<List<MediaDto>> add(@RequestParam("files") List<MultipartFile> files,
@@ -36,7 +40,7 @@ public class MediaController {
     }
 
     @DeleteMapping("/{mediaUuid}")
-    public ResponseEntity<Void> delete(@PathVariable String mediaUuid,@RequestParam("userId") UUID userId,@RequestParam("postId") UUID postId) {
+    public ResponseEntity<Void> delete(@PathVariable UUID mediaUuid,@RequestParam("userId") UUID userId,@RequestParam("postId") UUID postId) {
         mediaService.delete(mediaUuid);
         return ResponseEntity.noContent().build();
     }
@@ -51,7 +55,11 @@ public class MediaController {
         mediaService.deleteMediaByPostId(postId);
     }
 
-
-
-
+    @GetMapping("/sync")
+    public ResponseEntity<String> sync() {
+        mediaRepository.findAll().forEach(media -> {
+            mediaProducer.sendFeedEvent(mediaMapper.toDto(media));
+        });
+        return ResponseEntity.ok("Synced");
+    }
 }

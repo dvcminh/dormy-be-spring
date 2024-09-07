@@ -1,13 +1,18 @@
-package com.minhvu.media.kafka;
+package com.minhvu.review.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.minhvu.media.dto.FeedEvent;
-import com.minhvu.media.dto.MediaDto;
+import com.minhvu.review.dto.MediaEvent;
+import com.minhvu.review.dto.PostEntityDto;
+import com.minhvu.review.dto.PostResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.kafka.support.SendResult;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.CompletableFuture;
@@ -15,22 +20,24 @@ import java.util.concurrent.CompletableFuture;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class MediaProducer {
+public class PostProducer {
 
-    private static final String FEED_TOPIC = "saveImageTopic";
+    private static final String TOPIC = "savePostTopic";
 
     private final KafkaTemplate<String, String> kafkaTemplate;
 
-    public void sendFeedEvent(MediaDto mediaDto) {
+    @Transactional
+    public void send(PostEntityDto postProducerDto) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             CompletableFuture<SendResult<String, String>> future =
-                    kafkaTemplate.send(FEED_TOPIC, objectMapper.writeValueAsString(mediaDto));
+                    kafkaTemplate.send(TOPIC, objectMapper.writeValueAsString(postProducerDto));
+
             future.whenComplete((result, ex) -> {
                 if (ex != null) {
-                    log.error("Failed to send message: {}", ex.getMessage());
+                    System.err.println("Failed to send message: " + ex.getMessage());
                 } else {
-                    log.info("Message sent successfully: {}", result.getRecordMetadata());
+                    System.out.println("Message sent successfully: " + result.getRecordMetadata());
                 }
             });
         } catch (JsonProcessingException exc) {

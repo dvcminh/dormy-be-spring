@@ -22,9 +22,7 @@ public class Media {
     private UUID postId;
     private UUID userId;
     private String filename;
-    private String mediaUuid;
     private String uri;
     private String fileType;
-    private long size;
     private Date createdAt;
 }

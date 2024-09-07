@@ -44,7 +44,6 @@ public class ImageService {
             }
 
             if (filename.contains("..")) {
-                // This is a security check
                 log.warn("cannot store file with relative path {}", filename);
                 throw new MediaException(
                         "Cannot store file with relative path outside current directory "
@@ -68,6 +67,8 @@ public class ImageService {
         metadata.setUri(url);
         metadata.setUserId(userId);
         metadata.setPostId(postId);
+        metadata.setCreatedBy(userId);
+        metadata.setUpdatedBy(userId);
 
         mediaProducer.sendFeedEvent(metadata);
 
@@ -78,8 +79,8 @@ public class ImageService {
 
         return metadata;
     }
-    public void delete(String mediaUuid) {
-        Media media = mediaRepository.findByMediaUuid(mediaUuid)
+    public void delete(UUID mediaUuid) {
+        Media media = mediaRepository.findById(mediaUuid)
                 .orElseThrow(() -> new MediaException("Media not found with uuid: " + mediaUuid));
         fileStorageService.delete(media.getFilename());
         mediaRepository.delete(media);

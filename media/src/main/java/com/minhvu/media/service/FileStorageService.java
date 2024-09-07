@@ -90,7 +90,6 @@ public class FileStorageService {
                 .mediaUuid(postId+""+ userId +  UUID.randomUUID().toString().substring(0,4))
                 .postId(postId)
                 .fileType(file.getContentType())
-                .size(file.getSize())
                 .uri(fileUrl)
                 .createdAt(new Date())
                 .build();

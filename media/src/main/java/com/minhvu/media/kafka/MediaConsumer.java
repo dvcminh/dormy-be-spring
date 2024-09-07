@@ -21,6 +21,7 @@ public class MediaConsumer {
     public void consume(String message) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         MediaEvent mediaEvent = objectMapper.readValue(message, MediaEvent.class);
+        log.info("Consumed message: {}", mediaEvent);
         mediaEvent.getFiles().forEach(file -> mediaService.upload(file, mediaEvent.getUserId(), mediaEvent.getPostId()));
     }
 }

@@ -27,11 +27,10 @@ public class PostConsumer {
 
     @KafkaListener(topicPartitions = {@TopicPartition(topic = "savePostTopic",
             partitionOffsets = @PartitionOffset(partition = "0", initialOffset = "0"))})
-    public void receive(String message, Acknowledgment acknowledgment) throws JsonProcessingException {
+    public void receive(String message) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         PostEntityDto postEntity = mapper.readValue(message, PostEntityDto.class);
         log.info("** Saving user to repository payload: '{}'", postRepository.toString());
         postRepository.save(postMapper.toModel(postEntity));
-        acknowledgment.acknowledge();
     }
 }

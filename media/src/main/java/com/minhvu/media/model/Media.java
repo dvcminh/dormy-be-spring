@@ -21,11 +21,9 @@ import java.util.UUID;
 public class Media extends BaseEntity {
 
     private String filename;
-    private String mediaUuid;
     private UUID userId;
     private String uri;
     private UUID postId;
     private String fileType;
-    private long size;
 
 }

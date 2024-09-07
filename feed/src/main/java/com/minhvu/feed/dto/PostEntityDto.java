@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 @Entity
 @Data
@@ -17,8 +18,8 @@ public class PostEntityDto implements Serializable {
     @Id
     UUID id;
     String body;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
+    Date createdAt;
+    Date updatedAt;
     boolean isDeleted;
     UUID userId;
 }

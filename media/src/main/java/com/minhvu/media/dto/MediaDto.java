@@ -23,7 +23,6 @@ public class MediaDto implements Serializable {
     String filename;
     String uri;
     String fileType;
-    Long size;
     Date createdAt;
     Date updatedAt;
     UUID createdBy;

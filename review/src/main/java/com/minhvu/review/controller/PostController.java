@@ -4,7 +4,7 @@ package com.minhvu.review.controller;
 import com.minhvu.review.dto.*;
 import com.minhvu.review.dto.inter.AppUserDto;
 import com.minhvu.review.dto.mapper.PostMapper;
-import com.minhvu.review.producer.PostProducer;
+import com.minhvu.review.kafka.PostProducer;
 import com.minhvu.review.repository.PostRepository;
 import com.minhvu.review.service.PostService;
 import jakarta.servlet.http.HttpServletRequest;

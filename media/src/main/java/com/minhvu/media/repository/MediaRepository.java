@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MediaRepository extends JpaRepository<Media, UUID> {
-    Optional<Media> findByMediaUuid(String mediaUuid);
     List<Media> findByPostId(UUID postId);
 
 }
