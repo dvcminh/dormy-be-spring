@@ -1,5 +1,7 @@
 package com.minhvu.feed.service;
 
+import com.minhvu.feed.dto.FriendDto;
+import com.minhvu.feed.dto.UserFriendDto;
 import com.minhvu.feed.repository.FriendRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -19,5 +21,7 @@ public class FriendService {
 
     private final FriendRepository friendRepository;
 
-
+    public List<UUID> getFriends(UUID userId) {
+        return friendRepository.findAllByUserId(userId);
+    }
 }

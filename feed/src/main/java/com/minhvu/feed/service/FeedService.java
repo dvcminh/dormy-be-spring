@@ -23,6 +23,7 @@ public class FeedService {
     private final InteractionServiceClient interactionServiceClient;
     private final PostServiceClient postServiceClient;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final FriendService friendService;
 
     public HashMap<String, List<PostWithInteractionResponse>> getFeed(UUID userId) {
         if (redisTemplate.hasKey(String.valueOf(userId))) {
@@ -32,11 +33,11 @@ public class FeedService {
         HashMap<String, List<PostWithInteractionResponse>> listHashMap = new HashMap<>();
 //        List<FriendShip> friendShips = friendshipServiceClient.getFriends(userId);
         // Check if the user has friends
-        UserFriendDto friendShips = friendshipServiceClient.getFriends(userId).getBody();
+        List<UUID> friendShips = friendService.getFriends(userId);
         if (friendShips == null) {
             return null;
         }
-        friendShips.getFriendId().forEach(friendId -> {
+        friendShips.forEach(friendId -> {
             List<PostWithInteractionResponse> postDto = postServiceClient.getPostByUser(friendId).getBody();
             listHashMap.put(String.valueOf(friendId), postDto);
         });

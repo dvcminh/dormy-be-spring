@@ -11,5 +11,6 @@ import java.util.UUID;
 
 public interface FriendRepository extends JpaRepository<Friend, UUID> {
 
-
+    @Query("SELECT f.friendId FROM Friend f WHERE f.userId = :userId")
+    List<UUID> findAllByUserId(@Param("userId") UUID userId);
 }
