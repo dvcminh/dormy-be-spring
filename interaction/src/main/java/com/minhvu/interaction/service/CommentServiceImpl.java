@@ -59,15 +59,7 @@ public class CommentServiceImpl implements CommentService {
         return commentMapper.toDto(comment);
     }
 
-    @Override
-    public List<CommentDto> getAllCommentsByPostId(UUID postId)
-    {
-        List<Comment> comments = icommentRepository.findByPostId(postId);
-        return comments
-                .stream()
-                .map(commentMapper::toDto)
-                .toList();
-    }
+
 
     @Override
     public List<CommentDto> getAll()
@@ -79,12 +71,7 @@ public class CommentServiceImpl implements CommentService {
                 .toList();
     }
 
-    @Override
-    public int getCountOfCommentsByPost(UUID postId)
-    {
-        List<Comment> comments = icommentRepository.findByPostId(postId);
-        return comments.size();
-    }
+
 
     @Override
     public void delete(UUID id, UUID uuid)

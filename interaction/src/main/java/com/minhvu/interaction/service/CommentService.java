@@ -13,8 +13,6 @@ public interface CommentService {
     CommentDto save(UUID userId, CreateCommentRequest commentDto);
     CommentDto update(UUID id, UpdateCommentRequest commentDto);
     CommentDto getById(UUID id);
-    List<CommentDto> getAllCommentsByPostId(UUID postId);
     List<CommentDto> getAll();
-    int getCountOfCommentsByPost(UUID postId);
     void delete(UUID id, UUID uuid);
 }

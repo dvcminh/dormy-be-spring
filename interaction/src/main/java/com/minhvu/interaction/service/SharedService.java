@@ -12,8 +12,6 @@ public interface SharedService {
     SharedDto save(UUID userId, CreateSharedRequest sharedDto);
     SharedDto update(UUID id, UpdateSharedRequest sharedDto);
     SharedDto getById(UUID id);
-    List<SharedDto> getAllSharedByPostId(UUID postId);
-    int getCountSharedsOfPost(UUID postId);
     List<SharedDto> getAll();
     void delete(UUID id);
 }

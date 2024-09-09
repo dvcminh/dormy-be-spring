@@ -10,4 +10,5 @@ import java.util.UUID;
 @Repository
 public interface ReactionRepository extends JpaRepository<Reaction, UUID> {
 
+    List<Reaction> findByPostId(UUID postId);
 }

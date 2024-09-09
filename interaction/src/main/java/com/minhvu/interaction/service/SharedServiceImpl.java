@@ -53,22 +53,9 @@ public class SharedServiceImpl implements SharedService {
         return sharedMapper.toDto(shared);
     }
 
-    @Override
-    public List<SharedDto> getAllSharedByPostId(UUID postId)
-    {
-        List<Shared> shareds = isharedRepository.findByPostId(postId);
-        return shareds
-                .stream()
-                .map(sharedMapper::toDto)
-                .toList();
-    }
 
-    @Override
-    public int getCountSharedsOfPost(UUID postId)
-    {
-        List<Shared> shareds = isharedRepository.findByPostId(postId);
-        return shareds.size();
-    }
+
+
 
     @Override
     public List<SharedDto> getAll()

@@ -59,15 +59,7 @@ public class ReactionServiceImpl implements ReactionService {
         return reactionMapper.toDto(reaction);
     }
 
-    @Override
-    public List<ReactionDto> getAllReactionsByPostId(UUID postId)
-    {
-        List<Reaction> reactions = ireactionRepository.findByPostId(postId);
-        return reactions
-                .stream()
-                .map(reactionMapper::toDto)
-                .toList();
-    }
+
 
     @Override
     public List<ReactionDto> getAll()
@@ -79,67 +71,7 @@ public class ReactionServiceImpl implements ReactionService {
                 .toList();
     }
 
-    @Override
-    public int getLikeCountOfPost(UUID postId)
-    {
-        List<Reaction> reactions = ireactionRepository.findByPostId(postId);
-        return (int) reactions.stream()
-                .filter(reaction -> reaction.getReactionType() == ReactionType.LIKE)
-                .count();
-    }
 
-    @Override
-    public int getLoveCountOfPost(UUID postId)
-    {
-        List<Reaction> reactions = ireactionRepository.findByPostId(postId);
-        return (int) reactions.stream()
-                .filter(reaction -> reaction.getReactionType() == ReactionType.LOVE)
-                .count();
-    }
-
-    @Override
-    public int getWowCountOfPost(UUID postId)
-    {
-        List<Reaction> reactions = ireactionRepository.findByPostId(postId);
-        return (int) reactions.stream()
-                .filter(reaction -> reaction.getReactionType() == ReactionType.WOW)
-                .count();
-    }
-
-    @Override
-    public int getHahahCountOfPost(UUID postId)
-    {
-        List<Reaction> reactions = ireactionRepository.findByPostId(postId);
-        return (int) reactions.stream()
-                .filter(reaction -> reaction.getReactionType() == ReactionType.HAHAH)
-                .count();
-    }
-
-    @Override
-    public int getSadCountOfPost(UUID postId)
-    {
-
-        List<Reaction> reactions = ireactionRepository.findByPostId(postId);
-        return (int) reactions.stream()
-                .filter(reaction -> reaction.getReactionType() == ReactionType.SAD)
-                .count();
-    }
-
-    @Override
-    public int getAngryCountOfPost(UUID postId)
-    {
-        List<Reaction> reactions = ireactionRepository.findByPostId(postId);
-        return (int) reactions.stream()
-                .filter(reaction -> reaction.getReactionType() == ReactionType.ANGRY)
-                .count();
-    }
-
-    @Override
-    public int getCountReactionsOfPost(UUID postId)
-    {
-        List<Reaction> reactions = ireactionRepository.findByPostId(postId);
-        return reactions.size();
-    }
 
     @Override
     public void delete(UUID id, UUID uuid)

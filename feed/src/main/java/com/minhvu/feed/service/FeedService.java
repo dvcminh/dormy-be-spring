@@ -19,11 +19,9 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class FeedService {
 
-    private final FriendshipServiceClient friendshipServiceClient;
-    private final InteractionServiceClient interactionServiceClient;
-    private final PostServiceClient postServiceClient;
     private final RedisTemplate<String, Object> redisTemplate;
     private final FriendService friendService;
+    private final PostService postService;
 
     public HashMap<String, List<PostWithInteractionResponse>> getFeed(UUID userId) {
         if (redisTemplate.hasKey(String.valueOf(userId))) {
@@ -38,7 +36,7 @@ public class FeedService {
             return null;
         }
         friendShips.forEach(friendId -> {
-            List<PostWithInteractionResponse> postDto = postServiceClient.getPostByUser(friendId).getBody();
+            List<PostWithInteractionResponse> postDto = postService.getPostsByUserId(friendId);
             listHashMap.put(String.valueOf(friendId), postDto);
         });
 
