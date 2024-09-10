@@ -29,12 +29,6 @@ public class ReactionController extends BaseController{
         return new ResponseEntity<>(reactionService.save(getCurrentUser(request).getId(), createReactionRequest), HttpStatus.CREATED);
     }
 
-    @GetMapping("/post/{postId}")
-    public ResponseEntity<List<ReactionDto>> getReactionByPostId(@PathVariable UUID postId)
-    {
-        return new ResponseEntity<>(reactionService.getAllReactionsByPostId(postId), HttpStatus.OK);
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Error> delete(HttpServletRequest request, @PathVariable UUID id)
     {

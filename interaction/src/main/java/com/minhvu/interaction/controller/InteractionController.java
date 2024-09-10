@@ -16,10 +16,4 @@ import java.util.UUID;
 public class InteractionController {
 
     private final InteractionService interactionService;
-
-    @GetMapping("/post/{postId}")
-    public ResponseEntity<InteractionDto> getInteractionsOfPost(@PathVariable UUID postId)
-    {
-        return new ResponseEntity<>(interactionService.getInteractionsOfPost(postId), HttpStatus.OK);
-    }
 }

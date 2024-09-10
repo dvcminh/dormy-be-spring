@@ -31,12 +31,11 @@ public class FriendConsumer {
 
     @KafkaListener(topicPartitions = {@TopicPartition(topic = "saveFriendTopic",
             partitionOffsets = @PartitionOffset(partition = "0", initialOffset = "0"))})
-    public void receive(String message, Acknowledgment acknowledgment) throws JsonProcessingException {
+    public void receive(String message) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         FriendDto userDto = mapper.readValue(message, FriendDto.class);
         log.info("** Saving friend to repository payload: '{}'", userDto.toString());
         Friend user = friendMapper.toModel(userDto);
         friendRepository.save(user);
-        acknowledgment.acknowledge();
     }
 }

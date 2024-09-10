@@ -34,12 +34,6 @@ public class SharedController {
         return new ResponseEntity<>(sharedService.save(postId, createSharedRequest), HttpStatus.CREATED);
     }
 
-    @GetMapping("/post/{postId}")
-    public ResponseEntity<List<SharedDto>> getSharedsByPost(@PathVariable UUID postId)
-    {
-        return new ResponseEntity<>(sharedService.getAllSharedByPostId(postId), HttpStatus.OK);
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Error> delete(@PathVariable UUID id)
     {

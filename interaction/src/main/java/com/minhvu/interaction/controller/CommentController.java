@@ -34,11 +34,6 @@ public class CommentController extends BaseController {
         return new ResponseEntity<>(commentService.save(user.getId(), createCommentRequest), HttpStatus.CREATED);
     }
 
-    @GetMapping("/post/{postId}")
-    public ResponseEntity<List<CommentDto>> getCommentByPostId(@PathVariable UUID postId) {
-        return new ResponseEntity<>(commentService.getAllCommentsByPostId(postId), HttpStatus.OK);
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Error> delete(@PathVariable UUID id, HttpServletRequest request) {
         Error error = new Error("Comment deleted successfully");
