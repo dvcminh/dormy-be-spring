@@ -9,19 +9,16 @@ services:
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
-    container_name: zookeeper-dormy
+    container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     restart: always
     user: "0:0"
-    volumes:
-      - ./zookeeper-data:/var/lib/zookeeper/data
-      - ./.zookeeper-logs:/var/lib/zookeeper/log
 
   broker:
     image: confluentinc/cp-kafka:7.3.0
-    container_name: broker-dormy
+    container_name: broker
     ports:
       - 9092:9092
     expose:
@@ -40,9 +37,6 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
     restart: always
     user: "0:0"
-    volumes:
-      - ./.kafka-logs:/logs
-      - ./kafka-data:/var/lib/kafka/data
 
   redis:
     container_name: redis-dormy

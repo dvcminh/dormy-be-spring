@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.PartitionOffset;
 import org.springframework.kafka.annotation.TopicPartition;
-import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -31,13 +30,12 @@ public class ShareConsumer {
 
     @KafkaListener(topicPartitions = {@TopicPartition(topic = "saveShareTopic",
             partitionOffsets = @PartitionOffset(partition = "0", initialOffset = "0"))})
-    public void receive(String message, Acknowledgment acknowledgment) throws JsonProcessingException {
+    public void receive(String message) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         SharedDto userDto = mapper.readValue(message, SharedDto.class);
         log.info("** Saving share to repository payload: '{}'", userDto.toString());
         Shared user = sharedMapper.toModel(userDto);
         sharedRepository.save(user);
-        acknowledgment.acknowledge();
     }
 
 }

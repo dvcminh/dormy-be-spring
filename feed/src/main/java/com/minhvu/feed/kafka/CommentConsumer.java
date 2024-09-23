@@ -17,6 +17,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.PartitionOffset;
 import org.springframework.kafka.annotation.TopicPartition;
 import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -29,15 +30,23 @@ public class CommentConsumer {
     @Value(value = "${spring.kafka.bootstrap-servers}")
     private String bootstrapAddress;
 
-    @KafkaListener(topicPartitions = {@TopicPartition(topic = "CommentTopic",
-            partitionOffsets = @PartitionOffset(partition = "0", initialOffset = "0"))})
-    public void receive(String message, Acknowledgment acknowledgment) throws JsonProcessingException {
+    @KafkaListener(
+            topicPartitions = {
+                    @TopicPartition(
+                            topic = "saveCommentTopic",
+                            partitionOffsets = @PartitionOffset(
+                                    partition = "0", initialOffset = "0"
+                            )
+                    )
+            }
+    )
+    public void receive(@Payload String message) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         CommentDto userDto = mapper.readValue(message, CommentDto.class);
         log.info("** Saving comment to repository payload: '{}'", userDto.toString());
         Comment user = commentMapper.toModel(userDto);
         commentRepository.save(user);
-        acknowledgment.acknowledge();
     }
+
 
 }

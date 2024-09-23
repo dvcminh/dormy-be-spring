@@ -79,7 +79,7 @@ public class AuthService {
             throw new BadRequestException("Username is already taken!");
         }
 
-        AppUser newUser = appUserRepository.save(
+        AppUser newUser = appUserRepository.saveAndFlush(
                 AppUser.builder()
                         .name(registerRequest.getName())
                         .email(registerRequest.getEmail())

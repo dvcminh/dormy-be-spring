@@ -19,4 +19,8 @@ public class CommentDto {
     private UUID userId;
     private String commentText;
     private boolean isDelete;
+    private Date createdAt;
+    private Date updatedAt;
+    private UUID createdBy;
+    private UUID updatedBy;
 }

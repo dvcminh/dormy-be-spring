@@ -3,11 +3,11 @@ package com.minhvu.interaction.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(HttpStatus.NOT_FOUND)
-public class NotFoundException extends RuntimeException {
+@ResponseStatus(HttpStatus.FORBIDDEN)
+public class ForbiddenException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
-    public NotFoundException(String message) {
+    public ForbiddenException(String message) {
         super(message);
     }
 }

@@ -28,6 +28,6 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic inputTopic() {
-        return new NewTopic("saveImageTopic", 1, (short) 1);
+        return new NewTopic("saveMediaTopic", 1, (short) 1);
     }
 }

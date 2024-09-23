@@ -8,6 +8,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface IsharedRepository extends JpaRepository<Shared, UUID> {
+public interface SharedRepository extends JpaRepository<Shared, UUID> {
     List<Shared> findByPostId(UUID postId);
 }

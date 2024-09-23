@@ -8,10 +8,9 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface IreactionRepository extends JpaRepository<Reaction, UUID> {
+public interface ReactionRepository extends JpaRepository<Reaction, UUID> {
 
     List<Reaction> findByPostId(UUID postId);
 
-    @Override
-    boolean existsById(UUID aUUID);
+    boolean existsByUserIdAndPostId(UUID userId, UUID postId);
 }

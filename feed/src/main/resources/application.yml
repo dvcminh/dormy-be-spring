@@ -4,39 +4,11 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://eureka:password@localhost:8761/eureka
-
 spring:
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
-      user-group-id: userTopicId
-      friend-group-id: friendTopicId
-      post-group-id: postTopicId
-      comment-group-id: commentTopicId
-      reaction-group-id: reactionTopicId
-      shared-group-id: sharedTopicId
-      auto-offset-reset: earliest
-      enable-auto-commit: true
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      properties:
-        max.poll.records: 500
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
-      acks: all
-      retries: 3
-      linger-ms: 10
-      batch-size: 16384
-      properties:
-        enable.idempotence: true
-    listener:
-      concurrency: 3
-      ack-mode: manual
-    template:
-      user-topic: saveUserTopic
-      default-topic: saveUserTopic
-
+      group-id: saveFeed
   data:
     redis:
       host: localhost

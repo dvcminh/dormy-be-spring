@@ -21,6 +21,7 @@ public class MediaProducer {
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     public void sendMediaEvent(MediaEvent mediaEvent) {
+        log.info("Producing media event: {}", mediaEvent);
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             CompletableFuture<SendResult<String, String>> future =

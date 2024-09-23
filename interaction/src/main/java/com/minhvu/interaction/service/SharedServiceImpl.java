@@ -6,7 +6,8 @@ import com.minhvu.interaction.dto.UpdateSharedRequest;
 import com.minhvu.interaction.dto.mapper.SharedMapper;
 import com.minhvu.interaction.entity.Shared;
 import com.minhvu.interaction.exception.NotFoundException;
-import com.minhvu.interaction.repository.IsharedRepository;
+import com.minhvu.interaction.kafka.SharedProducer;
+import com.minhvu.interaction.repository.SharedRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,36 +21,37 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SharedServiceImpl implements SharedService {
 
-    private final IsharedRepository isharedRepository;
+    private final SharedRepository sharedRepository;
     private final SharedMapper sharedMapper;
+    private final SharedProducer sharedProducer;
     private final String SHARED_NOT_FOUND = "Shared not found with this id : ";
 
     @Override
-    public SharedDto save(UUID userId, CreateSharedRequest sharedDto)
+    public SharedDto save(UUID userId, CreateSharedRequest createSharedRequest)
     {
-        Shared shared = Shared.builder()
-                .postId(sharedDto.getPostId())
-                .sharedText(sharedDto.getSharedText())
-                .userId(userId)
-                .build();
-        Shared sharedSaved = isharedRepository.save(shared);
-        return sharedMapper.toDto(sharedSaved);
+        Shared sharedSaved = sharedRepository.saveAndFlush(
+                Shared.builder().postId(createSharedRequest.getPostId())
+                                .sharedText(createSharedRequest.getSharedText())
+                                .userId(userId)
+                                .build());
+        SharedDto sharedDto = sharedMapper.toDto(sharedSaved);
+        sharedProducer.send(sharedDto);
+        return sharedDto;
     }
 
     @Override
     public SharedDto update(UUID id, UpdateSharedRequest sharedDto)
     {
-        Shared shared = isharedRepository.findById(id).orElseThrow(() -> new NotFoundException(SHARED_NOT_FOUND + id));
+        Shared shared = sharedRepository.findById(id).orElseThrow(() -> new NotFoundException(SHARED_NOT_FOUND + id));
         shared.setSharedText(sharedDto.getSharedText());
-        shared.setUpdatedAt(new Date());
-        Shared sharedSaved = isharedRepository.save(shared);
+        Shared sharedSaved = sharedRepository.save(shared);
         return sharedMapper.toDto(sharedSaved);
     }
 
     @Override
     public SharedDto getById(UUID id)
     {
-        Shared shared = isharedRepository.findById(id).orElseThrow(() -> new NotFoundException(SHARED_NOT_FOUND + id));
+        Shared shared = sharedRepository.findById(id).orElseThrow(() -> new NotFoundException(SHARED_NOT_FOUND + id));
         return sharedMapper.toDto(shared);
     }
 
@@ -60,7 +62,7 @@ public class SharedServiceImpl implements SharedService {
     @Override
     public List<SharedDto> getAll()
     {
-        List<Shared> shareds = isharedRepository.findAll();
+        List<Shared> shareds = sharedRepository.findAll();
         return shareds
                 .stream()
                 .map(sharedMapper::toDto)
@@ -70,10 +72,10 @@ public class SharedServiceImpl implements SharedService {
     @Override
     public void delete(UUID id)
     {
-        if(!isharedRepository.existsById(id))
+        if(!sharedRepository.existsById(id))
         {
             throw new NotFoundException(SHARED_NOT_FOUND + id);
         }
-        isharedRepository.deleteById(id);
+        sharedRepository.deleteById(id);
     }
 }

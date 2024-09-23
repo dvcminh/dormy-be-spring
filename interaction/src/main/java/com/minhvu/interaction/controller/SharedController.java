@@ -3,7 +3,6 @@ package com.minhvu.interaction.controller;
 import com.minhvu.interaction.dto.CreateSharedRequest;
 import com.minhvu.interaction.dto.SharedDto;
 import com.minhvu.interaction.dto.UpdateSharedRequest;
-import com.minhvu.interaction.exception.Error;
 import com.minhvu.interaction.service.SharedService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,7 +27,7 @@ public class SharedController {
         return new ResponseEntity<>(sharedService.getAll(), HttpStatus.OK);
     }
 
-    @PostMapping("/post/{postId}")
+    @PostMapping("/post")
     public ResponseEntity<SharedDto> save(@PathVariable UUID postId, @RequestBody CreateSharedRequest createSharedRequest)
     {
         return new ResponseEntity<>(sharedService.save(postId, createSharedRequest), HttpStatus.CREATED);

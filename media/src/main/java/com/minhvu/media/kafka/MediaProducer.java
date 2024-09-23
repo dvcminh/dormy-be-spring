@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 public class MediaProducer {
 
-    private static final String FEED_TOPIC = "saveImageTopic";
+    private static final String FEED_TOPIC = "saveMediaTopic";
 
     private final KafkaTemplate<String, String> kafkaTemplate;
 

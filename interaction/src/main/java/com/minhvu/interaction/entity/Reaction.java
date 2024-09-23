@@ -3,6 +3,8 @@ package com.minhvu.interaction.entity;
 
 import com.minhvu.interaction.entity.enums.ReactionType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -24,6 +26,7 @@ public class Reaction extends BaseEntity{
     
     private UUID postId;
     private UUID userId;
+    @Enumerated(EnumType.STRING)
     private ReactionType reactionType;
     private boolean isDelete = Boolean.FALSE;
 }

@@ -7,7 +7,7 @@ import com.minhvu.interaction.dto.mapper.CommentMapper;
 import com.minhvu.interaction.entity.Comment;
 import com.minhvu.interaction.exception.NotFoundException;
 import com.minhvu.interaction.kafka.CommentProducer;
-import com.minhvu.interaction.repository.IcommentRepository;
+import com.minhvu.interaction.repository.CommentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
 
-    private final IcommentRepository icommentRepository;
+    private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
     private final CommentProducer commentProducer;
     private static final String COMMENT_NOT_FOUND = "Comment not found with this id : ";
@@ -28,34 +28,33 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentDto save(UUID userId, CreateCommentRequest createCommentRequest)
     {
-        Comment comment = Comment.builder()
+        Comment comment = commentRepository.saveAndFlush(Comment.builder()
                 .postId(createCommentRequest.getPostId())
                 .commentText(createCommentRequest.getCommentText())
                 .userId(userId)
-                .build();
+                .build());
         CommentDto commentDto = commentMapper.toDto(comment);
-        icommentRepository.save(comment);
-//        commentProducer.send(commentDto);
+        commentProducer.send(commentDto);
         return commentDto;
     }
 
     @Override
     public CommentDto update(UUID id, UpdateCommentRequest commentDto)
     {
-        Comment comment = icommentRepository.findById(commentDto.getPostId())
+        Comment comment = commentRepository.findById(commentDto.getPostId())
                 .orElseThrow(() -> new NotFoundException(COMMENT_NOT_FOUND + id));
         if(!comment.getUserId().equals(id)) {
             throw new NotFoundException("You are not allowed to update this comment");
         }
         comment.setCommentText(commentDto.getCommentText());
-        Comment commentUpdated = icommentRepository.save(comment);
+        Comment commentUpdated = commentRepository.saveAndFlush(comment);
         return commentMapper.toDto(commentUpdated);
     }
 
     @Override
     public CommentDto getById(UUID id)
     {
-        Comment comment = icommentRepository.findById(id).orElseThrow(() -> new NotFoundException(COMMENT_NOT_FOUND + id));
+        Comment comment = commentRepository.findById(id).orElseThrow(() -> new NotFoundException(COMMENT_NOT_FOUND + id));
         return commentMapper.toDto(comment);
     }
 
@@ -64,7 +63,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<CommentDto> getAll()
     {
-        List<Comment> comments = icommentRepository.findAll();
+        List<Comment> comments = commentRepository.findAll();
         return comments
                 .stream()
                 .map(commentMapper::toDto)
@@ -76,11 +75,11 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void delete(UUID id, UUID uuid)
     {
-        Comment comment = icommentRepository.findById(uuid)
+        Comment comment = commentRepository.findById(uuid)
                 .orElseThrow(() -> new NotFoundException(COMMENT_NOT_FOUND + uuid));
         if(!comment.getUserId().equals(id)) {
             throw new NotFoundException("You are not allowed to delete this comment");
         }
-        icommentRepository.delete(comment);
+        commentRepository.delete(comment);
     }
 }
