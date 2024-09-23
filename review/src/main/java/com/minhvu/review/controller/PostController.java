@@ -32,16 +32,9 @@ public class PostController extends BaseController {
     private final PostProducer producer;
     private final PostMapper postMapper;
 
-    @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<PostResponse> createPost(
-            @RequestParam("content") String content,
-            @RequestParam("mediaFiles") List<MultipartFile> mediaFiles,
-            HttpServletRequest request) {
+    @PostMapping()
+    public ResponseEntity<PostResponse> createPost(@RequestBody PostRequest postRequest, HttpServletRequest request) {
         AppUserDto user = getCurrentUser(request);
-        PostRequest postRequest = PostRequest.builder()
-                .body(content)
-                .multipartFiles(mediaFiles)
-                .build();
         return ResponseEntity.ok(postService.createPost(user.getId(), postRequest));
     }
 

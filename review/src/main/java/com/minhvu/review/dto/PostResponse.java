@@ -13,5 +13,5 @@ import java.util.List;
 @Builder
 public class PostResponse {
     private PostEntityDto post;
-    private List<MediaDTO> medias;
+    private List<String> medias;
 }

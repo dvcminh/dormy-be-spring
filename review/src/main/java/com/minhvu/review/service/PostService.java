@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,8 +46,6 @@ public class PostService {
     public PostResponse createPost(UUID userId, PostRequest postRequest) {
         PostEntityDto postEntityDto = PostEntityDto.builder()
                 .body(postRequest.getBody())
-                .createdAt(Date.from(LocalDateTime.now().toInstant(ZoneOffset.UTC)))
-                .updatedAt(Date.from(LocalDateTime.now().toInstant(ZoneOffset.UTC)))
                 .userId(userId)
                 .build();
         PostEntity postEntity = postMapper.toModel(postEntityDto);
@@ -54,11 +53,7 @@ public class PostService {
         PostResponse postResponse = new PostResponse();
         postResponse.setPost(postEntityDto);
         postResponse.getPost().setId(postEntity.getId());
-
-        if (postRequest.getMultipartFiles() != null && !postRequest.getMultipartFiles().isEmpty()) {
-            MediaEvent mediaEvent = new MediaEvent(postEntity.getId(), userId, postRequest.getMultipartFiles());
-            mediaProducer.sendMediaEvent(mediaEvent);
-        }
+        postResponse.setMedias(postRequest.getUrlsMedia());
 
         producer.send(postEntityDto);
         return postResponse;
@@ -83,17 +78,17 @@ public class PostService {
         List<MediaDTO> mediaDTOS = mediaClient.getMediaByPostId(id);
         log.info("mediaDTOS {} ", mediaDTOS);
         //check if there is media to add
-        if (postUpdateRequest.getMultipartFiles() != null && !postUpdateRequest.getMultipartFiles().isEmpty()) {
-
-            List<MediaDTO> mediaDTOS1 = mediaClient.add(postUpdateRequest.getMultipartFiles(), id, userId).getBody();
-            mediaDTOS.addAll(mediaDTOS1);
-        }
+//        if (postUpdateRequest.getMultipartFiles() != null && !postUpdateRequest.getMultipartFiles().isEmpty()) {
+//
+//            List<MediaDTO> mediaDTOS1 = mediaClient.add(postUpdateRequest.getMultipartFiles(), id, userId).getBody();
+//            mediaDTOS.addAll(mediaDTOS1);
+//        }
 
         postEntity.setBody(postUpdateRequest.getBody());
         postEntity = postRepository.save(postEntity);
         PostResponse postResponse = new PostResponse();
         postResponse.setPost(postMapper.toDto(postEntity));
-        postResponse.setMedias(mediaDTOS);
+//        postResponse.setMedias(mediaDTOS);
         return postResponse;
     }
 
@@ -120,7 +115,7 @@ public class PostService {
             PostWithInteractionResponse postWithInteractionResponse = new PostWithInteractionResponse();
             postWithInteractionResponse.setPostResponse(PostResponse.builder()
                     .post(postMapper.toDto(postEntity))
-                    .medias(mediaDTOS)
+//                    .medias(mediaDTOS)
                     .build());
             InteractionDto intercationResponse = interactionClient.getInteractionsOfPost(postEntity.getId()).getBody();
             postWithInteractionResponse.setInteractionDto(intercationResponse);
@@ -142,30 +137,12 @@ public class PostService {
                 PostWithInteractionResponse postWithInteractionResponse = new PostWithInteractionResponse();
                 postWithInteractionResponse.setPostResponse(PostResponse.builder()
                         .post(postMapper.toDto(postEntity))
-                        .medias(mediaDTOS)
+//                        .medias(mediaDTOS)
                         .build());
                 InteractionDto intercationResponse = interactionClient.getInteractionsOfPost(postEntity.getId()).getBody();
                 postWithInteractionResponse.setInteractionDto(intercationResponse);
                 postWithInteractionResponses.add(postWithInteractionResponse);
             });
-        });
-        return postWithInteractionResponses;
-    }
-
-    public List<PostWithInteractionResponse> syncPost(UUID userId) {
-        List<PostWithInteractionResponse> postWithInteractionResponses = new ArrayList<>();
-        List<PostEntity> postEntities = postRepository.findPostEntitiesByUserId(userId);
-        postEntities.forEach(postEntity -> {
-            List<MediaDTO> mediaDTOS = mediaClient.getMediaByPostId(postEntity.getId());
-            PostWithInteractionResponse postWithInteractionResponse = new PostWithInteractionResponse();
-            postWithInteractionResponse.setPostResponse(PostResponse.builder()
-                    .post(postMapper.toDto(postEntity))
-                    .medias(mediaDTOS)
-                    .build());
-            InteractionDto intercationResponse = interactionClient.getInteractionsOfPost(postEntity.getId()).getBody();
-            postWithInteractionResponse.setInteractionDto(intercationResponse);
-            postWithInteractionResponses.add(postWithInteractionResponse);
-
         });
         return postWithInteractionResponses;
     }
