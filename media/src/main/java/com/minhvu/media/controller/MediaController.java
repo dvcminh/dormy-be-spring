@@ -27,6 +27,10 @@ public class MediaController {
     private final MediaRepository mediaRepository;
     private final MediaProducer mediaProducer;
     private final MediaMapper mediaMapper;
+    @PostMapping("/getUrls")
+    public ResponseEntity<List<String>> getUrls(@RequestParam("media") List<MultipartFile> list) throws IOException {
+        return ResponseEntity.ok(mediaService.uploadImage(list));
+    }
 
     @PostMapping
     public ResponseEntity<List<MediaDto>> add(@RequestParam("files") List<MultipartFile> files,

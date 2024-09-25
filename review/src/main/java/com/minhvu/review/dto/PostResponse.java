@@ -1,5 +1,6 @@
 package com.minhvu.review.dto;
 
+import com.minhvu.review.model.PostEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +13,6 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class PostResponse {
-    private PostEntityDto post;
+    private PostEntity post;
     private List<String> medias;
 }

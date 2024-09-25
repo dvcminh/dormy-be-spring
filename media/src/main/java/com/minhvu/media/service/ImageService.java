@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -31,6 +32,21 @@ public class ImageService {
     private final MediaMapper mediaMapper;
     private final CloudinaryService cloudinaryService;
     private final MediaProducer mediaProducer;
+
+    public List<String> uploadImage(List<MultipartFile> multipartFileList) throws IOException {
+        List<String> mediaList = new ArrayList<>();
+        multipartFileList.forEach(file -> {
+            try {
+                mediaList.add(uploadImageAndGetUrl(file));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        return mediaList;
+    }
+    public String uploadImageAndGetUrl(MultipartFile file) throws IOException {
+        return cloudinaryService.upload(file);
+    }
 
     public MediaDto upload(MultipartFile file, UUID userId, UUID postId) {
         String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));

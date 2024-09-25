@@ -1,7 +1,10 @@
 package com.minhvu.review.controller;
 
 
-import com.minhvu.review.dto.*;
+import com.minhvu.review.dto.PostRequest;
+import com.minhvu.review.dto.PostResponse;
+import com.minhvu.review.dto.PostUpdateRequest;
+import com.minhvu.review.dto.PostWithInteractionResponse;
 import com.minhvu.review.dto.inter.AppUserDto;
 import com.minhvu.review.dto.mapper.PostMapper;
 import com.minhvu.review.kafka.PostProducer;
@@ -10,12 +13,9 @@ import com.minhvu.review.service.PostService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 

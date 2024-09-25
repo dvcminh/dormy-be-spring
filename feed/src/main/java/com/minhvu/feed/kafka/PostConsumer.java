@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.minhvu.feed.dto.PostEntityDto;
 import com.minhvu.feed.dto.mapper.PostMapper;
-import com.minhvu.feed.model.PostEntity;
 import com.minhvu.feed.repository.PostRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

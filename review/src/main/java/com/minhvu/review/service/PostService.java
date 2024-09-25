@@ -9,9 +9,9 @@ import com.minhvu.review.dto.inter.InteractionDto;
 import com.minhvu.review.dto.mapper.PostMapper;
 import com.minhvu.review.exception.PostException;
 import com.minhvu.review.exception.PostNotFoundException;
-import com.minhvu.review.model.PostEntity;
 import com.minhvu.review.kafka.MediaProducer;
 import com.minhvu.review.kafka.PostProducer;
+import com.minhvu.review.model.PostEntity;
 import com.minhvu.review.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,11 +19,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,18 +40,17 @@ public class PostService {
 
     @Transactional
     public PostResponse createPost(UUID userId, PostRequest postRequest) {
-        PostEntityDto postEntityDto = PostEntityDto.builder()
+        PostEntity postEntity = PostEntity.builder()
                 .body(postRequest.getBody())
                 .userId(userId)
                 .build();
-        PostEntity postEntity = postMapper.toModel(postEntityDto);
-        postEntity = postRepository.save(postEntity);
+        postEntity = postRepository.saveAndFlush(postEntity);
         PostResponse postResponse = new PostResponse();
-        postResponse.setPost(postEntityDto);
+        postResponse.setPost(postEntity);
         postResponse.getPost().setId(postEntity.getId());
         postResponse.setMedias(postRequest.getUrlsMedia());
 
-        producer.send(postEntityDto);
+        producer.send(postMapper.toDto(postEntity));
         return postResponse;
     }
 
@@ -87,7 +82,7 @@ public class PostService {
         postEntity.setBody(postUpdateRequest.getBody());
         postEntity = postRepository.save(postEntity);
         PostResponse postResponse = new PostResponse();
-        postResponse.setPost(postMapper.toDto(postEntity));
+//        postResponse.setPost(postMapper.toDto(postEntity));
 //        postResponse.setMedias(mediaDTOS);
         return postResponse;
     }
@@ -114,7 +109,7 @@ public class PostService {
             List<MediaDTO> mediaDTOS = mediaClient.getMediaByPostId(postEntity.getId());
             PostWithInteractionResponse postWithInteractionResponse = new PostWithInteractionResponse();
             postWithInteractionResponse.setPostResponse(PostResponse.builder()
-                    .post(postMapper.toDto(postEntity))
+//                    .post(postMapper.toDto(postEntity))
 //                    .medias(mediaDTOS)
                     .build());
             InteractionDto intercationResponse = interactionClient.getInteractionsOfPost(postEntity.getId()).getBody();
@@ -136,7 +131,7 @@ public class PostService {
                 List<MediaDTO> mediaDTOS = mediaClient.getMediaByPostId(postEntity.getId());
                 PostWithInteractionResponse postWithInteractionResponse = new PostWithInteractionResponse();
                 postWithInteractionResponse.setPostResponse(PostResponse.builder()
-                        .post(postMapper.toDto(postEntity))
+//                        .post(postMapper.toDto(postEntity))
 //                        .medias(mediaDTOS)
                         .build());
                 InteractionDto intercationResponse = interactionClient.getInteractionsOfPost(postEntity.getId()).getBody();

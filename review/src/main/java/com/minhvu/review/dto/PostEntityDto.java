@@ -1,12 +1,10 @@
 package com.minhvu.review.dto;
 
 import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -20,4 +18,11 @@ public class PostEntityDto implements Serializable {
     String body;
     boolean isDeleted;
     UUID userId;
+    Date createdAt;
+
+    Date updatedAt;
+
+    UUID createdBy;
+
+    UUID updatedBy;
 }

@@ -1,11 +1,9 @@
 package com.minhvu.feed.dto;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.*;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 @Data

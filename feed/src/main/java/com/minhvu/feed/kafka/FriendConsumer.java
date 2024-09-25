@@ -2,13 +2,9 @@ package com.minhvu.feed.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.minhvu.feed.dto.AppUserDto;
 import com.minhvu.feed.dto.FriendDto;
-import com.minhvu.feed.dto.mapper.AppUserMapper;
 import com.minhvu.feed.dto.mapper.FriendMapper;
-import com.minhvu.feed.model.AppUser;
 import com.minhvu.feed.model.Friend;
-import com.minhvu.feed.repository.AppUserRepository;
 import com.minhvu.feed.repository.FriendRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
