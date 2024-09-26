@@ -19,4 +19,6 @@ public class PostEntityDto implements Serializable {
     Date updatedAt;
     boolean isDeleted;
     UUID userId;
+    UUID createdBy;
+    UUID updatedBy;
 }
