@@ -1,19 +1,11 @@
 package com.minhvu.notification.repository;
 
-
-import com.minhvu.notification.entity.AppUser;
+import com.minhvu.notification.model.AppUser;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
 import java.util.UUID;
 
+@Repository
 public interface AppUserRepository extends JpaRepository<AppUser, UUID> {
-    Optional<AppUser> findByName(String name);
-
-    boolean existsByNameAllIgnoreCase(String name);
-
-    AppUser findByEmail(String email);
-
-    boolean existsByEmailIgnoreCase(String email);
-
 }

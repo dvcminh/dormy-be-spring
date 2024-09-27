@@ -1,4 +1,4 @@
-package com.minhvu.notification.entity;
+package com.minhvu.notification.model;
 
 import java.util.Arrays;
 

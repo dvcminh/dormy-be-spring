@@ -1,7 +1,7 @@
 package com.minhvu.notification.dto.mapper;
 
-import com.minhvu.notification.dto.AppUserDto;
-import com.minhvu.notification.entity.AppUser;
+import com.minhvu.notification.dto.model.AppUserDto;
+import com.minhvu.notification.model.AppUser;
 import org.mapstruct.Mapper;
 import org.springframework.stereotype.Component;
 

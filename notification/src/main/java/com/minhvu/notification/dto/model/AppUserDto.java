@@ -1,22 +1,17 @@
-package com.minhvu.notification.dto;
+package com.minhvu.notification.dto.model;
 
-import com.minhvu.notification.entity.Role;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.io.Serializable;
+import java.util.Date;
 import java.util.UUID;
 
-
-@Builder
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-public class AppUserDto {
+public class AppUserDto implements Serializable {
     private UUID id;
     private String email;
     private String name;
@@ -25,8 +20,8 @@ public class AppUserDto {
     private String avatar;
     @Enumerated(EnumType.STRING)
     private Role role;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private Date createdAt;
+    private Date updatedAt;
     private UUID createdBy;
     private UUID updatedBy;
 }

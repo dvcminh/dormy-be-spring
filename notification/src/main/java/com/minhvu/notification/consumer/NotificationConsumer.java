@@ -1,23 +1,89 @@
 package com.minhvu.notification.consumer;
 
-import com.minhvu.notification.service.INotificationService;
-import com.minhvu.review.dto.PostProducerDto;
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.minhvu.notification.dto.model.NotificationDto;
+import com.minhvu.notification.dto.model.NotificationUserDto;
+import com.minhvu.notification.model.Notification;
+import com.minhvu.notification.model.NotificationComponent;
+import com.minhvu.notification.model.NotificationUser;
+import com.minhvu.notification.repository.NotificationComponentRepository;
+import com.minhvu.notification.repository.NotificationRepository;
+import com.minhvu.notification.repository.NotificationUserRepository;
+import com.minhvu.notification.socket.SocketService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.stereotype.Service;
+import org.springframework.kafka.annotation.PartitionOffset;
+import org.springframework.kafka.annotation.TopicPartition;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-@Service
+import java.util.Collection;
+import java.util.UUID;
+
+@Component
 @Slf4j
-@RequiredArgsConstructor
 public class NotificationConsumer {
+    @Autowired
+    SocketService socketService;
 
-    private final INotificationService iNotificationService;
+    @Autowired
+    NotificationRepository notificationRepository;
 
-    @KafkaListener(topics = "post-topic", groupId = "myGroup")
-    public void sendNotifForPostToAllFriend(PostProducerDto postNotif)
-    {
-        iNotificationService.sendPostCreationNotification(postNotif);
-        //log.info(String.format("Consuming the message from post-topic topic: %s", postNotif));
+    @Autowired
+    NotificationUserRepository notificationUserRepository;
+
+    @Autowired
+    NotificationComponentRepository notificationComponentRepository;
+
+    @Transactional
+    @KafkaListener(topicPartitions = {@TopicPartition(topic = "saveNotificationTopic",
+            partitionOffsets = @PartitionOffset(partition = "0", initialOffset = "0"))})
+    public void receiveNotification(String message) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        NotificationDto notificationDto = mapper.readValue(message, NotificationDto.class);
+        log.info("** Saving notification to repository payload: '{}'", notificationDto.toString());
+        NotificationComponent notificationComponent = notificationComponentRepository
+                .findByEntityId(notificationDto.getComponent().getEntityId());
+
+        if (notificationComponent == null) {
+            notificationComponent = new NotificationComponent();
+            BeanUtils.copyProperties(notificationDto.getComponent(), notificationComponent);
+            Notification notification = new Notification();
+            BeanUtils.copyProperties(notificationDto, notification, "component");
+            notification.setComponent(notificationComponent);
+            notificationRepository.save(notification);
+            Collection<UUID> userIds = notificationDto.getToUserIds();
+            userIds.remove(notificationDto.getCreatedBy());
+
+            log.info(userIds.toString());
+            for (UUID userId : userIds) {
+                NotificationUser notificationUser = NotificationUser.builder()
+                        .notification(notification)
+                        .userId(userId)
+                        .isRead(false)
+                        .build();
+                notificationUserRepository.save(notificationUser);
+                socketService.sendMessage(notificationUser);
+            }
+        }
+    }
+
+    @Transactional
+    @KafkaListener(topicPartitions = {@TopicPartition(topic = "saveNotificationUserTopic",
+            partitionOffsets = @PartitionOffset(partition = "0", initialOffset = "0"))})
+    public void receiveNotificationUser(String message) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        NotificationUserDto notificationUserDto = mapper.readValue(message, NotificationUserDto.class);
+        log.info("** Saving notification to repository payload: '{}'", notificationUserDto.toString());
+        NotificationComponent notificationComponent = notificationComponentRepository
+                .findByEntityId(notificationUserDto.getComponent().getEntityId());
+        Notification notification = notificationRepository.findByComponent(notificationComponent);
+        NotificationUser notificationUser = notificationUserRepository.findByNotificationAndUserId(notification, notificationUserDto.getUserId());
+        notificationUser.setIsRead(notificationUserDto.getIsRead());
+        notificationUserRepository.save(notificationUser);
+        socketService.sendMessage(notificationUser);
     }
 }

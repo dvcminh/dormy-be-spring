@@ -2,12 +2,14 @@ package com.minhvu.notification.socket;
 
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
+import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.minhvu.notification.dto.AppUserDto;
-import com.minhvu.notification.exception.UnAuthorizedException;
+import com.minhvu.notification.dto.model.AppUserDto;
+import com.minhvu.notification.exception.UnauthorizedException;
 import com.minhvu.notification.service.UserService;
+import com.minhvu.notification.service.UserServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -34,12 +36,12 @@ public class SocketModule {
         return (client) -> {
             try {
                 Map<String, String> jwt = parseJwt(client.getHandshakeData().getHttpHeaders().get("Authorization"));
-                AppUserDto currentUser = userService.getUserById(UUID.fromString(jwt.get("userId")));
+                AppUserDto currentUser = userService.findByUserId(UUID.fromString(jwt.get("userId")));
                 client.set("userId", currentUser.getId().toString());
             } catch (Exception exc) {
                 client.set("userId", "");
             }
-            log.info((userService.getUserById(UUID.fromString("2455d54d-c280-46a9-ac8d-e7875078fda5"))).toString());
+            log.info((userService.findByUserId(UUID.fromString("2455d54d-c280-46a9-ac8d-e7875078fda5"))).toString());
             log.info("A client connected to server with session ID {}", client.getSessionId().toString());
         };
     }
@@ -53,7 +55,7 @@ public class SocketModule {
     private Map<String, String> parseJwt(String token) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         if (token == null || token.isEmpty()) {
-            throw new UnAuthorizedException("Lost token");
+            throw new UnauthorizedException("Lost token");
         }
         Base64.Decoder decoder = Base64.getUrlDecoder();
         String[] parts = token.split("Bearer ")[1].split("\\.");
