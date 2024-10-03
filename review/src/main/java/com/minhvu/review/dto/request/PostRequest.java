@@ -1,4 +1,4 @@
-package com.minhvu.review.dto;
+package com.minhvu.review.dto.request;
 
 
 import lombok.AllArgsConstructor;

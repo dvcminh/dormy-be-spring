@@ -1,4 +1,4 @@
-package com.minhvu.review.dto.inter;
+package com.minhvu.review.dto;
 
 import com.minhvu.review.model.Role;
 import jakarta.persistence.EnumType;

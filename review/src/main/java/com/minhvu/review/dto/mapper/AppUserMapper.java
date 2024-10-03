@@ -1,6 +1,6 @@
 package com.minhvu.review.dto.mapper;
 
-import com.minhvu.review.dto.inter.AppUserDto;
+import com.minhvu.review.dto.AppUserDto;
 import com.minhvu.review.model.AppUser;
 import org.mapstruct.Mapper;
 import org.springframework.stereotype.Component;

@@ -2,7 +2,7 @@ package com.minhvu.review.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.minhvu.review.dto.inter.AppUserDto;
+import com.minhvu.review.dto.AppUserDto;
 import com.minhvu.review.dto.mapper.AppUserMapper;
 import com.minhvu.review.model.AppUser;
 import com.minhvu.review.repository.AppUserRepository;

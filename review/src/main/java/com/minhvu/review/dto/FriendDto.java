@@ -1,4 +1,4 @@
-package com.minhvu.review.dto.inter;
+package com.minhvu.review.dto;
 
 
 import lombok.*;

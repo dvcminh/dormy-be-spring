@@ -4,7 +4,7 @@ package com.minhvu.review.service;
 
 
 
-import com.minhvu.review.dto.inter.AppUserDto;
+import com.minhvu.review.dto.AppUserDto;
 
 import java.util.UUID;
 

@@ -4,14 +4,21 @@ import com.minhvu.review.client.FriendClient;
 import com.minhvu.review.client.InteractionClient;
 import com.minhvu.review.client.MediaClient;
 import com.minhvu.review.dto.*;
-import com.minhvu.review.dto.inter.FriendDto;
-import com.minhvu.review.dto.inter.InteractionDto;
+import com.minhvu.review.dto.AppUserDto;
+import com.minhvu.review.dto.FriendDto;
+import com.minhvu.review.dto.InteractionDto;
 import com.minhvu.review.dto.mapper.PostMapper;
-import com.minhvu.review.exception.PostException;
-import com.minhvu.review.exception.PostNotFoundException;
+import com.minhvu.review.dto.request.Notification;
+import com.minhvu.review.dto.request.NotificationComponent;
+import com.minhvu.review.dto.request.PostRequest;
+import com.minhvu.review.dto.request.PostUpdateRequest;
+import com.minhvu.review.exception.BadRequestException;
 import com.minhvu.review.kafka.MediaProducer;
+import com.minhvu.review.kafka.NotificationProducer;
 import com.minhvu.review.kafka.PostProducer;
+import com.minhvu.review.model.AppUser;
 import com.minhvu.review.model.PostEntity;
+import com.minhvu.review.repository.AppUserRepository;
 import com.minhvu.review.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +26,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,70 +45,22 @@ public class PostService {
     private final InteractionClient interactionClient;
     private final PostProducer producer;
     private final FriendClient friendClient;
-    private final MediaProducer mediaProducer;
+    private final AppUserRepository appUserRepository;
+    private final NotificationProducer notificationProducer;
 
     @Transactional
-    public PostResponse createPost(UUID userId, PostRequest postRequest) {
+    public PostEntityDto createPost(UUID userId, PostRequest postRequest) {
         PostEntity postEntity = PostEntity.builder()
                 .body(postRequest.getBody())
                 .userId(userId)
+                .urlsMedia(postRequest.getUrlsMedia())
+                .isDeleted(false)
                 .build();
+        postEntity.setCreatedBy(userId);
         postEntity = postRepository.saveAndFlush(postEntity);
-        PostResponse postResponse = new PostResponse();
-        postResponse.setPost(postEntity);
-        postResponse.getPost().setId(postEntity.getId());
-        postResponse.setMedias(postRequest.getUrlsMedia());
-
-        producer.send(postMapper.toDto(postEntity));
+        PostEntityDto postResponse = postMapper.toDto(postEntity);
+        producer.send(postResponse);
         return postResponse;
-    }
-
-
-    public PostResponse updatePost(UUID userId, UUID id, PostUpdateRequest postUpdateRequest) {
-
-        //check if the post exist
-        PostEntity postEntity = postRepository.findById(id).orElseThrow(() -> new PostNotFoundException("Post not found"));
-        //check if the user is the owner of the post
-        if (!postEntity.getUserId().equals(userId)) throw new PostException("You are not the owner of the post");
-        //check if there is media to delete
-        if (postUpdateRequest.getMediaUuidsToDelete() != null && !postUpdateRequest.getMediaUuidsToDelete().isEmpty()) {
-            postUpdateRequest.getMediaUuidsToDelete().forEach(mediaUuid -> {
-                // call media client to delete media
-                //send post id and media id and user id
-                mediaClient.delete(mediaUuid,  userId, id);
-            });
-        }
-        // get the list of media for this post
-        List<MediaDTO> mediaDTOS = mediaClient.getMediaByPostId(id);
-        log.info("mediaDTOS {} ", mediaDTOS);
-        //check if there is media to add
-//        if (postUpdateRequest.getMultipartFiles() != null && !postUpdateRequest.getMultipartFiles().isEmpty()) {
-//
-//            List<MediaDTO> mediaDTOS1 = mediaClient.add(postUpdateRequest.getMultipartFiles(), id, userId).getBody();
-//            mediaDTOS.addAll(mediaDTOS1);
-//        }
-
-        postEntity.setBody(postUpdateRequest.getBody());
-        postEntity = postRepository.save(postEntity);
-        PostResponse postResponse = new PostResponse();
-//        postResponse.setPost(postMapper.toDto(postEntity));
-//        postResponse.setMedias(mediaDTOS);
-        return postResponse;
-    }
-
-  public void deletePost(UUID userId, UUID id) {
-        PostEntity postEntity = postRepository.findById(id).orElseThrow(() -> new PostNotFoundException("Post not found"));
-        if (!postEntity.getUserId().equals(userId)) throw new PostException("You are not the owner of the post");
-        mediaClient.deleteMediaByPostId(id);
-        postRepository.delete(postEntity);
-
-    }
-
-    public List<PostEntityDto> getPostsByUserId(UUID id) {
-        log.info("id: {}", id);
-        return postRepository.findPostEntitiesByUserId(id).stream()
-                .map(postMapper::toDto)
-                .toList();
     }
 
     public List<PostWithInteractionResponse> getAllPost(UUID userId) {
@@ -140,5 +101,68 @@ public class PostService {
             });
         });
         return postWithInteractionResponses;
+    }
+
+    public void delete(UUID postId, AppUserDto currentUser) {
+        PostEntity postEntity = postRepository.findByIdAndUserId(postId, currentUser.getId())
+                .orElseThrow(() -> new BadRequestException(
+                        String.format("Post with id [%s] not found", postId)
+                ));
+        if (postEntity.getIsDeleted())
+            throw new BadRequestException(
+                    String.format("Post with id [%s] has already deleted", postId)
+            );
+        postEntity.setIsDeleted(true);
+        postEntity.setUpdatedBy(currentUser.getId());
+        postRepository.saveAndFlush(postEntity);
+        producer.send(postMapper.toDto(postEntity));
+    }
+
+    public Notification generateNotification(PostEntity postEntity) {
+        Collection<UUID> toUsersId = new ArrayList<>();
+        toUsersId.addAll(appUserRepository.findById(
+                postEntity.getCreatedBy()
+        ).stream().map(AppUser::getId).collect(Collectors.toList()));
+
+        Date date = Date.from(Instant.from(ZonedDateTime.now().toLocalDate()));
+
+
+        return Notification.builder()
+                .component(new NotificationComponent(
+                        "Post",
+                        "Post",
+                        postEntity.getId()
+                ))
+                .message("New post entity")
+                .description(String.format("Post created by %s", postEntity.getCreatedBy()))
+                .createdAt(date)
+                .toUserIds(toUsersId)
+                .createdBy(postEntity.getCreatedBy())
+                .build();
+    }
+
+    public void restore(UUID postId, AppUserDto currentUser) {
+        PostEntity postEntity = postRepository.findByIdAndUserId(postId, currentUser.getId())
+                .orElseThrow(() -> new BadRequestException(
+                        String.format("Post with id [%s] not found", postId)
+                ));
+        if (!postEntity.getIsDeleted())
+            throw new BadRequestException(
+                    String.format("Post with id [%s] has already displayed", postId)
+            );
+        postEntity.setIsDeleted(false);
+        postEntity.setUpdatedBy(currentUser.getId());
+        postRepository.save(postEntity);
+    }
+
+    public void update(UUID postId, PostUpdateRequest postUpdateRequest, AppUserDto currentUser) {
+        PostEntity postEntity = postRepository.findByIdAndUserId(postId, currentUser.getId())
+                .orElseThrow(() -> new BadRequestException(
+                        String.format("Post with id [%s] not found", postId)
+                ));
+        postEntity.setBody(postUpdateRequest.getBody());
+        postEntity.setUrlsMedia(postUpdateRequest.getUrlsMedia());
+        postEntity.setUpdatedBy(currentUser.getId());
+        postRepository.save(postEntity);
     }
 }

@@ -1,24 +1,29 @@
 package com.minhvu.review.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Table
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PostEntity extends BaseEntity{
+public class PostEntity extends BaseEntity {
 
     private String body;
-
+    @ElementCollection
+    private Collection<String> urlsMedia;
     private UUID userId;
-    private boolean isDeleted;
+    @Column(
+            nullable = false,
+            columnDefinition = "BOOLEAN DEFAULT FALSE"
+    )
+    private Boolean isDeleted = false;
 }

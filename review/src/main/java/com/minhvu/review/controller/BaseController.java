@@ -3,7 +3,7 @@ package com.minhvu.review.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.minhvu.review.dto.inter.AppUserDto;
+import com.minhvu.review.dto.AppUserDto;
 import com.minhvu.review.dto.response.page.PageLink;
 import com.minhvu.review.dto.response.page.SortOrder;
 import com.minhvu.review.exception.ForbiddenException;

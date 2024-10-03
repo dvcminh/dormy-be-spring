@@ -1,6 +1,6 @@
 package com.minhvu.review.client;
 
-import com.minhvu.review.dto.inter.FriendDto;
+import com.minhvu.review.dto.FriendDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

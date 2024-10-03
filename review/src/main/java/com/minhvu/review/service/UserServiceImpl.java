@@ -1,6 +1,6 @@
 package com.minhvu.review.service;
 
-import com.minhvu.review.dto.inter.AppUserDto;
+import com.minhvu.review.dto.AppUserDto;
 import com.minhvu.review.dto.mapper.AppUserMapper;
 import com.minhvu.review.model.AppUser;
 import com.minhvu.review.repository.AppUserRepository;

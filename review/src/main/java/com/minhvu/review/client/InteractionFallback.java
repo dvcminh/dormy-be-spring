@@ -1,6 +1,6 @@
 package com.minhvu.review.client;
 
-import com.minhvu.review.dto.inter.InteractionDto;
+import com.minhvu.review.dto.InteractionDto;
 import com.minhvu.review.exception.InteractionFallbackException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

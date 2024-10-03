@@ -1,22 +1,23 @@
 package com.minhvu.review.controller;
 
 
-import com.minhvu.review.dto.PostRequest;
+import com.minhvu.review.dto.PostEntityDto;
+import com.minhvu.review.dto.request.PostRequest;
 import com.minhvu.review.dto.PostResponse;
-import com.minhvu.review.dto.PostUpdateRequest;
-import com.minhvu.review.dto.PostWithInteractionResponse;
-import com.minhvu.review.dto.inter.AppUserDto;
+import com.minhvu.review.dto.request.PostUpdateRequest;
+import com.minhvu.review.dto.AppUserDto;
 import com.minhvu.review.dto.mapper.PostMapper;
+import com.minhvu.review.dto.response.Response;
 import com.minhvu.review.kafka.PostProducer;
 import com.minhvu.review.repository.PostRepository;
 import com.minhvu.review.service.PostService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 
@@ -33,41 +34,49 @@ public class PostController extends BaseController {
     private final PostMapper postMapper;
 
     @PostMapping()
-    public ResponseEntity<PostResponse> createPost(@RequestBody PostRequest postRequest, HttpServletRequest request) {
+    public ResponseEntity<PostEntityDto> createPost(@RequestBody PostRequest postRequest, HttpServletRequest request) {
         AppUserDto user = getCurrentUser(request);
         return ResponseEntity.ok(postService.createPost(user.getId(), postRequest));
     }
 
-    @PutMapping("/{postId}")
-    public ResponseEntity<PostResponse> updatePost(HttpServletRequest request, @PathVariable("postId") UUID postId, @ModelAttribute PostUpdateRequest postUpdateRequest) {
-        log.info("update post {} ", postUpdateRequest);
-        AppUserDto user = getCurrentUser(request);
-        return ResponseEntity.ok(postService.updatePost(user.getId(), postId, postUpdateRequest));
+    @DeleteMapping("{postId}")
+    @Transactional
+    public ResponseEntity<Response> deleteById(
+            @PathVariable("postId") UUID postId,
+            HttpServletRequest request
+    ) {
+        AppUserDto currentUser = getCurrentUser(request);
+        postService.delete(postId, currentUser);
+        return ResponseEntity.ok(
+                new Response(String.format("Bill with id [%s] move to trash bin", postId))
+        );
     }
 
-    @DeleteMapping("/{postId}")
-    public ResponseEntity<Void> deletePost(HttpServletRequest request, @PathVariable("postId") UUID postId) {
-        UUID userId = getCurrentUser(request).getId();
-        postService.deletePost(userId, postId);
-        return ResponseEntity.noContent().build();
+    @PutMapping("{postId}/restore")
+    @Transactional
+    public ResponseEntity<Response> restorePostById(
+            @PathVariable UUID postId,
+            HttpServletRequest request
+    ) {
+        AppUserDto currentUser = getCurrentUser(request);
+        postService.restore(postId, currentUser);
+        return ResponseEntity.ok(
+                new Response(String.format("Bill with id [%s] restore from trash bin", postId))
+        );
     }
 
-    @GetMapping("/all/{userId}")
-    public ResponseEntity<List<PostWithInteractionResponse>> getPost(@PathVariable("userId") UUID userId) {
-        return ResponseEntity.ok(postService.getAllPost(userId));
-    }
-
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<PostWithInteractionResponse>> getPostByUserId(@PathVariable("userId") UUID userId) {
-        return ResponseEntity.ok(postService.getAllPostByUserId(userId));
-    }
-
-    @GetMapping("/sync")
-    public ResponseEntity<String> syncPost(HttpServletRequest request) {
-        postRepository.findAll().forEach(post -> {
-            producer.send(postMapper.toDto(post));
-        });
-        return ResponseEntity.ok("Sync post successfully");
+    @PutMapping("{postId}")
+    @Transactional
+    public ResponseEntity<Response> updatePostById(
+            @PathVariable UUID postId,
+            @RequestBody PostUpdateRequest postUpdateRequest,
+            HttpServletRequest request
+    ) {
+        AppUserDto currentUser = getCurrentUser(request);
+        postService.update(postId, postUpdateRequest, currentUser);
+        return ResponseEntity.ok(
+                new Response(String.format("Bill with id [%s] updated", postId))
+        );
     }
 
 

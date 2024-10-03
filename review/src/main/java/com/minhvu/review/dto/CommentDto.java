@@ -1,20 +1,20 @@
-package com.minhvu.review.dto.inter;
+package com.minhvu.review.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
-public class ReactionDto {
+public class CommentDto {
 
     private UUID id;
     private UUID postId;
     private UUID userId;
-    private ReactionType reactionType;
+    private String commentText;
     private LocalDateTime createdAt;
 }
