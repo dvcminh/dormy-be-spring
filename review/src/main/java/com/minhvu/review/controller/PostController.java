@@ -48,7 +48,7 @@ public class PostController extends BaseController {
         AppUserDto currentUser = getCurrentUser(request);
         postService.delete(postId, currentUser);
         return ResponseEntity.ok(
-                new Response(String.format("Bill with id [%s] move to trash bin", postId))
+                new Response(String.format("Post with id [%s] move to trash bin", postId))
         );
     }
 
@@ -61,7 +61,7 @@ public class PostController extends BaseController {
         AppUserDto currentUser = getCurrentUser(request);
         postService.restore(postId, currentUser);
         return ResponseEntity.ok(
-                new Response(String.format("Bill with id [%s] restore from trash bin", postId))
+                new Response(String.format("Post with id [%s] restore from trash bin", postId))
         );
     }
 
@@ -75,7 +75,7 @@ public class PostController extends BaseController {
         AppUserDto currentUser = getCurrentUser(request);
         postService.update(postId, postUpdateRequest, currentUser);
         return ResponseEntity.ok(
-                new Response(String.format("Bill with id [%s] updated", postId))
+                new Response(String.format("Post with id [%s] updated", postId))
         );
     }
 

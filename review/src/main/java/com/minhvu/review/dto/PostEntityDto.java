@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.UUID;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -16,7 +15,7 @@ public class PostEntityDto implements Serializable {
 
     UUID id;
     String body;
-    boolean isDeleted;
+    Boolean isDeleted;
     UUID userId;
     Date createdAt;
 

@@ -13,7 +13,6 @@ import com.minhvu.review.dto.request.NotificationComponent;
 import com.minhvu.review.dto.request.PostRequest;
 import com.minhvu.review.dto.request.PostUpdateRequest;
 import com.minhvu.review.exception.BadRequestException;
-import com.minhvu.review.kafka.MediaProducer;
 import com.minhvu.review.kafka.NotificationProducer;
 import com.minhvu.review.kafka.PostProducer;
 import com.minhvu.review.model.AppUser;
@@ -27,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -43,7 +41,7 @@ public class PostService {
     private final MediaClient mediaClient;
     @Qualifier("com.minhvu.review.client.InteractionClient")
     private final InteractionClient interactionClient;
-    private final PostProducer producer;
+    private final PostProducer postProducer;
     private final FriendClient friendClient;
     private final AppUserRepository appUserRepository;
     private final NotificationProducer notificationProducer;
@@ -57,9 +55,10 @@ public class PostService {
                 .isDeleted(false)
                 .build();
         postEntity.setCreatedBy(userId);
+        postEntity.setUpdatedBy(userId);
         postEntity = postRepository.saveAndFlush(postEntity);
         PostEntityDto postResponse = postMapper.toDto(postEntity);
-        producer.send(postResponse);
+        postProducer.send(postResponse);
         return postResponse;
     }
 
@@ -115,7 +114,7 @@ public class PostService {
         postEntity.setIsDeleted(true);
         postEntity.setUpdatedBy(currentUser.getId());
         postRepository.saveAndFlush(postEntity);
-        producer.send(postMapper.toDto(postEntity));
+        postProducer.send(postMapper.toDto(postEntity));
     }
 
     public Notification generateNotification(PostEntity postEntity) {
@@ -153,6 +152,7 @@ public class PostService {
         postEntity.setIsDeleted(false);
         postEntity.setUpdatedBy(currentUser.getId());
         postRepository.save(postEntity);
+        postProducer.send(postMapper.toDto(postEntity));
     }
 
     public void update(UUID postId, PostUpdateRequest postUpdateRequest, AppUserDto currentUser) {
@@ -164,5 +164,6 @@ public class PostService {
         postEntity.setUrlsMedia(postUpdateRequest.getUrlsMedia());
         postEntity.setUpdatedBy(currentUser.getId());
         postRepository.save(postEntity);
+        postProducer.send(postMapper.toDto(postEntity));
     }
 }

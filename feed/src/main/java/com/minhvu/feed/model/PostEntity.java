@@ -22,5 +22,5 @@ public class PostEntity extends BaseEntity {
     private UUID userId;
     @ElementCollection
     private Collection<String> urlsMedia;
-    private boolean isDeleted;
+    private Boolean isDeleted;
 }
