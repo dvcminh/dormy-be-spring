@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface CommentService {
 
     CommentDto save(UUID userId, CreateCommentRequest commentDto);
-    CommentDto update(UUID id, UpdateCommentRequest commentDto);
+    CommentDto update(UUID commentId, UUID id, UpdateCommentRequest commentDto);
     CommentDto getById(UUID id);
     List<CommentDto> getAll();
     void delete(UUID id, UUID uuid);

@@ -33,21 +33,25 @@ public class CommentServiceImpl implements CommentService {
                 .commentText(createCommentRequest.getCommentText())
                 .userId(userId)
                 .build());
+        comment.setCreatedBy(userId);
+        comment.setUpdatedBy(userId);
         CommentDto commentDto = commentMapper.toDto(comment);
         commentProducer.send(commentDto);
         return commentDto;
     }
 
     @Override
-    public CommentDto update(UUID id, UpdateCommentRequest commentDto)
+    public CommentDto update(UUID commentId, UUID userId, UpdateCommentRequest commentDto)
     {
-        Comment comment = commentRepository.findById(commentDto.getPostId())
-                .orElseThrow(() -> new NotFoundException(COMMENT_NOT_FOUND + id));
-        if(!comment.getUserId().equals(id)) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new NotFoundException(COMMENT_NOT_FOUND + commentId));
+        if(!comment.getUserId().equals(userId)) {
             throw new NotFoundException("You are not allowed to update this comment");
         }
         comment.setCommentText(commentDto.getCommentText());
+        comment.setUpdatedBy(userId);
         Comment commentUpdated = commentRepository.saveAndFlush(comment);
+        commentProducer.send(commentMapper.toDto(commentUpdated));
         return commentMapper.toDto(commentUpdated);
     }
 
@@ -80,6 +84,7 @@ public class CommentServiceImpl implements CommentService {
         if(!comment.getUserId().equals(id)) {
             throw new NotFoundException("You are not allowed to delete this comment");
         }
-        commentRepository.delete(comment);
+        comment.setDelete(true);
+        commentProducer.send(commentMapper.toDto(commentRepository.saveAndFlush(comment)));
     }
 }

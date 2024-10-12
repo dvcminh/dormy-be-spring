@@ -1,9 +1,6 @@
 package com.minhvu.interaction.controller;
 
-import com.minhvu.interaction.dto.AppUserDto;
-import com.minhvu.interaction.dto.CommentDto;
-import com.minhvu.interaction.dto.CreateCommentRequest;
-import com.minhvu.interaction.dto.UpdateCommentRequest;
+import com.minhvu.interaction.dto.*;
 import com.minhvu.interaction.service.CommentService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -34,11 +31,12 @@ public class CommentController extends BaseController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Error> delete(@PathVariable UUID id, HttpServletRequest request) {
-        Error error = new Error("Comment deleted successfully");
+    public ResponseEntity<Response> delete(@PathVariable UUID id, HttpServletRequest request) {
         AppUserDto user = getCurrentUser(request);
         commentService.delete(user.getId(), id);
-        return new ResponseEntity<>(error, HttpStatus.OK);
+        return ResponseEntity.ok(
+                new Response(String.format("Bill with id [%s] move to trash bin", id))
+        );
     }
 
     @GetMapping
@@ -52,9 +50,9 @@ public class CommentController extends BaseController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CommentDto> update(HttpServletRequest request, @RequestBody UpdateCommentRequest updateCommentRequest)
+    public ResponseEntity<CommentDto> update(HttpServletRequest request, @RequestBody UpdateCommentRequest updateCommentRequest, @PathVariable UUID id)
     {
         AppUserDto user = getCurrentUser(request);
-        return new ResponseEntity<>(commentService.update(user.getId(), updateCommentRequest), HttpStatus.OK);
+        return new ResponseEntity<>(commentService.update(id, user.getId(), updateCommentRequest), HttpStatus.OK);
     }
 }
