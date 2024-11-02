@@ -1,5 +1,6 @@
 package com.minhvu.authservice.service;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.minhvu.authservice.dto.AppUserDto;
 import com.minhvu.authservice.dto.RegisterRequest;
 import com.minhvu.authservice.entity.AppUser;
@@ -50,10 +51,12 @@ public class AuthService {
     @Value("${jwt.secret}")
     private String jwtSecret;
     private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+
     private Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
+
     public String generateToken(SecurityUser userDetails, Long time) {
         String username = userDetails.getUsername();
         Date currentDate = new Date();
@@ -73,6 +76,26 @@ public class AuthService {
 
         return token.compact();
     }
+
+    public String generateTokenForOauth2(AppUser appUser, Long time) {
+        Date currentDate = new Date();
+        Date expireDate = new Date(currentDate.getTime() + time);
+
+        JwtBuilder token = Jwts.builder()
+                .setSubject(appUser.getEmail())
+                .setIssuedAt(new Date())
+                .setExpiration(expireDate)
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256);
+
+        token.claim(USER_ID, appUser.getId())
+                .claim(EMAIL, appUser.getEmail())
+                .claim(FIRST_NAME, appUser.getName())
+                .claim(PHONE, appUser.getPhone())
+                .claim(ROLE, appUser.getRole());
+
+        return token.compact();
+    }
+
     @Transactional
     public AppUserDto signUp(RegisterRequest registerRequest) {
         if (appUserRepository.existsByEmailIgnoreCase(registerRequest.getEmail())) {
@@ -95,4 +118,21 @@ public class AuthService {
         return userMapper.toDto(newUser);
     }
 
+    public AppUser processGoogleUser(GoogleIdToken.Payload payload) {
+        String email = payload.getEmail();
+        String name = (String) payload.get("name");
+        String pictureUrl = (String) payload.get("picture");
+        String phone = (String) payload.get("phone_number");
+        String address = (String) payload.get("address");
+
+        AppUser newUser = AppUser.builder()
+                .email(email)
+                .name(name)
+                .avatar(pictureUrl)
+                .address(address)
+                .phone(phone)
+                .role(Role.CUSTOMER)
+                .build();
+        return appUserRepository.save(newUser);
+    }
 }

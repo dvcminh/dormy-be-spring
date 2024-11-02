@@ -1,5 +1,8 @@
 package com.minhvu.authservice.controller;
 
+import com.google.api.client.auth.oauth2.TokenResponse;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.minhvu.authservice.config.GoogleTokenVerifierService;
 import com.minhvu.authservice.service.SecurityUserService;
 import com.minhvu.authservice.dto.*;
 import com.minhvu.authservice.dto.request.RefreshTokenRequest;
@@ -25,7 +28,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -52,6 +57,8 @@ public class AuthController extends BaseController{
     private Long jwtRefreshExp;
     @Autowired
     private RefreshTokenService refreshTokenService;
+    @Autowired
+    private GoogleTokenVerifierService googleTokenVerifierService;
 
     @PostMapping("/signup")
     @Operation(summary = "Sign Up Customer (signUp)")
@@ -127,5 +134,26 @@ public class AuthController extends BaseController{
     public ResponseEntity<String> deleteUser(@PathVariable UUID id) {
         userService.deleteUser(id);
         return ResponseEntity.ok("Delete User successfully");
+    }
+    @GetMapping("/user")
+    public OAuth2User getCurrentUser(@AuthenticationPrincipal OAuth2User oAuth2User) {
+        return oAuth2User;
+    }
+    @PostMapping("/google-login")
+    public ResponseEntity<LoginResponse> loginWithGoogle(@RequestBody String idTokenString) {
+        GoogleIdToken idToken = googleTokenVerifierService.verifyToken(idTokenString);
+
+        if (idToken != null) {
+            GoogleIdToken.Payload payload = idToken.getPayload();
+
+            AppUser user = authService.processGoogleUser(payload);
+
+            String accessToken = authService.generateTokenForOauth2(user, jwtExp);
+            String refreshToken = authService.generateTokenForOauth2(user, jwtRefreshExp);
+
+            return ResponseEntity.ok(new LoginResponse(accessToken, refreshToken, jwtExp));
+        } else {
+            throw new RuntimeException("Invalid access");
+        }
     }
 }

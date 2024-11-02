@@ -50,9 +50,11 @@ public class CommentController extends BaseController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CommentDto> update(HttpServletRequest request, @RequestBody UpdateCommentRequest updateCommentRequest, @PathVariable UUID id)
+    public ResponseEntity<CommentDto> update(HttpServletRequest request,
+                                             @RequestBody UpdateCommentRequest updateCommentRequest,
+                                             @PathVariable UUID id)
     {
         AppUserDto user = getCurrentUser(request);
-        return new ResponseEntity<>(commentService.update(id, user.getId(), updateCommentRequest), HttpStatus.OK);
+        return ResponseEntity.ok(commentService.update(id, user.getId(), updateCommentRequest));
     }
 }
