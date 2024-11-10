@@ -17,7 +17,7 @@ public class GoogleTokenVerifierService {
     public GoogleIdToken verifyToken(String idTokenString) {
         try {
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(GoogleNetHttpTransport.newTrustedTransport(), jsonFactory)
-                    .setAudience(Collections.singletonList("<YOUR_CLIENT_ID>"))  // Client ID từ Google Cloud Console
+                    .setAudience(Collections.singletonList("<YOUR_CLIENT_ID>"))
                     .build();
 
             GoogleIdToken idToken = verifier.verify(idTokenString);
