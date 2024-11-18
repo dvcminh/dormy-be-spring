@@ -48,4 +48,4 @@ resilience4j:
         waitDurationInOpenState: 20000
 
 server:
-  port: 8085
+  port: 8086
