@@ -1,11 +1,9 @@
-FROM openjdk:8-jdk-alpine
+FROM openjdk:17-jdk-slim
 
-LABEL maintainer="dvcminh@example.com"
+WORKDIR /app
 
-EXPOSE 8080
+COPY target/feed-0.0.1-SNAPSHOT.jar .
 
-ARG JAR_FILE=target/*.jar
+EXPOSE 8085:8085
 
-ADD ${JAR_FILE} app.jar
-
-ENTRYPOINT ["java","-jar","/app.jar"]
+ENTRYPOINT ["java", "-jar", "feed-0.0.1-SNAPSHOT.jar"]

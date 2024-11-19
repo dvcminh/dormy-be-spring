@@ -1,4 +1,9 @@
-FROM openjdk:17-oracle
-VOLUME /tmp
-COPY target/media-0.0.1-SNAPSHOT.jar media.jar
-ENTRYPOINT ["java", "-jar", "media.jar"]
+FROM openjdk:17-jdk-slim
+
+WORKDIR /app
+
+COPY target/media-0.0.1-SNAPSHOT.jar .
+
+EXPOSE 8016:8016
+
+ENTRYPOINT ["java", "-jar", "media-0.0.1-SNAPSHOT.jar"]

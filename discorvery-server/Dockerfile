@@ -1,4 +1,9 @@
-FROM openjdk:17-oracle
-VOLUME /tmp
-COPY target/discovery-server-0.0.1-SNAPSHOT.jar discovery.jar
-ENTRYPOINT ["java", "-jar", "discovery.jar"]
+FROM openjdk:17-jdk-slim
+
+WORKDIR /app
+
+COPY target/discorvery-0.0.1-SNAPSHOT.jar .
+
+EXPOSE 8761:8761
+
+ENTRYPOINT ["java", "-jar", "discorvery-0.0.1-SNAPSHOT.jar"]

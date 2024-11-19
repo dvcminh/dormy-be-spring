@@ -32,6 +32,12 @@ spring:
           filters:
             - AuthenticationFilter
 
+        - id: chat
+          uri: lb://chat-service
+          predicates:
+            - Path=/api/v1/chat/**
+          filters:
+            - AuthenticationFilter
 
         - id: comments
           uri: lb://interactions-service

@@ -10,7 +10,8 @@
     </parent>
 
     <artifactId>media</artifactId>
-
+    <version>0.0.1-SNAPSHOT</version>
+    <name>media-server</name>
     <properties>
         <maven.compiler.source>19</maven.compiler.source>
         <maven.compiler.target>19</maven.compiler.target>

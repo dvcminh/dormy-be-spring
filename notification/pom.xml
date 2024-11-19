@@ -10,7 +10,8 @@
     </parent>
 
     <artifactId>notification</artifactId>
-
+    <version>0.0.1-SNAPSHOT</version>
+    <name>notification-server</name>
     <properties>
         <java.version>17</java.version>
         <maven.compiler.source>17</maven.compiler.source>

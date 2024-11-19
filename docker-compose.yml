@@ -1,6 +1,86 @@
 ---
 version: '3'
 services:
+  sso-server:
+    image: ducminh210503/sso-server:latest
+    container_name: sso-server
+    ports:
+      - "8081:8080"
+    networks:
+      - dormy-network
+
+  review-server:
+    image: ducminh210503/review-server:latest
+    container_name: review-server
+    ports:
+      - "8082:8080"
+    networks:
+      - dormy-network
+
+  notification-server:
+    image: ducminh210503/notification-server:latest
+    container_name: notification-server
+    ports:
+      - "8083:8080"
+    networks:
+      - dormy-network
+
+  media-server:
+    image: ducminh210503/media-server:latest
+    container_name: media-server
+    ports:
+      - "8084:8080"
+    networks:
+      - dormy-network
+
+  interaction-server:
+    image: ducminh210503/interaction-server:latest
+    container_name: interaction-server
+    ports:
+      - "8085:8080"
+    networks:
+      - dormy-network
+
+  friends-server:
+    image: ducminh210503/friends-server:latest
+    container_name: friends-server
+    ports:
+      - "8086:8080"
+    networks:
+      - dormy-network
+
+  feed-server:
+    image: ducminh210503/feed-server:latest
+    container_name: feed-server
+    ports:
+      - "8087:8080"
+    networks:
+      - dormy-network
+
+  discovery-server:
+    image: ducminh210503/discovery-server:latest
+    container_name: discovery-server
+    ports:
+      - "8088:8080"
+    networks:
+      - dormy-network
+
+  chat-server:
+    image: ducminh210503/chat-server:latest
+    container_name: chat-server
+    ports:
+      - "8089:8080"
+    networks:
+      - dormy-network
+
+  api-gateway:
+    image: ducminh210503/api-gateway:latest
+    container_name: api-gateway
+    ports:
+      - "8090:8080"
+    networks:
+      - dormy-network
+
   zipkin:
     image: openzipkin/zipkin
     container_name: zipkin-dormy
