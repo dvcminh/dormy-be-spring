@@ -1,93 +1,311 @@
 ---
 version: '3'
 services:
-  sso-server:
-    image: ducminh210503/sso-server:latest
-    container_name: sso-server
-    ports:
-      - "8081:8080"
-    networks:
-      - dormy-network
-
-  review-server:
-    image: ducminh210503/review-server:latest
-    container_name: review-server
-    ports:
-      - "8082:8080"
-    networks:
-      - dormy-network
-
-  notification-server:
-    image: ducminh210503/notification-server:latest
-    container_name: notification-server
-    ports:
-      - "8083:8080"
-    networks:
-      - dormy-network
-
-  media-server:
-    image: ducminh210503/media-server:latest
-    container_name: media-server
-    ports:
-      - "8084:8080"
-    networks:
-      - dormy-network
-
-  interaction-server:
-    image: ducminh210503/interaction-server:latest
-    container_name: interaction-server
-    ports:
-      - "8085:8080"
-    networks:
-      - dormy-network
-
-  friends-server:
-    image: ducminh210503/friends-server:latest
-    container_name: friends-server
-    ports:
-      - "8086:8080"
-    networks:
-      - dormy-network
-
-  feed-server:
-    image: ducminh210503/feed-server:latest
-    container_name: feed-server
-    ports:
-      - "8087:8080"
-    networks:
-      - dormy-network
-
   discovery-server:
-    image: ducminh210503/discovery-server:latest
+    image: ${DISCOVERY_IMAGE}
     container_name: discovery-server
     ports:
-      - "8088:8080"
-    networks:
-      - dormy-network
-
-  chat-server:
-    image: ducminh210503/chat-server:latest
-    container_name: chat-server
-    ports:
-      - "8089:8080"
-    networks:
-      - dormy-network
+      - "${DISCOVERY_PORT}:${DISCOVERY_PORT}"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_USERNAME=${DISCOVERY_USER}
+      - EUREKA_PASSWORD=${DISCOVERY_PASSWORD}
+      - TZ=Asia/Ho_Chi_Minh
+    restart: always
 
   api-gateway:
-    image: ducminh210503/api-gateway:latest
+    image: ${GATEWAY_IMAGE}
     container_name: api-gateway
     ports:
-      - "8090:8080"
-    networks:
-      - dormy-network
+      - "${API_GATEWAY_PORT}:8080"
+    expose:
+      - ${API_GATEWAY_PORT}
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
+      - TZ=Asia/Ho_Chi_Minh
+    depends_on:
+      - discovery-server
+    restart: always
+
+  postgres-sso:
+    container_name: postgres-sso
+    image: postgres:12-alpine
+    ports:
+      - "${SSO_DB_PORT}:${SSO_DB_PORT}"
+    expose:
+      - ${SSO_DB_PORT}
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - PGDATA=${DB_DATA}
+    command: -p ${SSO_DB_PORT}
+    volumes:
+      - ./postgres-sso:${DB_DATA}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    restart: always
+
+  sso-service:
+    container_name: sso-service
+    image: ${SSO_IMAGE}
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://${DISCOVERY_USER}:${DISCOVERY_PASSWORD}@discovery-server:${DISCOVERY_PORT}/eureka
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-sso:${SSO_DB_PORT}/postgres
+      - SPRING_KAFKA_BOOTSTRAP-SERVERS=broker:${KAFKA_PORT}
+      - TZ=Asia/Ho_Chi_Minh
+    depends_on:
+      - postgres-sso
+      - discovery-server
+      - api-gateway
+      - broker
+    restart: always
+
+  postgres-notification:
+    container_name: postgres-notification
+    image: postgres:12-alpine
+    ports:
+      - "${NOTIFICATION_DB_PORT}:${NOTIFICATION_DB_PORT}"
+    expose:
+      - ${NOTIFICATION_DB_PORT}
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - PGDATA=${DB_DATA}
+    command: -p ${NOTIFICATION_DB_PORT}
+    volumes:
+      - ./postgres-news:${DB_DATA}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    restart: always
+
+  notification-service:
+    container_name: notification-service
+    image: ${NOTIFICATION_IMAGE}
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://${DISCOVERY_USER}:${DISCOVERY_PASSWORD}@discovery-server:${DISCOVERY_PORT}/eureka
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-news:${NOTIFICATION_DB_PORT}/postgres
+      - SPRING_KAFKA_BOOTSTRAP-SERVERS=broker:${KAFKA_PORT}
+      - TZ=Asia/Ho_Chi_Minh
+    depends_on:
+      - postgres-notification
+      - discovery-server
+      - api-gateway
+      - broker
+    restart: always
+
+  postgres-media:
+    container_name: postgres-media
+    image: postgres:12-alpine
+    ports:
+      - "${MEDIA_DB_PORT}:${MEDIA_DB_PORT}"
+    expose:
+      - ${MEDIA_DB_PORT}
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - PGDATA=${DB_DATA}
+    command: -p ${MEDIA_DB_PORT}
+    volumes:
+      - ./postgres-news:${DB_DATA}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    restart: always
+
+  media-service:
+    container_name: media-service
+    image: ${MEDIA_IMAGE}
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://${DISCOVERY_USER}:${DISCOVERY_PASSWORD}@discovery-server:${DISCOVERY_PORT}/eureka
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-news:${MEDIA_DB_PORT}/postgres
+      - SPRING_KAFKA_BOOTSTRAP-SERVERS=broker:${KAFKA_PORT}
+      - TZ=Asia/Ho_Chi_Minh
+    depends_on:
+      - postgres-media
+      - discovery-server
+      - api-gateway
+      - broker
+    restart: always
+
+  postgres-interaction:
+    container_name: postgres-interaction
+    image: postgres:12-alpine
+    ports:
+      - "${INTERACTION_DB_PORT}:${INTERACTION_DB_PORT}"
+    expose:
+      - ${INTERACTION_DB_PORT}
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - PGDATA=${DB_DATA}
+    command: -p ${INTERACTION_DB_PORT}
+    volumes:
+      - ./postgres-news:${DB_DATA}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    restart: always
+
+  interaction-service:
+    container_name: interaction-service
+    image: ${INTERACTION_IMAGE}
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://${DISCOVERY_USER}:${DISCOVERY_PASSWORD}@discovery-server:${DISCOVERY_PORT}/eureka
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-news:${INTERACTION_DB_PORT}/postgres
+      - SPRING_KAFKA_BOOTSTRAP-SERVERS=broker:${KAFKA_PORT}
+      - TZ=Asia/Ho_Chi_Minh
+    depends_on:
+      - postgres-interaction
+      - discovery-server
+      - api-gateway
+      - broker
+    restart: always
+
+  postgres-friend:
+    container_name: postgres-friend
+    image: postgres:12-alpine
+    ports:
+      - "${FRIEND_DB_PORT}:${FRIEND_DB_PORT}"
+    expose:
+      - ${FRIEND_DB_PORT}
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - PGDATA=${DB_DATA}
+    command: -p ${FRIEND_DB_PORT}
+    volumes:
+      - ./postgres-news:${DB_DATA}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    restart: always
+
+  friend-service:
+    container_name: friend-service
+    image: ${FRIEND_IMAGE}
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://${DISCOVERY_USER}:${DISCOVERY_PASSWORD}@discovery-server:${DISCOVERY_PORT}/eureka
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-news:${FRIEND_DB_PORT}/postgres
+      - SPRING_KAFKA_BOOTSTRAP-SERVERS=broker:${KAFKA_PORT}
+      - TZ=Asia/Ho_Chi_Minh
+    depends_on:
+      - postgres-friend
+      - discovery-server
+      - api-gateway
+      - broker
+    restart: always
+
+  postgres-feed:
+    container_name: postgres-feed
+    image: postgres:12-alpine
+    ports:
+      - "${FEED_DB_PORT}:${FEED_DB_PORT}"
+    expose:
+      - ${FEED_DB_PORT}
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - PGDATA=${DB_DATA}
+    command: -p ${FEED_DB_PORT}
+    volumes:
+      - ./postgres-news:${DB_DATA}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    restart: always
+
+  feed-service:
+    container_name: review-feed
+    image: ${FEED_IMAGE}
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://${DISCOVERY_USER}:${DISCOVERY_PASSWORD}@discovery-server:${DISCOVERY_PORT}/eureka
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-news:${FEED_DB_PORT}/postgres
+      - SPRING_KAFKA_BOOTSTRAP-SERVERS=broker:${KAFKA_PORT}
+      - TZ=Asia/Ho_Chi_Minh
+    depends_on:
+      - postgres-feed
+      - discovery-server
+      - api-gateway
+      - broker
+    restart: always
+
+  postgres-chat:
+    container_name: postgres-chat
+    image: postgres:12-alpine
+    ports:
+      - "${CHAT_DB_PORT}:${CHAT_DB_PORT}"
+    expose:
+      - ${CHAT_DB_PORT}
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - PGDATA=${DB_DATA}
+    command: -p ${CHAT_DB_PORT}
+    volumes:
+      - ./postgres-news:${DB_DATA}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    restart: always
+
+  chat-service:
+    container_name: chat-service
+    image: ${CHAT_IMAGE}
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://${DISCOVERY_USER}:${DISCOVERY_PASSWORD}@discovery-server:${DISCOVERY_PORT}/eureka
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-news:${CHAT_DB_PORT}/postgres
+      - SPRING_KAFKA_BOOTSTRAP-SERVERS=broker:${KAFKA_PORT}
+      - TZ=Asia/Ho_Chi_Minh
+    depends_on:
+      - postgres-chat
+      - discovery-server
+      - api-gateway
+      - broker
+    restart: always
 
   zipkin:
     image: openzipkin/zipkin
     container_name: zipkin-dormy
     ports:
       - "9411:9411"
-    networks:
-      - dormy-network
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
@@ -97,8 +315,9 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     restart: always
     user: "0:0"
-    networks:
-      - dormy-network
+    volumes:
+      - ./zookeeper-data:/var/lib/zookeeper/data
+      - ./.zookeeper-logs:/var/lib/zookeeper/log
 
   broker:
     image: confluentinc/cp-kafka:7.3.0
@@ -121,62 +340,14 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
     restart: always
     user: "0:0"
-    networks:
-      - dormy-network
+    volumes:
+      - ./.kafka-logs:/logs
+      - ./kafka-data:/var/lib/kafka/data
 
   redis:
-    container_name: redis-dormy
+    container_name: redis
     image: redis:latest
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
     volumes:
       - ./redis-data:/data
-    networks:
-      - dormy-network
-
-  dormy-data:
-    container_name: dormy-data
-    image: postgres:12-alpine
-    ports:
-      - ${DB_PORT}:${DB_PORT}
-    expose:
-      - ${DB_PORT}
-    environment:
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - PGDATA=${DB_DATA}
-    command: -p ${DB_PORT}
-    volumes:
-      - ./${DB_LOCAL_DIR}:${DB_DATA}
-      - ./init.local.sql:/docker-entrypoint-initdb.d/init.sql
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 10s
-      timeout: 10s
-      retries: 10
-    restart: on-failure
-    networks:
-      - dormy-network
-
-  dormy-pgadmin:
-    container_name: dormy-pgadmin
-    image: dpage/pgadmin4
-    volumes:
-      - pgadmin4_data:/var/lib/pgadmin4/data
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=postgres@gmail.com
-      - PGADMIN_DEFAULT_PASSWORD=postgres
-    ports:
-      - "5050:80"
-    depends_on:
-      - dormy-data
-    restart: on-failure
-    networks:
-      - dormy-network
-
-volumes:
-  pgadmin4_data: { }
-
-networks:
-  dormy-network:
-    driver: bridge
