@@ -32,6 +32,7 @@
         <module>friends</module>
         <module>feed</module>
         <module>chat</module>
+        <module>monolithic</module>
     </modules>
     <scm>
         <connection/>

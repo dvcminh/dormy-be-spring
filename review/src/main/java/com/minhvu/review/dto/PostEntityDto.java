@@ -4,6 +4,7 @@ import lombok.*;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
 
@@ -12,16 +13,13 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 public class PostEntityDto implements Serializable {
-
     UUID id;
     String body;
     Boolean isDeleted;
     UUID userId;
+    Collection<String> urlsMedia;
     Date createdAt;
-
     Date updatedAt;
-
     UUID createdBy;
-
     UUID updatedBy;
 }
