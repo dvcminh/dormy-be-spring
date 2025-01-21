@@ -11,11 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Table(name = "Likes")
-public class Like {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private  Long id;
-
+public class Like extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private LikeType likeType;
@@ -23,7 +19,7 @@ public class Like {
 
     @ManyToOne
     @JoinColumn(name = "user_id" , nullable = false)
-    private  User user;
+    private  AppUser user;
 
 
     @ManyToOne

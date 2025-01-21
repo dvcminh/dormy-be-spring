@@ -20,10 +20,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Data
 @Table(name = "posts")
-public class Post {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Post extends BaseEntity {
 
     @Size(max = 200,message = "Caption cannot be more than 200 character")
     private String caption;
@@ -52,7 +49,7 @@ public class Post {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private  User user;
+    private  AppUser user;
 
 
     @ManyToMany
@@ -61,7 +58,7 @@ public class Post {
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private Set<User> taggedUSer;
+    private Set<AppUser> taggedUSer;
 
 
     //change done from here to automatically delete comment and like when post is deleted

@@ -1,6 +1,11 @@
-package com.minhvu.monolithic.entity;
+package com.minhvu.monolithic.security.model;
 
 
+import com.minhvu.monolithic.entity.AppUser;
+import com.minhvu.monolithic.entity.UserCredential;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,44 +14,34 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class UserPrinciple implements UserDetails {
+@Data
+@ToString
+@AllArgsConstructor
+public class SecurityUser implements UserDetails {
+    private AppUser user;
 
-    private  User user;
-
-    public  UserPrinciple(User user){
-        this.user = user;
-    }
-
-
-    // this method is created by me to retrieve user id from user
-    public Long getId()
-    {
-        return user.getId();
-    }
-
+    private UserCredential userCredential;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(user.getRole().name()));
+        return getGrantedAuthorities(user.getRole().name());
+    }
+
+    private List<GrantedAuthority> getGrantedAuthorities(final String authority) {
+        final List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(authority));
         return authorities;
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return userCredential.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return user.getEmail();
+        return user.getUsername();
     }
-
-    public User getUser() {
-        return user;
-    }
-
-
 
     @Override
     public boolean isAccountNonExpired() {
@@ -65,6 +60,7 @@ public class UserPrinciple implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return userCredential.isEnabled();
     }
+
 }

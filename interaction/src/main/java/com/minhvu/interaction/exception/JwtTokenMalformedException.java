@@ -1,6 +1,6 @@
 package com.minhvu.interaction.exception;
 
-import javax.naming.AuthenticationException;
+import jakarta.naming.AuthenticationException;
 
 public class JwtTokenMalformedException extends AuthenticationException {
     private static final long serialVersionUID = 1L;

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class LikeService {
@@ -27,21 +28,21 @@ public class LikeService {
     @Autowired
     IComment iComment;
 
-    public ResponseEntity<String> addPostLike(Long postId, UserPrinciple userDetails) {
+    public ResponseEntity<String> addPostLike(UUID postId, AppUser userDetails) {
         Optional<Post> existingPost = iPost.findById(postId);
 
         if (existingPost.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found");
         }
 
-        Optional<Like> existingLike = ilike.findByPostAndUser(existingPost.get(), userDetails.getUser());
+        Optional<Like> existingLike = ilike.findByPostAndUser(existingPost.get(), userDetails);
 
         try {
             if (existingLike.isEmpty()) {
                 // Add like
                 Like like = new Like();
                 like.setLikeType(LikeType.POST);
-                like.setUser(userDetails.getUser());
+                like.setUser(userDetails);
                 like.setPost(existingPost.get());
                 ilike.save(like);
                 return ResponseEntity.status(HttpStatus.OK).body("Post liked successfully");
@@ -61,21 +62,21 @@ public class LikeService {
 
 
     
-    public ResponseEntity<String> likeComment(Long commentId, UserPrinciple userDetails) {
+    public ResponseEntity<String> likeComment(UUID commentId, AppUser userDetails) {
         Optional<Comment> existingComment = iComment.findById(commentId);
 
         if(existingComment.isEmpty()){
             return  ResponseEntity.status(HttpStatus.NOT_FOUND).body("Comment not found");
         }
 
-        Optional<Like> existingLike = ilike.findByCommentAndUser(existingComment.get(),userDetails.getUser());
+        Optional<Like> existingLike = ilike.findByCommentAndUser(existingComment.get(),userDetails);
 
         try {
             if (existingLike.isEmpty()) {
                 // Add like
                 Like like = new Like();
                 like.setLikeType(LikeType.COMMENT);
-                like.setUser(userDetails.getUser());
+                like.setUser(userDetails);
                 like.setComment(existingComment.get());
                 ilike.save(like);
                 return ResponseEntity.status(HttpStatus.OK).body("comment liked successfully");
@@ -93,7 +94,7 @@ public class LikeService {
     }
 
 
-    public ResponseEntity<?> postLikeDetails(Long postId) {
+    public ResponseEntity<?> postLikeDetails(UUID postId) {
         Optional<Post> existingPost = iPost.findById(postId);
 
         if (existingPost.isEmpty()) {
@@ -110,16 +111,16 @@ public class LikeService {
         List<LikeDto> allLikesDetails = allLikes.stream().map( like -> {
             LikeDto likeRecord = new LikeDto();
             likeRecord.setId(like.getId());
-            likeRecord.setUserName(like.getUser().getUserName());
+            likeRecord.setUserName(like.getUser().getUsername());
             likeRecord.setUserId(like.getUser().getId());
-            likeRecord.setUserProfilePicture(like.getUser().getProfilePictureUrl());
+            likeRecord.setUserProfilePicture(like.getUser().getProfilePicture());
             return likeRecord;
         }).toList();
 
         return ResponseEntity.status(HttpStatus.OK).body(allLikesDetails);
     }
 
-    public ResponseEntity<?> postLikeCount(Long postId) {
+    public ResponseEntity<?> postLikeCount(UUID postId) {
         Optional<Post> existingPost = iPost.findById(postId);
 
         if (existingPost.isEmpty()) {
@@ -134,7 +135,7 @@ public class LikeService {
         return ResponseEntity.status(HttpStatus.OK).body(allLikes.size());
     }
 
-    public ResponseEntity<?> commentLikeCount(Long commentId) {
+    public ResponseEntity<?> commentLikeCount(UUID commentId) {
         Optional<Comment> existingComment = iComment.findById(commentId);
 
         if (existingComment.isEmpty()) {

@@ -3,10 +3,9 @@ package com.minhvu.monolithic.service;
 
 import com.minhvu.monolithic.dto.PostResponseDto;
 import com.minhvu.monolithic.dto.UserDto;
+import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.entity.Follow;
 import com.minhvu.monolithic.entity.Post;
-import com.minhvu.monolithic.entity.User;
-import com.minhvu.monolithic.entity.UserPrinciple;
 import com.minhvu.monolithic.enums.AccountType;
 import com.minhvu.monolithic.enums.FollowStatus;
 import com.minhvu.monolithic.enums.PostType;
@@ -41,7 +40,7 @@ public class ExploreService {
     IFollow iFollow;
 
 
-    public ResponseEntity<?> searchUser(String query, UserPrinciple userDetails) {
+    public ResponseEntity<?> searchUser(String query, AppUser userDetails) {
 
         // Validate the query length
         if (query.length() < 3) { // Check for query length
@@ -49,36 +48,36 @@ public class ExploreService {
         }
 
         // Fetch all users matching the query (by username or full name)
-        List<User> allResults = iUser.findByUserNameIgnoreCaseContainingOrFullNameIgnoreCaseContaining(query, query);
+        List<AppUser> allResults = iUser.findByUsernameIgnoreCaseContainingOrDisplayNameIgnoreCaseContaining(query, query);
 
         // 1. Find exact matches (users with a username exactly matching the query)
-        List<User> exactMatch = allResults.stream()
-                .filter(user -> user.getUserName().equalsIgnoreCase(query))
+        List<AppUser> exactMatch = allResults.stream()
+                .filter(user -> user.getUsername().equalsIgnoreCase(query))
                 .toList();
 
         // 2. Find users that the current user is following
-        List<Follow> followingList = iFollow.findByFollower(userDetails.getUser());
+        List<Follow> followingList = iFollow.findByFollower(userDetails);
 
-        Set<User> followingUsers = followingList.stream()
+        Set<AppUser> followingUsers = followingList.stream()
                 .map(follow -> follow.getFollowing())
                 .collect(Collectors.toSet());
 
-        List<User> followingMatches = allResults.stream()
+        List<AppUser> followingMatches = allResults.stream()
                 .filter(user -> followingUsers.contains(user) && !exactMatch.contains(user))
                 .toList();
 
         // 3. Find users who are following the current user
-        List<Follow> followerList = iFollow.findByFollowing(userDetails.getUser());
-        Set<User> followerUsers = followerList.stream()
+        List<Follow> followerList = iFollow.findByFollowing(userDetails);
+        Set<AppUser> followerUsers = followerList.stream()
                 .map(follow -> follow.getFollower())
                 .collect(Collectors.toSet());
 
-        List<User> followerMatches = allResults.stream()
+        List<AppUser> followerMatches = allResults.stream()
                 .filter(user -> followerUsers.contains(user) && !exactMatch.contains(user) && !followingMatches.contains(user))
                 .toList();
 
         // 4. Filter remaining matches (users not in exact, following, or follower matches)
-        List<User> otherMatches = allResults.stream()
+        List<AppUser> otherMatches = allResults.stream()
                 .filter(user -> !exactMatch.contains(user) && !followingMatches.contains(user) && !followerMatches.contains(user))
                 .toList();
 
@@ -87,7 +86,7 @@ public class ExploreService {
         // 2. Following matches
         // 3. Follower matches
         // 4. Other matches
-        List<User> rankedResults = new ArrayList<>();
+        List<AppUser> rankedResults = new ArrayList<>();
         rankedResults.addAll(exactMatch);
         rankedResults.addAll(followingMatches);
         rankedResults.addAll(followerMatches);
@@ -129,10 +128,8 @@ public class ExploreService {
 
             //we have to convert user to user dto
             userResponse.setId(post.getUser().getId());
-            userResponse.setUserName(post.getUser().getUserName());
-            userResponse.setFullName(post.getUser().getFullName());
+            userResponse.setUserName(post.getUser().getUsername());
             userResponse.setBio(post.getUser().getBio());
-            userResponse.setEmail(post.getUser().getEmail());
             userResponse.setGender(post.getUser().getGender());
 
             response.setUser(userResponse);
@@ -144,12 +141,12 @@ public class ExploreService {
 
     }
 
-    public ResponseEntity<?> createTimeline(int page, int size, UserPrinciple userDetails) {
+    public ResponseEntity<?> createTimeline(int page, int size, AppUser userDetails) {
 
         //step 1 find all the user which is followed by current user.
-        List<Follow> follows = iFollow.findByFollowerAndStatus(userDetails.getUser(), FollowStatus.ACCEPTED);
+        List<Follow> follows = iFollow.findByFollowerAndStatus(userDetails, FollowStatus.ACCEPTED);
         // list of follows have all information like following and followers, but we only interested in following user because we know follower is current user
-        List<User> followedUsers = follows.stream()
+        List<AppUser> followedUsers = follows.stream()
                 .map(follow -> follow.getFollowing())
                 .toList();
 
@@ -176,10 +173,8 @@ public class ExploreService {
             // Map the user details to UserDto
             UserDto userInfo = new UserDto();
             userInfo.setId(post.getUser().getId());
-            userInfo.setUserName(post.getUser().getUserName());
-            userInfo.setFullName(post.getUser().getFullName());
+            userInfo.setUserName(post.getUser().getUsername());
             userInfo.setBio(post.getUser().getBio());
-            userInfo.setEmail(post.getUser().getEmail());
             userInfo.setGender(post.getUser().getGender());
             postInfo.setUser(userInfo);
 
@@ -189,9 +184,7 @@ public class ExploreService {
                    UserDto taggedUserDto = new UserDto();
                    taggedUserDto.setId(taggedUser.getId());
                    taggedUserDto.setUserName(taggedUser.getUserName());
-                   taggedUserDto.setFullName(taggedUser.getFullName());
                    taggedUserDto.setBio(taggedUser.getBio());
-                   taggedUserDto.setEmail(taggedUser.getEmail());
                    taggedUserDto.setGender(taggedUser.getGender());
                    return taggedUserDto;
                }).collect(Collectors.toSet());
@@ -208,7 +201,7 @@ public class ExploreService {
         return ResponseEntity.status(HttpStatus.OK).body(allPost);
     }
 
-    public ResponseEntity<?> createReelTimeLine(int page, int size, UserPrinciple userDetails) {
+    public ResponseEntity<?> createReelTimeLine(int page, int size, AppUser userDetails) {
 
         if (page < 0 || size <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Page and size must be positive values.");
@@ -234,10 +227,8 @@ public class ExploreService {
             // Map the user details to UserDto
             UserDto userInfo = new UserDto();
             userInfo.setId(post.getUser().getId());
-            userInfo.setUserName(post.getUser().getUserName());
-            userInfo.setFullName(post.getUser().getFullName());
+            userInfo.setUserName(post.getUser().getUsername());
             userInfo.setBio(post.getUser().getBio());
-            userInfo.setEmail(post.getUser().getEmail());
             userInfo.setGender(post.getUser().getGender());
             reelInfo.setUser(userInfo);
 
@@ -246,10 +237,8 @@ public class ExploreService {
                 Set<UserDto> taggedUsers = post.getTaggedUSer().stream().map(taggedUser -> {
                     UserDto taggedUserDto = new UserDto();
                     taggedUserDto.setId(taggedUser.getId());
-                    taggedUserDto.setUserName(taggedUser.getUserName());
-                    taggedUserDto.setFullName(taggedUser.getFullName());
+                    taggedUserDto.setUserName(taggedUser.getUsername());
                     taggedUserDto.setBio(taggedUser.getBio());
-                    taggedUserDto.setEmail(taggedUser.getEmail());
                     taggedUserDto.setGender(taggedUser.getGender());
                     return taggedUserDto;
                 }).collect(Collectors.toSet());

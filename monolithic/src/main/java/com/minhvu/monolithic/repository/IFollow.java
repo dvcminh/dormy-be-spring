@@ -1,30 +1,31 @@
 package com.minhvu.monolithic.repository;
 
+import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.entity.Follow;
-import com.minhvu.monolithic.entity.User;
 import com.minhvu.monolithic.enums.FollowStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-public interface IFollow extends JpaRepository<Follow,Long> {
+public interface IFollow extends JpaRepository<Follow, UUID> {
 
-    Optional<Follow> findByFollowerAndFollowing(User user, User user1);
+    Optional<Follow> findByFollowerAndFollowing(AppUser AppUser, AppUser AppUser1);
 
-    List<Follow> findByFollowingAndStatus(User currentUser, FollowStatus followStatus);
+    List<Follow> findByFollowingAndStatus(AppUser currentAppUser, FollowStatus followStatus);
 
-    List<Follow> findByFollowing(User currentUser);
+    List<Follow> findByFollowing(AppUser currentAppUser);
 
-    List<Follow> findByFollower(User user);
+    List<Follow> findByFollower(AppUser AppUser);
 
-    Optional<Follow> findByIdAndStatus(Long requestId, FollowStatus followStatus);
+    Optional<Follow> findByIdAndStatus(UUID requestId, FollowStatus followStatus);
 
-    List<Follow> findByFollowerAndStatus(User user, FollowStatus followStatus);
+    List<Follow> findByFollowerAndStatus(AppUser AppUser, FollowStatus followStatus);
 
-    Optional<Follow> findByFollowerAndFollowingAndStatus(User user, User user1, FollowStatus followStatus);
+    Optional<Follow> findByFollowerAndFollowingAndStatus(AppUser AppUser, AppUser AppUser1, FollowStatus followStatus);
 
-    Optional<Long> countByFollowingAndStatus(User user, FollowStatus followStatus);
+    Optional<UUID> countByFollowingAndStatus(AppUser AppUser, FollowStatus followStatus);
 
-    Optional<Long> countByFollowerAndStatus(User user, FollowStatus followStatus);
+    Optional<UUID> countByFollowerAndStatus(AppUser AppUser, FollowStatus followStatus);
 }

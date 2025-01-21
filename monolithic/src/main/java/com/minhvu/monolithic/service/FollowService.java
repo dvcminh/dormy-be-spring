@@ -2,9 +2,8 @@ package com.minhvu.monolithic.service;
 
 
 import com.minhvu.monolithic.dto.PendingFollowRequest;
+import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.entity.Follow;
-import com.minhvu.monolithic.entity.User;
-import com.minhvu.monolithic.entity.UserPrinciple;
 import com.minhvu.monolithic.enums.AccountType;
 import com.minhvu.monolithic.enums.FollowStatus;
 import com.minhvu.monolithic.repository.IFollow;
@@ -14,10 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,23 +24,23 @@ public class FollowService {
     @Autowired
     IUser iUser;
 
-    public ResponseEntity<String> followUser(Long userId, UserPrinciple userPrinciple) {
+    public ResponseEntity<String> followUser(UUID userId, AppUser userPrinciple) {
 
         // Check if the target user (to be followed) exists
-        Optional<User> targetUser = iUser.findById(userId);
+        Optional<AppUser> targetUser = iUser.findById(userId);
         if (targetUser.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
 
         // Check if the current user already follows the target user
-        Optional<Follow> alreadyFollow = iFollow.findByFollowerAndFollowing(userPrinciple.getUser(), targetUser.get());
+        Optional<Follow> alreadyFollow = iFollow.findByFollowerAndFollowing(userPrinciple, targetUser.get());
         if (alreadyFollow.isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Already followed");
         }
 
         Follow follow = new Follow();
         follow.setFollowing(targetUser.get());
-        follow.setFollower(userPrinciple.getUser());
+        follow.setFollower(userPrinciple);
 
         // Set follow status based on account type
         if (targetUser.get().getAccountType().equals(AccountType.PUBLIC)) {
@@ -63,19 +59,19 @@ public class FollowService {
         return ResponseEntity.status(HttpStatus.CREATED).body("User followed successfully");
     }
 
-    public ResponseEntity<String> unfollowUser(Long userId, UserPrinciple userPrinciple) {
+    public ResponseEntity<String> unfollowUser(UUID userId, AppUser userPrinciple) {
 
         // Check if the target user ( followed) exists
-        Optional<User> targetUser = iUser.findById(userId);
+        Optional<AppUser> targetUser = iUser.findById(userId);
         if (targetUser.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("The user you want to unfollow is not found");
         }
 
         // Check if the current user already follows the target user
-        Optional<Follow> alreadyFollow = iFollow.findByFollowerAndFollowing(userPrinciple.getUser(), targetUser.get());
+        Optional<Follow> alreadyFollow = iFollow.findByFollowerAndFollowing(userPrinciple, targetUser.get());
         if (alreadyFollow.isEmpty()) {
             return ResponseEntity.status(HttpStatus.CONFLICT).
-                    body("You have successfully unfollowed " + targetUser.get().getUserName());
+                    body("You have successfully unfollowed " + targetUser.get().getUsername());
         }
 
         try {
@@ -89,17 +85,16 @@ public class FollowService {
 
     }
 
-    public ResponseEntity<List<PendingFollowRequest>> getAllPendingRequest(UserPrinciple userPrinciple) {
+    public ResponseEntity<List<PendingFollowRequest>> getAllPendingRequest(AppUser userPrinciple) {
 
-        User currentUser = userPrinciple.getUser();
-        List<Follow> pendingRequest = iFollow.findByFollowingAndStatus(currentUser, FollowStatus.PENDING);
+        List<Follow> pendingRequest = iFollow.findByFollowingAndStatus(userPrinciple, FollowStatus.PENDING);
 
         // Map the Follow entities to PendingFollowRequest DTOs
         List<PendingFollowRequest> pendingFollowRequests = pendingRequest.stream().map(follow ->
                 new PendingFollowRequest(
                         follow.getFollower().getId(),
-                        follow.getFollower().getUserName(),
-                        follow.getFollower().getFullName(),
+                        follow.getFollower().getUsername(),
+                        follow.getFollower().getDisplayName(),
                         follow.getFollower().getBio()
                 )
         ).toList();
@@ -108,17 +103,16 @@ public class FollowService {
         return ResponseEntity.status(HttpStatus.OK).body(pendingFollowRequests);
     }
 
-    public ResponseEntity<String> deletePendingRequest(Long userId, UserPrinciple userPrinciple) {
-        User currentUser = userPrinciple.getUser();
+    public ResponseEntity<String> deletePendingRequest(UUID userId, AppUser userPrinciple) {
 
         // Check if the target user (the user who sent the request) exists
-        Optional<User> targetUser = iUser.findById(userId);
+        Optional<AppUser> targetUser = iUser.findById(userId);
         if (targetUser.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Target user not found");
         }
 
         // Check if there is a pending follow request where currentUser is the following and targetUser is the follower
-        Optional<Follow> pendingFollowRequest = iFollow.findByFollowerAndFollowing(targetUser.get(), currentUser);
+        Optional<Follow> pendingFollowRequest = iFollow.findByFollowerAndFollowing(targetUser.get(), userPrinciple);
         if (pendingFollowRequest.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No pending follow request found");
         }
@@ -134,9 +128,9 @@ public class FollowService {
         return ResponseEntity.status(HttpStatus.OK).body("Pending follow request deleted successfully");
     }
 
-    public ResponseEntity<List<PendingFollowRequest>> getAllFollowers(Long userId, UserPrinciple userPrinciple) {
+    public ResponseEntity<List<PendingFollowRequest>> getAllFollowers(UUID userId, AppUser userPrinciple) {
 
-        Optional<User> user = iUser.findById(userId);
+        Optional<AppUser> user = iUser.findById(userId);
 
         if (user.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
@@ -145,7 +139,7 @@ public class FollowService {
         // Check if the account is private and the current user doesn't follow the target user
         boolean isPrivateAccount = user.get().getAccountType().equals(AccountType.PRIVATE);
 
-        Optional<Follow> checkFollowing = iFollow.findByFollowerAndFollowingAndStatus(userPrinciple.getUser(), user.get()
+        Optional<Follow> checkFollowing = iFollow.findByFollowerAndFollowingAndStatus(userPrinciple, user.get()
                 , FollowStatus.ACCEPTED);
 
         if (isPrivateAccount && checkFollowing.isEmpty()) {
@@ -159,16 +153,16 @@ public class FollowService {
         List<PendingFollowRequest> followers = allFollowers.stream().map(follow ->
                 new PendingFollowRequest(
                         follow.getFollower().getId(),
-                        follow.getFollower().getUserName(),
-                        follow.getFollower().getFullName(),
+                        follow.getFollower().getUsername(),
+                        follow.getFollower().getDisplayName(),
                         follow.getFollower().getBio()
                 )).toList();
 
         return ResponseEntity.status(HttpStatus.OK).body(followers);
     }
 
-    public ResponseEntity<List<PendingFollowRequest>> getAllFollowing(Long userId, UserPrinciple userPrinciple) {
-        Optional<User> user = iUser.findById(userId);
+    public ResponseEntity<List<PendingFollowRequest>> getAllFollowing(UUID userId, AppUser userPrinciple) {
+        Optional<AppUser> user = iUser.findById(userId);
 
         if (user.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
@@ -178,7 +172,7 @@ public class FollowService {
         // Check if the account is private and the current user doesn't follow the target user
         boolean isPrivateAccount = user.get().getAccountType().equals(AccountType.PRIVATE);
 
-        Optional<Follow> checkFollowing = iFollow.findByFollowerAndFollowingAndStatus(userPrinciple.getUser(), user.get()
+        Optional<Follow> checkFollowing = iFollow.findByFollowerAndFollowingAndStatus(userPrinciple, user.get()
                 , FollowStatus.ACCEPTED);
 
         if (isPrivateAccount && checkFollowing.isEmpty()) {
@@ -190,8 +184,8 @@ public class FollowService {
         List<PendingFollowRequest> following = allFollowing.stream().map(follow ->
                 new PendingFollowRequest(
                         follow.getFollowing().getId(),
-                        follow.getFollowing().getUserName(),
-                        follow.getFollowing().getFullName(),
+                        follow.getFollowing().getUsername(),
+                        follow.getFollowing().getDisplayName(),
                         follow.getFollowing().getBio()
                 )).toList();
 
@@ -200,10 +194,7 @@ public class FollowService {
 
     }
 
-    public ResponseEntity<String> acceptPendingRequest(Long requestId, UserPrinciple userPrinciple) {
-        //get the current authentic user
-        User user = userPrinciple.getUser();
-
+    public ResponseEntity<String> acceptPendingRequest(UUID requestId, AppUser userPrinciple) {
 
         //getting follow request
         Optional<Follow> followRequest = iFollow.findByIdAndStatus(requestId, FollowStatus.PENDING);
@@ -215,7 +206,7 @@ public class FollowService {
         Follow request = followRequest.get();
 
         // Verify only user can accept the request for whom it made
-        if (!request.getFollowing().equals(user)) {
+        if (!request.getFollowing().equals(userPrinciple)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized to accept this follow request");
         }
 
@@ -229,54 +220,51 @@ public class FollowService {
         return ResponseEntity.status(HttpStatus.OK).body("Follow request accepted successfully");
 
     }
-    
-    public ResponseEntity<Long> getAllFollowersCount(Long userId) {
-        Optional<User> targetUser = iUser.findById(userId);
+
+    public ResponseEntity<UUID> getAllFollowersCount(UUID userId) {
+        Optional<AppUser> targetUser = iUser.findById(userId);
         if (targetUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0L);
+            throw new RuntimeException("User not found");
         }
 
-        Optional<Long> count = iFollow.countByFollowingAndStatus(targetUser.get(), FollowStatus.ACCEPTED);
+        Optional<UUID> count = iFollow.countByFollowingAndStatus(targetUser.get(), FollowStatus.ACCEPTED);
 
         if (count.isEmpty()){
-            return ResponseEntity.ok(0L);
+            throw new RuntimeException("No followers found");
         }
         return ResponseEntity.ok(count.get());
     }
 
-    public ResponseEntity<Long> getAllFollowingCount(Long userId) {
-        Optional<User> targetUser = iUser.findById(userId);
+    public ResponseEntity<UUID> getAllFollowingCount(UUID userId) {
+        Optional<AppUser> targetUser = iUser.findById(userId);
         if (targetUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0L);
+            throw new RuntimeException("User not found");
         }
 
 
-        Optional<Long> followingCount = iFollow.countByFollowerAndStatus(targetUser.get(), FollowStatus.ACCEPTED);
+        Optional<UUID> followingCount = iFollow.countByFollowerAndStatus(targetUser.get(), FollowStatus.ACCEPTED);
 
         if (followingCount.isEmpty()){
-            return ResponseEntity.ok(0L);
+            throw new RuntimeException("No following found");
         }
         return ResponseEntity.ok(followingCount.get());
     }
 
-    public ResponseEntity<List<PendingFollowRequest>> mutualFollowers(Long userId, UserPrinciple userPrinciple) {
+    public ResponseEntity<List<PendingFollowRequest>> mutualFollowers(UUID userId, AppUser userPrinciple) {
         // Find the target user by ID
-        Optional<User> targetUser = iUser.findById(userId);
+        Optional<AppUser> targetUser = iUser.findById(userId);
         if (targetUser.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
         }
 
-        // Get the current user
-        User currentUser = userPrinciple.getUser();
-
         // Get the list of users the current user is following
-        List<Follow> currentUserFollowing = iFollow.findByFollowerAndStatus(currentUser, FollowStatus.ACCEPTED);
+        List<Follow> currentUserFollowing = iFollow.findByFollowerAndStatus(userPrinciple, FollowStatus.ACCEPTED);
 
         // Get the list of users who are following the target user
         List<Follow> targetUserFollowers = iFollow.findByFollowingAndStatus(targetUser.get(), FollowStatus.ACCEPTED);
 
         // Extract mutual followers
-        Set<Long> currentUserFollowingIds = currentUserFollowing.stream()
+        Set<UUID> currentUserFollowingIds = currentUserFollowing.stream()
                 .map(follow -> follow.getFollowing().getId())
                 .collect(Collectors.toSet());
 
@@ -284,8 +272,8 @@ public class FollowService {
                 .filter(follow -> currentUserFollowingIds.contains(follow.getFollower().getId()))
                 .map(follow -> new PendingFollowRequest(
                         follow.getFollower().getId(),
-                        follow.getFollower().getUserName(),
-                        follow.getFollower().getFullName(),
+                        follow.getFollower().getUsername(),
+                        follow.getFollower().getDisplayName(),
                         follow.getFollower().getBio()
                 ))
                 .toList();

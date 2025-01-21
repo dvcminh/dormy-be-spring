@@ -13,18 +13,15 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @Table(name = "follows")
-public class Follow {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Follow extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "following_id",nullable = false) // The user being followed
-    private  User following;
+    private  AppUser following;
 
     @ManyToOne
     @JoinColumn(name = "follower_id",nullable = false) // The user initiating the follow request
-    private User follower;
+    private AppUser follower;
 
     @Enumerated(EnumType.STRING)
     private FollowStatus status;

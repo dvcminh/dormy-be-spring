@@ -4,9 +4,8 @@ package com.minhvu.monolithic.service;
 import com.minhvu.monolithic.dto.PostRequestDto;
 import com.minhvu.monolithic.dto.PostResponseDto;
 import com.minhvu.monolithic.dto.UserDto;
+import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.entity.Post;
-import com.minhvu.monolithic.entity.User;
-import com.minhvu.monolithic.entity.UserPrinciple;
 import com.minhvu.monolithic.repository.IPost;
 import com.minhvu.monolithic.repository.IUser;
 import jakarta.validation.Valid;
@@ -16,10 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,11 +29,7 @@ public class PostService {
 //    @Autowired
 //    CloudinaryService cloudinaryService;
 
-    public ResponseEntity<String> addPost(@Valid PostRequestDto postDetails, UserPrinciple userPrinciple) {
-        // Get the current user
-        User currentUser = userPrinciple.getUser();
-
-
+    public ResponseEntity<String> addPost(@Valid PostRequestDto postDetails, AppUser userPrinciple) {
         // we have to verify tagged user means user is available or not
 
 
@@ -65,7 +57,7 @@ public class PostService {
             post.setCreatedAt(LocalDateTime.now());
             post.setPostContent(postContentUrl);
             post.setThumbnailUrl(thumbnailUrl);
-            post.setUser(currentUser);
+            post.setUser(userPrinciple);
             post.setTaggedUSer(postDetails.getTaggedUser());
 
 
@@ -77,8 +69,8 @@ public class PostService {
         }
     }
 
-    public ResponseEntity<String> updateCaption(String caption, UserPrinciple userPrinciple, Long postId) {
-        Long currentUserId = userPrinciple.getId();
+    public ResponseEntity<String> updateCaption(String caption, AppUser userPrinciple, UUID postId) {
+        UUID currentUserId = userPrinciple.getId();
 
 
         Optional<Post> currentPost = iPost.findById(postId);
@@ -112,7 +104,7 @@ public class PostService {
 
     }
 
-    public ResponseEntity<String> deletePost(Long postId, UserPrinciple userPrinciple) {
+    public ResponseEntity<String> deletePost(UUID postId, AppUser userPrinciple) {
         Optional<Post> currentPost = iPost.findById(postId);
 
         if (currentPost.isEmpty()) {
@@ -121,7 +113,7 @@ public class PostService {
 
         Post post = currentPost.get();
 
-        Long loginUserId = userPrinciple.getId();
+        UUID loginUserId = userPrinciple.getId();
         if (!loginUserId.equals(post.getUser().getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to delete this post");
         }
@@ -135,7 +127,7 @@ public class PostService {
         }
     }
 
-    public ResponseEntity<?> getSinglePost(Long postId) {
+    public ResponseEntity<?> getSinglePost(UUID postId) {
         Optional<Post> currentPost = iPost.findById(postId);
 
         if (currentPost.isEmpty()) {
@@ -157,10 +149,9 @@ public class PostService {
         //setting user dto
         UserDto userDto = new UserDto();
         userDto.setId(post.getUser().getId());
-        userDto.setUserName(post.getUser().getUserName());
-        userDto.setFullName(post.getUser().getFullName());
+        userDto.setUserName(post.getUser().getUsername());
+        userDto.setFullName(post.getUser().getDisplayName());
         userDto.setBio(post.getUser().getBio());
-        userDto.setEmail(post.getUser().getEmail());
         userDto.setGender(post.getUser().getGender());
 
         postResponseDto.setUser(userDto);
@@ -172,10 +163,9 @@ public class PostService {
                 .map(taggedUser -> {
                     UserDto taggedUserDto = new UserDto();
                     taggedUserDto.setId(taggedUser.getId());
-                    taggedUserDto.setUserName(taggedUser.getUserName());
-                    taggedUserDto.setFullName(taggedUser.getFullName());
+                    taggedUserDto.setUserName(taggedUser.getUsername());
+                    taggedUserDto.setFullName(taggedUser.getDisplayName());
                     taggedUserDto.setBio(taggedUser.getBio());
-                    taggedUserDto.setEmail(taggedUser.getEmail());
                     taggedUserDto.setGender(taggedUser.getGender());
                     return taggedUserDto;
                 })
@@ -185,15 +175,15 @@ public class PostService {
         return ResponseEntity.status(HttpStatus.OK).body(postResponseDto);
     }
 
-    public ResponseEntity<?> getAllPost(Long userId) {
+    public ResponseEntity<?> getAllPost(UUID userId) {
 
-        Optional<User> userDetails = iUser.findById(userId);
+        Optional<AppUser> userDetails = iUser.findById(userId);
 
         if (userDetails.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
 
-        User user = userDetails.get();
+        AppUser user = userDetails.get();
 
         try {
             // Finding all posts related to a user
@@ -216,10 +206,9 @@ public class PostService {
                 // Setting UserDto for the post
                 UserDto userDto = new UserDto();
                 userDto.setId(post.getUser().getId());
-                userDto.setUserName(post.getUser().getUserName());
-                userDto.setFullName(post.getUser().getFullName());
+                userDto.setUserName(post.getUser().getUsername());
+                userDto.setFullName(post.getUser().getDisplayName());
                 userDto.setBio(post.getUser().getBio());
-                userDto.setEmail(post.getUser().getEmail());
                 userDto.setGender(post.getUser().getGender());
                 postResponseDto.setUser(userDto);
 
@@ -229,10 +218,9 @@ public class PostService {
                         .map(taggedUser -> {
                             UserDto taggedUserDto = new UserDto();
                             taggedUserDto.setId(taggedUser.getId());
-                            taggedUserDto.setUserName(taggedUser.getUserName());
-                            taggedUserDto.setFullName(taggedUser.getFullName());
+                            taggedUserDto.setUserName(taggedUser.getUsername());
+                            taggedUserDto.setFullName(taggedUser.getDisplayName());
                             taggedUserDto.setBio(taggedUser.getBio());
-                            taggedUserDto.setEmail(taggedUser.getEmail());
                             taggedUserDto.setGender(taggedUser.getGender());
                             return taggedUserDto;
                         })

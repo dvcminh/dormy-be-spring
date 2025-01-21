@@ -1,6 +1,6 @@
 package com.minhvu.monolithic.dto;
 
-import com.minhvu.monolithic.entity.User;
+import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.enums.PostType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -26,6 +26,6 @@ public class PostRequestDto {
 
     private MultipartFile thumbnailFile;
 
-    private Set<User> taggedUser;
+    private Set<AppUser> taggedUser;
 
 }

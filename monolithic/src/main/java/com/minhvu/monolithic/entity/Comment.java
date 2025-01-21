@@ -11,16 +11,14 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Entity
 @Table(name = "Comments")
-public class Comment {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Comment extends BaseEntity {
 
     @Size(min = 1, message = "Comment can not be shorter than 1 character")
     @Size(max = 400, message = "You reached maximum comment size ")
@@ -38,7 +36,7 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private AppUser user;
 
     @ManyToOne
     @JoinColumn(name = "parent_Comment_id")

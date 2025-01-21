@@ -1,7 +1,7 @@
 package com.minhvu.monolithic.controller;
 
 
-import com.minhvu.monolithic.entity.UserPrinciple;
+import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.service.ExploreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,15 +13,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/api/v1")
 @RestController
-public class ExploreController {
+public class ExploreController extends BaseController {
     @Autowired
     ExploreService exploreService;
     //api to search post
 
     // api to search user
     @GetMapping("/search/user")
-    private ResponseEntity<?> searchUser(@RequestParam String query,
-                                         @AuthenticationPrincipal UserPrinciple userDetails) {
+    private ResponseEntity<?> searchUser(@RequestParam String query) {
+        AppUser userDetails = getCurrentUser();
         return exploreService.searchUser(query, userDetails);
     }
 
@@ -40,16 +40,16 @@ public class ExploreController {
     //api to create timeline for user
      @GetMapping("/timeline")
     private ResponseEntity<?> createTimeLine(@RequestParam(value = "page", defaultValue = "0")int page,
-                                             @RequestParam(value="size",defaultValue = "20")int size,
-                                             @AuthenticationPrincipal UserPrinciple userDetails){
+                                             @RequestParam(value="size",defaultValue = "20")int size){
+        AppUser userDetails = getCurrentUser();
         return exploreService.createTimeline(page,size,userDetails);
     }
 
     //create reel timeline
     @GetMapping("/timeline/reel")
     private ResponseEntity<?> createReel(@RequestParam(value = "page", defaultValue = "0")int page,
-                                             @RequestParam(value="size",defaultValue = "5")int size,
-                                             @AuthenticationPrincipal UserPrinciple userDetails){
+                                             @RequestParam(value="size",defaultValue = "5")int size){
+        AppUser userDetails = getCurrentUser();
         return exploreService.createReelTimeLine(page,size,userDetails);
     }
 }

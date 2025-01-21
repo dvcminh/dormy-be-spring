@@ -1,22 +1,23 @@
 package com.minhvu.monolithic.repository;
 
 
+import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.entity.Comment;
 import com.minhvu.monolithic.entity.Like;
 import com.minhvu.monolithic.entity.Post;
-import com.minhvu.monolithic.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface ILIKE  extends JpaRepository<Like,Long> {
+public interface ILIKE  extends JpaRepository<Like, UUID> {
 
-    Optional<Like> findByPostAndUser(Post postId, User id);
+    Optional<Like> findByPostAndUser(Post postId, AppUser id);
 
-    Optional<Like> findByCommentAndUser(Comment comment, User user);
+    Optional<Like> findByCommentAndUser(Comment comment, AppUser user);
 
     List<Like> findByPost(Post id);
 

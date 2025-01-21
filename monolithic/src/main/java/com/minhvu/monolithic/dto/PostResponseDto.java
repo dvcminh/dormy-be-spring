@@ -5,11 +5,12 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.UUID;
 
 @Data
 public class PostResponseDto {
 
-    private Long id;
+    private UUID id;
 
     private String caption;
 

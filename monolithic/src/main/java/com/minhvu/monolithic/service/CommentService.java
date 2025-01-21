@@ -3,10 +3,9 @@ package com.minhvu.monolithic.service;
 
 import com.minhvu.monolithic.dto.CommentRequestDto;
 import com.minhvu.monolithic.dto.ReplyDto;
+import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.entity.Comment;
 import com.minhvu.monolithic.entity.Post;
-import com.minhvu.monolithic.entity.User;
-import com.minhvu.monolithic.entity.UserPrinciple;
 import com.minhvu.monolithic.repository.IComment;
 import com.minhvu.monolithic.repository.IPost;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class CommentService {
@@ -28,13 +28,12 @@ public class CommentService {
     private IPost iPost;
 
 
-    public ResponseEntity<String> addComment(CommentRequestDto commentDetails, UserPrinciple userDetails) {
-        User userId = userDetails.getUser();
-        if (userId == null){
+    public ResponseEntity<String> addComment(CommentRequestDto commentDetails, AppUser userDetails) {
+        if (userDetails.getId() == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You can not add comment");
         }
 
-        Long postId = commentDetails.getPostId();
+        UUID postId = commentDetails.getPostId();
         //finding post
 
         Optional<Post> existingPost = iPost.findById(postId);
@@ -53,7 +52,7 @@ public class CommentService {
         comment.setText(commentBody);
         comment.setCreatedAt(LocalDateTime.now());
         comment.setPost(existingPost.get());
-        comment.setUser(userId);
+        comment.setUser(userDetails);
         comment.setParentComment(null);
 
         try{
@@ -65,13 +64,12 @@ public class CommentService {
        return ResponseEntity.status(HttpStatus.CREATED).body("comment added");
     }
 
-    public ResponseEntity<String> addReply(Long commentId, CommentRequestDto commentDetails, UserPrinciple userDetails) {
-        User user = userDetails.getUser();
-        if(user == null){
+    public ResponseEntity<String> addReply(UUID commentId, CommentRequestDto commentDetails, AppUser userDetails) {
+        if(userDetails == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not authorized to reply");
         }
 
-        Long existingPostId = commentDetails.getPostId();
+        UUID existingPostId = commentDetails.getPostId();
         Optional<Post>post = iPost.findById(existingPostId);
         if(post.isEmpty()){
             return  ResponseEntity.status(HttpStatus.NOT_FOUND).body("post not found in which you want to reply the comment");
@@ -93,7 +91,7 @@ public class CommentService {
         comment.setText(commentBody);
         comment.setCreatedAt(LocalDateTime.now());
         comment.setPost(post.get());
-        comment.setUser(user);
+        comment.setUser(userDetails);
         comment.setParentComment(existingComment.get());
 
 
@@ -110,9 +108,8 @@ public class CommentService {
 
     }
 
-    public ResponseEntity<?> getAllReplyOfPost(Long commentId, UserPrinciple userDetails) {
-        User user = userDetails.getUser();
-        if(user == null){
+    public ResponseEntity<?> getAllReplyOfPost(UUID commentId, AppUser userDetails) {
+        if(userDetails == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not authorized ");
         }
 
@@ -133,8 +130,8 @@ public class CommentService {
              replies.setText(comment.getText());
              replies.setCreatedAt(comment.getCreatedAt());
              replies.setUserId(comment.getUser().getId());
-             replies.setUserName(comment.getUser().getUserName());
-             replies.setUserprofilePicture(comment.getUser().getProfilePictureUrl());
+             replies.setUserName(comment.getUser().getUsername());
+             replies.setUserprofilePicture(comment.getUser().getProfilePicture());
              replies.setParentCommentId(comment.getParentComment().getId());
              return  replies;
         }).toList();
@@ -142,7 +139,7 @@ public class CommentService {
         return ResponseEntity.status(HttpStatus.OK).body(allReplies);
     }
 
-    public ResponseEntity<?> getNoOfReplies(Long commentId) {
+    public ResponseEntity<?> getNoOfReplies(UUID commentId) {
         Optional<Comment>parentComment = iComment.findById(commentId);
         if (parentComment.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Comment not found");
@@ -154,7 +151,7 @@ public class CommentService {
         return ResponseEntity.status(HttpStatus.OK).body(numberOfReplies);
     }
 
-    public ResponseEntity<?> getAllComments(Long postId) {
+    public ResponseEntity<?> getAllComments(UUID postId) {
         Optional<Post> existingPost = iPost.findById(postId);
         if (existingPost.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found");
@@ -169,8 +166,8 @@ public class CommentService {
             replies.setText(comment.getText());
             replies.setCreatedAt(comment.getCreatedAt());
             replies.setUserId(comment.getUser().getId());
-            replies.setUserName(comment.getUser().getUserName());
-            replies.setUserprofilePicture(comment.getUser().getProfilePictureUrl());
+            replies.setUserName(comment.getUser().getDisplayName());
+            replies.setUserprofilePicture(comment.getUser().getProfilePicture());
             replies.setParentCommentId(null);
             return  replies;
         }).toList();
@@ -178,7 +175,7 @@ public class CommentService {
         return ResponseEntity.status(HttpStatus.OK).body(allReplies);
     }
 
-    public ResponseEntity<Integer> getTotalNumberOfCommets(Long postId) {
+    public ResponseEntity<Integer> getTotalNumberOfCommets(UUID postId) {
         Optional<Post> existingPost = iPost.findById(postId);
         if (existingPost.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0);
@@ -188,7 +185,7 @@ public class CommentService {
 
     }
 
-    public ResponseEntity<String> editComment(Long commentId, UserPrinciple userDetails, String text) {
+    public ResponseEntity<String> editComment(UUID commentId, AppUser userDetails, String text) {
         if (text == null || text.trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Text cannot be null or empty");
         }
@@ -219,7 +216,7 @@ public class CommentService {
 
     }
 
-    public ResponseEntity<String> deleteComment(Long commentId, UserPrinciple userDetails) {
+    public ResponseEntity<String> deleteComment(UUID commentId, AppUser userDetails) {
         Optional<Comment> comment = iComment.findById(commentId);
 
         if (comment.isEmpty()) {
