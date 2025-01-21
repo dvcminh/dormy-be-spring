@@ -20,8 +20,8 @@ public class PostController extends BaseController {
     PostService postService;
 
     //api to create post
-    @PostMapping(value = "/post", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    private ResponseEntity<String> addPost(@ModelAttribute PostRequestDto postDetails) {
+    @PostMapping(value = "/post")
+    private ResponseEntity<String> addPost(@RequestBody PostRequestDto postDetails) {
         AppUser userPrinciple = getCurrentUser();
         return postService.addPost(postDetails, userPrinciple);
     }
@@ -55,7 +55,4 @@ public class PostController extends BaseController {
     private ResponseEntity<?> getAllPost(@PathVariable UUID userId) {
         return postService.getAllPost(userId);
     }
-
-
-    // api to search a post
 }

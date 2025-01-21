@@ -30,35 +30,14 @@ public class PostService {
 //    CloudinaryService cloudinaryService;
 
     public ResponseEntity<String> addPost(@Valid PostRequestDto postDetails, AppUser userPrinciple) {
-        // we have to verify tagged user means user is available or not
-
-
-        String postContentUrl = null;
-        String thumbnailUrl = null;
-
-        try {
-
-//            postContentUrl = cloudinaryService.upload(postDetails.getPostContentFile());
-            postContentUrl = "a";
-
-            if (postDetails.getThumbnailFile() != null) {
-//                thumbnailUrl = cloudinaryService.upload(postDetails.getThumbnailFile());
-                thumbnailUrl = "a";
-            }
-        } catch (Exception exception) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File upload failed !! " + exception.getMessage());
-        }
-
         try {
             // Create Post entity
             Post post = new Post();
             post.setCaption(postDetails.getCaption());
             post.setPostType(postDetails.getPostType());
             post.setCreatedAt(LocalDateTime.now());
-            post.setPostContent(postContentUrl);
-            post.setThumbnailUrl(thumbnailUrl);
+            post.setPostContent(postDetails.getPostContentFileUrl());
             post.setUser(userPrinciple);
-            post.setTaggedUSer(postDetails.getTaggedUser());
 
 
             iPost.save(post);
@@ -141,7 +120,6 @@ public class PostService {
         postResponseDto.setId(post.getId());
         postResponseDto.setCaption(post.getCaption());
         postResponseDto.setPostContentUrl(post.getPostContent());
-        postResponseDto.setThumbnailUrl(post.getThumbnailUrl());
         postResponseDto.setCreatedAt(post.getCreatedAt());
         postResponseDto.setUpdatedAt(post.getUpdatedAt());
         postResponseDto.setPostType(post.getPostType());
@@ -199,7 +177,6 @@ public class PostService {
                 postResponseDto.setId(post.getId());
                 postResponseDto.setCaption(post.getCaption());
                 postResponseDto.setPostContentUrl(post.getPostContent());
-                postResponseDto.setThumbnailUrl(post.getThumbnailUrl());
                 postResponseDto.setCreatedAt(post.getCreatedAt());
                 postResponseDto.setUpdatedAt(post.getUpdatedAt());
 

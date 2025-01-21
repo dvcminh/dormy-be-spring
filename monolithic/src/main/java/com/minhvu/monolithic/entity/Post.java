@@ -37,14 +37,8 @@ public class Post extends BaseEntity {
 
 
     @NotNull(message = "Reel URL is required")
-    @Pattern(regexp = "^(http|https)://.*$", message = "Invalid reel URL format")
     @Column(name = "reel_url", nullable = false)
     private String postContent;
-
-
-    @Pattern(regexp = "^(http|https)://.*$", message = "Invalid thumbnail URL format")
-    @Column(name = "thumbnail_url")
-    private String thumbnailUrl;
 
 
     @ManyToOne

@@ -22,10 +22,5 @@ public class PostRequestDto {
     private PostType postType;
 
     @NotNull(message = "Post content file is required")
-    private MultipartFile postContentFile;
-
-    private MultipartFile thumbnailFile;
-
-    private Set<AppUser> taggedUser;
-
+    private String postContentFileUrl;
 }

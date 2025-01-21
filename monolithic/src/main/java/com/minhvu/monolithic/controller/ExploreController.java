@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class ExploreController extends BaseController {
     @Autowired
     ExploreService exploreService;
-    //api to search post
 
     // api to search user
     @GetMapping("/search/user")
@@ -28,7 +27,6 @@ public class ExploreController extends BaseController {
 
     // api to search for  post
     @GetMapping("/search/post")
-
     private ResponseEntity<?> postSearch(@RequestParam("query") String query,
                                          @RequestParam(value = "page", defaultValue = "0") int page,
                                          @RequestParam(value = "size", defaultValue = "10") int size

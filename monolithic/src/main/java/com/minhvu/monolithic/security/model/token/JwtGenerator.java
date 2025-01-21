@@ -4,7 +4,9 @@ import com.minhvu.monolithic.security.model.SecurityUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +16,8 @@ import java.util.Date;
 @Component
 public class JwtGenerator {
     //private static final KeyPair keyPair = Keys.keyPairFor(SignatureAlgorithm.RS256);
-    private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+    @Value("${jwt.secret}")
+    private String secretKey;
 
     public String generateToken(SecurityUser userDetails, Long time) {
         String username = userDetails.getUsername();
@@ -25,7 +28,7 @@ public class JwtGenerator {
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(expireDate)
-                .signWith(key, SignatureAlgorithm.HS512)
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
 
         return token;
@@ -33,7 +36,7 @@ public class JwtGenerator {
 
     public String getUsernameFromJWT(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(key)
+                .setSigningKey(getSignInKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -43,7 +46,7 @@ public class JwtGenerator {
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
-                    .setSigningKey(key)
+                    .setSigningKey(getSignInKey())
                     .build()
                     .parseClaimsJws(token);
             return true;
@@ -52,4 +55,8 @@ public class JwtGenerator {
         }
     }
 
+    private Key getSignInKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
 }

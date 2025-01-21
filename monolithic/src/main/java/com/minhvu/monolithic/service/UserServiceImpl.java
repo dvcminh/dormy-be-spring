@@ -76,6 +76,9 @@ public class UserServiceImpl implements UserService {
                 AppUser.builder()
                         .username(registerRequest.getUsername())
                         .role(RoleType.USER)
+                        .accountType(AccountType.PUBLIC)
+                        .displayName(registerRequest.getUsername())
+                        .bio("Hello, I'm new here!")
                         .build()
         );
 

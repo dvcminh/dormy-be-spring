@@ -122,7 +122,6 @@ public class ExploreService {
             response.setCaption(post.getCaption());
             response.setPostType(post.getPostType());
             response.setPostContentUrl(post.getPostContent());
-            response.setThumbnailUrl(post.getThumbnailUrl());
             response.setCreatedAt(post.getCreatedAt());
             response.setUpdatedAt(post.getUpdatedAt());
 
@@ -167,7 +166,6 @@ public class ExploreService {
             postInfo.setPostType(post.getPostType());
             postInfo.setCreatedAt(post.getCreatedAt());
             postInfo.setPostContentUrl(post.getPostContent());
-            postInfo.setThumbnailUrl(post.getThumbnailUrl());
             postInfo.setUpdatedAt(post.getUpdatedAt());
 
             // Map the user details to UserDto
@@ -221,7 +219,6 @@ public class ExploreService {
             reelInfo.setPostType(post.getPostType());
             reelInfo.setCreatedAt(post.getCreatedAt());
             reelInfo.setPostContentUrl(post.getPostContent());
-            reelInfo.setThumbnailUrl(post.getThumbnailUrl());
             reelInfo.setUpdatedAt(post.getUpdatedAt());
 
             // Map the user details to UserDto
