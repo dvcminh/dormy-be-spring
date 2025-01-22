@@ -1,8 +1,9 @@
 package com.minhvu.monolithic.service;
 
 
-import com.minhvu.monolithic.dto.PostRequestDto;
+import com.minhvu.monolithic.dto.CreatePostRequestDto;
 import com.minhvu.monolithic.dto.PostResponseDto;
+import com.minhvu.monolithic.dto.UpdatePostRequestDto;
 import com.minhvu.monolithic.dto.UserDto;
 import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.entity.Post;
@@ -29,7 +30,7 @@ public class PostService {
 //    @Autowired
 //    CloudinaryService cloudinaryService;
 
-    public ResponseEntity<String> addPost(@Valid PostRequestDto postDetails, AppUser userPrinciple) {
+    public ResponseEntity<String> addPost(@Valid CreatePostRequestDto postDetails, AppUser userPrinciple) {
         try {
             // Create Post entity
             Post post = new Post();
@@ -48,17 +49,15 @@ public class PostService {
         }
     }
 
-    public ResponseEntity<String> updateCaption(String caption, AppUser userPrinciple, UUID postId) {
+    public ResponseEntity<String> updateCaption(UpdatePostRequestDto updatePostRequestDto, AppUser userPrinciple) {
         UUID currentUserId = userPrinciple.getId();
 
+        Optional<Post> currentPost = iPost.findById(updatePostRequestDto.getPostId());
 
-        Optional<Post> currentPost = iPost.findById(postId);
-
-        if (caption != null && caption.length() > 200) {
+        if (updatePostRequestDto.getCaption().length() > 200) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).
                     body("Caption should be less than 200 characters.");
         }
-
 
         if (currentPost.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found");
@@ -70,7 +69,9 @@ public class PostService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not authorized to update post");
         }
 
-        post.setCaption(caption);
+        post.setCaption(updatePostRequestDto.getCaption());
+        post.setPostType(updatePostRequestDto.getPostType());
+        post.setPostContent(updatePostRequestDto.getPostContentFileUrl());
 
         try {
             iPost.save(post);
@@ -78,7 +79,6 @@ public class PostService {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).
                     body("something went wrong, please try agan latter");
-
         }
 
     }

@@ -6,7 +6,6 @@ import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.service.FollowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -73,12 +72,12 @@ public class FollowController extends BaseController {
 
     //api to get follower count
     @GetMapping("/{userId}/followers/count")
-    private ResponseEntity<UUID> FollowCount(@PathVariable UUID userId){
+    private ResponseEntity<Long> FollowCount(@PathVariable UUID userId) {
         return followService.getAllFollowersCount(userId);
     }
 
     @GetMapping("/{userId}/following/count")
-    private ResponseEntity<UUID> followingCount(@PathVariable UUID userId){
+    private ResponseEntity<Long> followingCount(@PathVariable UUID userId) {
         return followService.getAllFollowingCount(userId);
     }
 

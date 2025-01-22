@@ -7,10 +7,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class PostRequestDto {
+public class UpdatePostRequestDto {
+    @NotNull(message = "Post ID is required")
+    private UUID postId;
     @Size(max = 200, message = "Caption cannot be more than 200 characters")
     private String caption;
 

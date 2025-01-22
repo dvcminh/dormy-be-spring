@@ -25,7 +25,7 @@ public interface IFollow extends JpaRepository<Follow, UUID> {
 
     Optional<Follow> findByFollowerAndFollowingAndStatus(AppUser AppUser, AppUser AppUser1, FollowStatus followStatus);
 
-    Optional<UUID> countByFollowingAndStatus(AppUser AppUser, FollowStatus followStatus);
+    Optional<Long> countByFollowingAndStatus(AppUser AppUser, FollowStatus followStatus);
 
-    Optional<UUID> countByFollowerAndStatus(AppUser AppUser, FollowStatus followStatus);
+    Optional<Long> countByFollowerAndStatus(AppUser AppUser, FollowStatus followStatus);
 }

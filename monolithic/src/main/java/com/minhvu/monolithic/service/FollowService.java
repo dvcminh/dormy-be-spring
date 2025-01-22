@@ -221,28 +221,28 @@ public class FollowService {
 
     }
 
-    public ResponseEntity<UUID> getAllFollowersCount(UUID userId) {
+    public ResponseEntity<Long> getAllFollowersCount(UUID userId) {
         Optional<AppUser> targetUser = iUser.findById(userId);
         if (targetUser.isEmpty()) {
             throw new RuntimeException("User not found");
         }
 
-        Optional<UUID> count = iFollow.countByFollowingAndStatus(targetUser.get(), FollowStatus.ACCEPTED);
+        Optional<Long> count = iFollow.countByFollowingAndStatus(targetUser.get(), FollowStatus.ACCEPTED);
 
         if (count.isEmpty()){
             throw new RuntimeException("No followers found");
         }
-        return ResponseEntity.ok(count.get());
+        return ResponseEntity.ok(0L);
     }
 
-    public ResponseEntity<UUID> getAllFollowingCount(UUID userId) {
+    public ResponseEntity<Long> getAllFollowingCount(UUID userId) {
         Optional<AppUser> targetUser = iUser.findById(userId);
         if (targetUser.isEmpty()) {
             throw new RuntimeException("User not found");
         }
 
 
-        Optional<UUID> followingCount = iFollow.countByFollowerAndStatus(targetUser.get(), FollowStatus.ACCEPTED);
+        Optional<Long> followingCount = iFollow.countByFollowerAndStatus(targetUser.get(), FollowStatus.ACCEPTED);
 
         if (followingCount.isEmpty()){
             throw new RuntimeException("No following found");

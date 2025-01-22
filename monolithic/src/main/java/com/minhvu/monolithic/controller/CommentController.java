@@ -6,7 +6,6 @@ import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -73,7 +72,7 @@ public class CommentController extends BaseController{
     //api to edit a comment
     @PutMapping("/comment/{commentId}")
     private ResponseEntity<String> editComment(@PathVariable UUID commentId,
-                                               @RequestBody  String text){
+                                               @RequestBody String text) {
         AppUser userDetails = getCurrentUser();
         return  commentService.editComment(commentId,userDetails,text);
     }

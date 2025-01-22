@@ -1,13 +1,12 @@
 package com.minhvu.monolithic.controller;
 
 
-import com.minhvu.monolithic.dto.PostRequestDto;
+import com.minhvu.monolithic.dto.CreatePostRequestDto;
+import com.minhvu.monolithic.dto.UpdatePostRequestDto;
 import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -21,17 +20,16 @@ public class PostController extends BaseController {
 
     //api to create post
     @PostMapping(value = "/post")
-    private ResponseEntity<String> addPost(@RequestBody PostRequestDto postDetails) {
+    private ResponseEntity<String> addPost(@RequestBody CreatePostRequestDto postDetails) {
         AppUser userPrinciple = getCurrentUser();
         return postService.addPost(postDetails, userPrinciple);
     }
 
     //api to update post caption
-    @PutMapping("/post/{postId}/{caption}")
-    private ResponseEntity<String> updateCaption(@PathVariable String caption,
-                                                 @PathVariable UUID postId) {
+    @PutMapping("/post")
+    private ResponseEntity<String> updateCaption(@RequestBody UpdatePostRequestDto updatePostRequestDto) {
         AppUser userPrinciple = getCurrentUser();
-        return postService.updateCaption(caption, userPrinciple, postId);
+        return postService.updateCaption(updatePostRequestDto, userPrinciple);
     }
 
 
