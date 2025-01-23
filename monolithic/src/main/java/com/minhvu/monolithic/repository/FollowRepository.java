@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface IFollow extends JpaRepository<Follow, UUID> {
+public interface FollowRepository extends JpaRepository<Follow, UUID> {
 
     Optional<Follow> findByFollowerAndFollowing(AppUser AppUser, AppUser AppUser1);
 

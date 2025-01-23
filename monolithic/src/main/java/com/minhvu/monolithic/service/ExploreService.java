@@ -9,9 +9,9 @@ import com.minhvu.monolithic.entity.Post;
 import com.minhvu.monolithic.enums.AccountType;
 import com.minhvu.monolithic.enums.FollowStatus;
 import com.minhvu.monolithic.enums.PostType;
-import com.minhvu.monolithic.repository.IFollow;
-import com.minhvu.monolithic.repository.IPost;
-import com.minhvu.monolithic.repository.IUser;
+import com.minhvu.monolithic.repository.FollowRepository;
+import com.minhvu.monolithic.repository.PostRepository;
+import com.minhvu.monolithic.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,13 +31,13 @@ import java.util.stream.Collectors;
 public class ExploreService {
 
     @Autowired
-    IPost iPost;
+    PostRepository postRepository;
 
     @Autowired
-    IUser iUser;
+    UserRepository userRepository;
 
     @Autowired
-    IFollow iFollow;
+    FollowRepository followRepository;
 
 
     public ResponseEntity<?> searchUser(String query, AppUser userDetails) {
@@ -48,7 +48,7 @@ public class ExploreService {
         }
 
         // Fetch all users matching the query (by username or full name)
-        List<AppUser> allResults = iUser.findByUsernameIgnoreCaseContainingOrDisplayNameIgnoreCaseContaining(query, query);
+        List<AppUser> allResults = userRepository.findByUsernameIgnoreCaseContainingOrDisplayNameIgnoreCaseContaining(query, query);
 
         // 1. Find exact matches (users with a username exactly matching the query)
         List<AppUser> exactMatch = allResults.stream()
@@ -56,7 +56,7 @@ public class ExploreService {
                 .toList();
 
         // 2. Find users that the current user is following
-        List<Follow> followingList = iFollow.findByFollower(userDetails);
+        List<Follow> followingList = followRepository.findByFollower(userDetails);
 
         Set<AppUser> followingUsers = followingList.stream()
                 .map(follow -> follow.getFollowing())
@@ -67,7 +67,7 @@ public class ExploreService {
                 .toList();
 
         // 3. Find users who are following the current user
-        List<Follow> followerList = iFollow.findByFollowing(userDetails);
+        List<Follow> followerList = followRepository.findByFollowing(userDetails);
         Set<AppUser> followerUsers = followerList.stream()
                 .map(follow -> follow.getFollower())
                 .collect(Collectors.toSet());
@@ -105,7 +105,7 @@ public class ExploreService {
         Pageable pageable = PageRequest.of(page, size);
 
         // Fetch paginated results
-        Page<Post> postPage = iPost.findByCaptionIgnoreCaseContaining(query, pageable);
+        Page<Post> postPage = postRepository.findByCaptionIgnoreCaseContaining(query, pageable);
 
         if (postPage.isEmpty()) {
             return ResponseEntity.status(HttpStatus.OK).body(Collections.emptyList());
@@ -143,7 +143,7 @@ public class ExploreService {
     public ResponseEntity<?> createTimeline(int page, int size, AppUser userDetails) {
 
         //step 1 find all the user which is followed by current user.
-        List<Follow> follows = iFollow.findByFollowerAndStatus(userDetails, FollowStatus.ACCEPTED);
+        List<Follow> follows = followRepository.findByFollowerAndStatus(userDetails, FollowStatus.ACCEPTED);
         // list of follows have all information like following and followers, but we only interested in following user because we know follower is current user
         List<AppUser> followedUsers = follows.stream()
                 .map(follow -> follow.getFollowing())
@@ -152,7 +152,7 @@ public class ExploreService {
 
         //step 2 fetch the posts from followed user
         Pageable pageable = PageRequest.of(page,size, Sort.by("createdAt").descending());
-        Page<Post> followedPosts = iPost.findByUserIn(followedUsers,pageable);
+        Page<Post> followedPosts = postRepository.findByUserIn(followedUsers, pageable);
 
 
 
@@ -207,7 +207,7 @@ public class ExploreService {
 
         // Step 1: Fetch public reels sorted by creation date
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        List<Post> fetchedReels = iPost.findByPostTypeAndUser_AccountType(PostType.REEL,AccountType.PUBLIC, pageable);
+        List<Post> fetchedReels = postRepository.findByPostTypeAndUser_AccountType(PostType.REEL, AccountType.PUBLIC, pageable);
 
         // Step 2: Convert reels to PostResponseDto
         List<PostResponseDto> allReels = fetchedReels.stream().map(post -> {

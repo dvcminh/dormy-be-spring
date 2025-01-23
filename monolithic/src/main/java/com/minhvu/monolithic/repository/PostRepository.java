@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.UUID;
 
-public interface IPost extends JpaRepository<Post, UUID> {
+public interface PostRepository extends JpaRepository<Post, UUID> {
     List<Post> findAllByUser(AppUser user);
 
     Page<Post> findByCaptionIgnoreCaseContaining(String query, Pageable pageable);

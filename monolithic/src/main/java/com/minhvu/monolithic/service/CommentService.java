@@ -6,8 +6,8 @@ import com.minhvu.monolithic.dto.ReplyDto;
 import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.entity.Comment;
 import com.minhvu.monolithic.entity.Post;
-import com.minhvu.monolithic.repository.IComment;
-import com.minhvu.monolithic.repository.IPost;
+import com.minhvu.monolithic.repository.CommentRepository;
+import com.minhvu.monolithic.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +22,10 @@ import java.util.UUID;
 public class CommentService {
 
     @Autowired
-    private IComment iComment;
+    private CommentRepository commentRepository;
 
     @Autowired
-    private IPost iPost;
+    private PostRepository postRepository;
 
 
     public ResponseEntity<String> addComment(CommentRequestDto commentDetails, AppUser userDetails) {
@@ -36,7 +36,7 @@ public class CommentService {
         UUID postId = commentDetails.getPostId();
         //finding post
 
-        Optional<Post> existingPost = iPost.findById(postId);
+        Optional<Post> existingPost = postRepository.findById(postId);
         if(existingPost.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("post not found in which you want to add this comment");
         }
@@ -56,7 +56,7 @@ public class CommentService {
         comment.setParentComment(null);
 
         try{
-            iComment.save(comment);
+            commentRepository.save(comment);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("something went wrong please try again latter");
         }
@@ -70,12 +70,12 @@ public class CommentService {
         }
 
         UUID existingPostId = commentDetails.getPostId();
-        Optional<Post>post = iPost.findById(existingPostId);
+        Optional<Post> post = postRepository.findById(existingPostId);
         if(post.isEmpty()){
             return  ResponseEntity.status(HttpStatus.NOT_FOUND).body("post not found in which you want to reply the comment");
         }
 
-        Optional<Comment> existingComment = iComment.findById(commentId);
+        Optional<Comment> existingComment = commentRepository.findById(commentId);
         if(existingComment.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("comment not found which you want to reply");
         }
@@ -96,7 +96,7 @@ public class CommentService {
 
 
         try {
-            iComment.save(comment);
+            commentRepository.save(comment);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("something went wrong please try again latter");
         }
@@ -113,12 +113,12 @@ public class CommentService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not authorized ");
         }
 
-        Optional<Comment> existingComment = iComment.findById(commentId);
+        Optional<Comment> existingComment = commentRepository.findById(commentId);
         if(existingComment.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("comment not found ");
         }
 
-        List<Comment> allReplyComments = iComment.findAllByParentComment(existingComment.get());
+        List<Comment> allReplyComments = commentRepository.findAllByParentComment(existingComment.get());
 
 
         if (allReplyComments.isEmpty()){
@@ -140,24 +140,24 @@ public class CommentService {
     }
 
     public ResponseEntity<?> getNoOfReplies(UUID commentId) {
-        Optional<Comment>parentComment = iComment.findById(commentId);
+        Optional<Comment> parentComment = commentRepository.findById(commentId);
         if (parentComment.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Comment not found");
         }
 
-        List<Comment> allReplies = iComment.findAllByParentComment(parentComment.get());
+        List<Comment> allReplies = commentRepository.findAllByParentComment(parentComment.get());
         Integer numberOfReplies = allReplies.size();
 
         return ResponseEntity.status(HttpStatus.OK).body(numberOfReplies);
     }
 
     public ResponseEntity<?> getAllComments(UUID postId) {
-        Optional<Post> existingPost = iPost.findById(postId);
+        Optional<Post> existingPost = postRepository.findById(postId);
         if (existingPost.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found");
         }
 
-        List<Comment> allParentComment = iComment.findAllByParentCommentAndPost(null,existingPost.get());
+        List<Comment> allParentComment = commentRepository.findAllByParentCommentAndPost(null, existingPost.get());
 
 
         List<ReplyDto> allReplies  = allParentComment.stream().map(comment -> {
@@ -176,11 +176,11 @@ public class CommentService {
     }
 
     public ResponseEntity<Integer> getTotalNumberOfCommets(UUID postId) {
-        Optional<Post> existingPost = iPost.findById(postId);
+        Optional<Post> existingPost = postRepository.findById(postId);
         if (existingPost.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0);
         }
-      Integer totalComments = iComment.findAllByParentCommentAndPost(null,existingPost.get()).size();
+        Integer totalComments = commentRepository.findAllByParentCommentAndPost(null, existingPost.get()).size();
       return  ResponseEntity.status(HttpStatus.OK).body(totalComments);
 
     }
@@ -194,7 +194,7 @@ public class CommentService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("please add comment between 1 to 400 character");
         }
 
-        Optional<Comment> existingComment = iComment.findById(commentId);
+        Optional<Comment> existingComment = commentRepository.findById(commentId);
         if (existingComment.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("comment not found");
         }
@@ -207,7 +207,7 @@ public class CommentService {
         existingComment.get().setText(text);
 
         try{
-            iComment.save(existingComment.get());
+            commentRepository.save(existingComment.get());
         }catch (Exception e){
             return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong, please try again latter");
         }
@@ -217,7 +217,7 @@ public class CommentService {
     }
 
     public ResponseEntity<String> deleteComment(UUID commentId, AppUser userDetails) {
-        Optional<Comment> comment = iComment.findById(commentId);
+        Optional<Comment> comment = commentRepository.findById(commentId);
 
         if (comment.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Comment not found");
@@ -229,7 +229,7 @@ public class CommentService {
         }
 
         try {
-            iComment.delete(comment.get());
+            commentRepository.delete(comment.get());
             return ResponseEntity.status(HttpStatus.OK).body("Comment deleted successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete the comment");

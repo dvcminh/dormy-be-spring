@@ -7,8 +7,8 @@ import com.minhvu.monolithic.dto.UpdatePostRequestDto;
 import com.minhvu.monolithic.dto.UserDto;
 import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.entity.Post;
-import com.minhvu.monolithic.repository.IPost;
-import com.minhvu.monolithic.repository.IUser;
+import com.minhvu.monolithic.repository.PostRepository;
+import com.minhvu.monolithic.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,10 +22,10 @@ import java.util.stream.Collectors;
 @Service
 public class PostService {
     @Autowired
-    IPost iPost;
+    PostRepository postRepository;
 
     @Autowired
-    IUser iUser;
+    UserRepository userRepository;
 
 //    @Autowired
 //    CloudinaryService cloudinaryService;
@@ -41,7 +41,7 @@ public class PostService {
             post.setUser(userPrinciple);
 
 
-            iPost.save(post);
+            postRepository.save(post);
             return ResponseEntity.status(HttpStatus.CREATED).body("Post added successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -52,7 +52,7 @@ public class PostService {
     public ResponseEntity<String> updateCaption(UpdatePostRequestDto updatePostRequestDto, AppUser userPrinciple) {
         UUID currentUserId = userPrinciple.getId();
 
-        Optional<Post> currentPost = iPost.findById(updatePostRequestDto.getPostId());
+        Optional<Post> currentPost = postRepository.findById(updatePostRequestDto.getPostId());
 
         if (updatePostRequestDto.getCaption().length() > 200) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).
@@ -74,7 +74,7 @@ public class PostService {
         post.setPostContent(updatePostRequestDto.getPostContentFileUrl());
 
         try {
-            iPost.save(post);
+            postRepository.save(post);
             return ResponseEntity.status(HttpStatus.OK).body("Post updated successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).
@@ -84,7 +84,7 @@ public class PostService {
     }
 
     public ResponseEntity<String> deletePost(UUID postId, AppUser userPrinciple) {
-        Optional<Post> currentPost = iPost.findById(postId);
+        Optional<Post> currentPost = postRepository.findById(postId);
 
         if (currentPost.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found");
@@ -98,7 +98,7 @@ public class PostService {
         }
 
         try {
-            iPost.delete(post);
+            postRepository.delete(post);
             return ResponseEntity.status(HttpStatus.OK).body("Post deleted successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).
@@ -107,7 +107,7 @@ public class PostService {
     }
 
     public ResponseEntity<?> getSinglePost(UUID postId) {
-        Optional<Post> currentPost = iPost.findById(postId);
+        Optional<Post> currentPost = postRepository.findById(postId);
 
         if (currentPost.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found");
@@ -155,7 +155,7 @@ public class PostService {
 
     public ResponseEntity<?> getAllPost(UUID userId) {
 
-        Optional<AppUser> userDetails = iUser.findById(userId);
+        Optional<AppUser> userDetails = userRepository.findById(userId);
 
         if (userDetails.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
@@ -165,7 +165,7 @@ public class PostService {
 
         try {
             // Finding all posts related to a user
-            List<Post> allPost = iPost.findAllByUser(user);
+            List<Post> allPost = postRepository.findAllByUser(user);
 
             if (allPost == null || allPost.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.OK).body(Collections.emptyList());

@@ -2,11 +2,14 @@ package com.minhvu.monolithic.service;
 
 
 import com.minhvu.monolithic.dto.LikeDto;
-import com.minhvu.monolithic.entity.*;
+import com.minhvu.monolithic.entity.AppUser;
+import com.minhvu.monolithic.entity.Comment;
+import com.minhvu.monolithic.entity.Like;
+import com.minhvu.monolithic.entity.Post;
 import com.minhvu.monolithic.enums.LikeType;
-import com.minhvu.monolithic.repository.IComment;
-import com.minhvu.monolithic.repository.ILIKE;
-import com.minhvu.monolithic.repository.IPost;
+import com.minhvu.monolithic.repository.CommentRepository;
+import com.minhvu.monolithic.repository.LikeRepository;
+import com.minhvu.monolithic.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,22 +23,22 @@ import java.util.UUID;
 @Service
 public class LikeService {
     @Autowired
-    ILIKE ilike;
+    LikeRepository likeRepository;
 
     @Autowired
-    IPost iPost;
+    PostRepository postRepository;
 
     @Autowired
-    IComment iComment;
+    CommentRepository commentRepository;
 
     public ResponseEntity<String> addPostLike(UUID postId, AppUser userDetails) {
-        Optional<Post> existingPost = iPost.findById(postId);
+        Optional<Post> existingPost = postRepository.findById(postId);
 
         if (existingPost.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found");
         }
 
-        Optional<Like> existingLike = ilike.findByPostAndUser(existingPost.get(), userDetails);
+        Optional<Like> existingLike = likeRepository.findByPostAndUser(existingPost.get(), userDetails);
 
         try {
             if (existingLike.isEmpty()) {
@@ -44,11 +47,11 @@ public class LikeService {
                 like.setLikeType(LikeType.POST);
                 like.setUser(userDetails);
                 like.setPost(existingPost.get());
-                ilike.save(like);
+                likeRepository.save(like);
                 return ResponseEntity.status(HttpStatus.OK).body("Post liked successfully");
             } else {
                 // Remove like
-                ilike.delete(existingLike.get());
+                likeRepository.delete(existingLike.get());
                 return ResponseEntity.status(HttpStatus.OK).body("Post unliked successfully");
             }
         } catch (Exception e) {
@@ -63,13 +66,13 @@ public class LikeService {
 
     
     public ResponseEntity<String> likeComment(UUID commentId, AppUser userDetails) {
-        Optional<Comment> existingComment = iComment.findById(commentId);
+        Optional<Comment> existingComment = commentRepository.findById(commentId);
 
         if(existingComment.isEmpty()){
             return  ResponseEntity.status(HttpStatus.NOT_FOUND).body("Comment not found");
         }
 
-        Optional<Like> existingLike = ilike.findByCommentAndUser(existingComment.get(),userDetails);
+        Optional<Like> existingLike = likeRepository.findByCommentAndUser(existingComment.get(), userDetails);
 
         try {
             if (existingLike.isEmpty()) {
@@ -78,11 +81,11 @@ public class LikeService {
                 like.setLikeType(LikeType.COMMENT);
                 like.setUser(userDetails);
                 like.setComment(existingComment.get());
-                ilike.save(like);
+                likeRepository.save(like);
                 return ResponseEntity.status(HttpStatus.OK).body("comment liked successfully");
             } else {
                 // Remove like
-                ilike.delete(existingLike.get());
+                likeRepository.delete(existingLike.get());
                 return ResponseEntity.status(HttpStatus.OK).body("comment unliked successfully");
             }
         } catch (Exception e) {
@@ -95,13 +98,13 @@ public class LikeService {
 
 
     public ResponseEntity<?> postLikeDetails(UUID postId) {
-        Optional<Post> existingPost = iPost.findById(postId);
+        Optional<Post> existingPost = postRepository.findById(postId);
 
         if (existingPost.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found");
         }
 
-        List<Like> allLikes = ilike.findByPost(existingPost.get());
+        List<Like> allLikes = likeRepository.findByPost(existingPost.get());
 
         if (allLikes.isEmpty()){
             return ResponseEntity.status(HttpStatus.OK).body(Collections.emptyList());
@@ -121,13 +124,13 @@ public class LikeService {
     }
 
     public ResponseEntity<?> postLikeCount(UUID postId) {
-        Optional<Post> existingPost = iPost.findById(postId);
+        Optional<Post> existingPost = postRepository.findById(postId);
 
         if (existingPost.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found");
         }
 
-        List<Like> allLikes = ilike.findByPost(existingPost.get());
+        List<Like> allLikes = likeRepository.findByPost(existingPost.get());
 
         if (allLikes.isEmpty()){
             return ResponseEntity.status(HttpStatus.OK).body(0);
@@ -136,13 +139,13 @@ public class LikeService {
     }
 
     public ResponseEntity<?> commentLikeCount(UUID commentId) {
-        Optional<Comment> existingComment = iComment.findById(commentId);
+        Optional<Comment> existingComment = commentRepository.findById(commentId);
 
         if (existingComment.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("comment not found");
         }
 
-        List<Like> allLikes = ilike.findByComment(existingComment.get());
+        List<Like> allLikes = likeRepository.findByComment(existingComment.get());
 
         if (allLikes.isEmpty()){
             return ResponseEntity.status(HttpStatus.OK).body(0);

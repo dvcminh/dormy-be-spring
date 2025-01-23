@@ -1,8 +1,9 @@
 package com.minhvu.monolithic.controller;
 
 
-import com.minhvu.monolithic.exception.BadRequestException;
+import com.minhvu.monolithic.dto.response.page.PageLink;
 import com.minhvu.monolithic.entity.AppUser;
+import com.minhvu.monolithic.exception.BadRequestException;
 import com.minhvu.monolithic.repository.AppUserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,9 @@ public abstract class BaseController {
     @Autowired
     private AppUserRepository appUserRepository;
 
+    public PageLink createPageLink(int page, int pageSize) {
+        return new PageLink(page, pageSize);
+    }
     protected AppUser getCurrentUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         AppUser currentUser = appUserRepository.findByUsername(username).get();
