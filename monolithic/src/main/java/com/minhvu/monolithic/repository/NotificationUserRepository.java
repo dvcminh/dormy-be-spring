@@ -23,4 +23,6 @@ public interface NotificationUserRepository extends JpaRepository<NotificationUs
             @Param("userId") UUID userId,
             @Param("isRead") Boolean isRead,
             Pageable pageable);
+
+    NotificationUser findByIdAndUserId(UUID id, UUID id1);
 }
