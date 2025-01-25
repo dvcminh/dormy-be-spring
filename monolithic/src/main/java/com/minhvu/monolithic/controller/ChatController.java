@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 
 @Controller
-@RequestMapping("/api/chat")
+@RequestMapping("/api/v1/chat")
 @CrossOrigin(origins = "http://localhost:5173")
 public class ChatController {
 

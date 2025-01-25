@@ -1,5 +1,6 @@
 package com.minhvu.monolithic.controller;
 
+import com.minhvu.monolithic.dto.model.NotificationDto;
 import com.minhvu.monolithic.dto.model.NotificationUserResponseDto;
 import com.minhvu.monolithic.dto.response.page.PageData;
 import com.minhvu.monolithic.dto.response.page.PageLink;
@@ -10,17 +11,20 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/notification")
+@RequestMapping("api/v1/notification")
 @AllArgsConstructor
 public class NotificationController extends BaseController {
     private final NotificationService notificationService;
-
+    private final SimpMessagingTemplate simpMessagingTemplate;
     @Operation(summary = "Get All Notifications for a user")
     @SecurityRequirement(name = "Bearer Authentication")
     @GetMapping
@@ -37,5 +41,10 @@ public class NotificationController extends BaseController {
                         isRead,
                         appUser
                 ));
+    }
+
+    @MessageMapping("/notification")
+    public void recMessage(@Payload NotificationDto notification) {
+        notificationService.saveNotification(notification);
     }
 }
