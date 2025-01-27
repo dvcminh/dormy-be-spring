@@ -1,5 +1,6 @@
 package com.minhvu.monolithic.dto;
 
+import com.minhvu.monolithic.dto.model.AppUserDto;
 import com.minhvu.monolithic.enums.PostType;
 import lombok.Data;
 
@@ -24,7 +25,7 @@ public class PostResponseDto {
 
     private LocalDateTime updatedAt;
 
-    private UserDto user;
+    private AppUserDto user;
 
-    private Set<UserDto> taggedUser;
+    private Set<AppUserDto> taggedUser;
 }

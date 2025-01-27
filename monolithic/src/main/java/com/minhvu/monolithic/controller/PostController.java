@@ -12,21 +12,21 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/post")
 @RestController
 public class PostController extends BaseController {
     @Autowired
     PostService postService;
 
     //api to create post
-    @PostMapping(value = "/post")
+    @PostMapping
     private ResponseEntity<String> addPost(@RequestBody CreatePostRequestDto postDetails) {
         AppUser userPrinciple = getCurrentUser();
         return postService.addPost(postDetails, userPrinciple);
     }
 
     //api to update post caption
-    @PutMapping("/post")
+    @PutMapping
     private ResponseEntity<String> updateCaption(@RequestBody UpdatePostRequestDto updatePostRequestDto) {
         AppUser userPrinciple = getCurrentUser();
         return postService.updateCaption(updatePostRequestDto, userPrinciple);
@@ -34,7 +34,7 @@ public class PostController extends BaseController {
 
 
     //api to delete post
-    @DeleteMapping("/post/{postId}")
+    @DeleteMapping("/{postId}")
     private ResponseEntity<String> deletePost(@PathVariable UUID postId) {
         AppUser userPrinciple = getCurrentUser();
         return postService.deletePost(postId, userPrinciple);
@@ -42,7 +42,7 @@ public class PostController extends BaseController {
 
 
     //api to get single post
-    @GetMapping("/post/{postId}")
+    @GetMapping("/{postId}")
     private ResponseEntity<?> getSinglePost(@PathVariable UUID postId) {
         return postService.getSinglePost(postId);
     }
@@ -52,5 +52,12 @@ public class PostController extends BaseController {
     @GetMapping("/posts/{userId}")
     private ResponseEntity<?> getAllPost(@PathVariable UUID userId) {
         return postService.getAllPost(userId);
+    }
+
+    //api to get all post of me
+    @GetMapping
+    private ResponseEntity<?> getAllPost() {
+        AppUser userPrinciple = getCurrentUser();
+        return postService.getAllPost(userPrinciple.getId());
     }
 }

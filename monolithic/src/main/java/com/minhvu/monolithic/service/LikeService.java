@@ -2,6 +2,7 @@ package com.minhvu.monolithic.service;
 
 
 import com.minhvu.monolithic.dto.LikeDto;
+import com.minhvu.monolithic.dto.model.NotificationDto;
 import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.entity.Comment;
 import com.minhvu.monolithic.entity.Like;
@@ -10,7 +11,7 @@ import com.minhvu.monolithic.enums.LikeType;
 import com.minhvu.monolithic.repository.CommentRepository;
 import com.minhvu.monolithic.repository.LikeRepository;
 import com.minhvu.monolithic.repository.PostRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,15 +22,24 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class LikeService {
-    @Autowired
-    LikeRepository likeRepository;
+    private final LikeRepository likeRepository;
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
+    private final NotificationService notificationService;
 
-    @Autowired
-    PostRepository postRepository;
+    public ResponseEntity<Boolean> checkIfUserLikedPost(UUID postId, AppUser userDetails) {
+        Optional<Post> existingPost = postRepository.findById(postId);
 
-    @Autowired
-    CommentRepository commentRepository;
+        if (existingPost.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
+        }
+
+        Optional<Like> existingLike = likeRepository.findByPostAndUser(existingPost.get(), userDetails);
+
+        return ResponseEntity.status(HttpStatus.OK).body(existingLike.isPresent());
+    }
 
     public ResponseEntity<String> addPostLike(UUID postId, AppUser userDetails) {
         Optional<Post> existingPost = postRepository.findById(postId);
@@ -47,7 +57,14 @@ public class LikeService {
                 like.setLikeType(LikeType.POST);
                 like.setUser(userDetails);
                 like.setPost(existingPost.get());
-                likeRepository.save(like);
+                likeRepository.saveAndFlush(like);
+                NotificationDto notificationDto = notificationService.generateNotification(existingPost.get().getUser().getId(),
+                        "New post like",
+                        "Some one just like your post",
+                        "like",
+                        existingPost.get().getId(),
+                        userDetails.getId());
+                notificationService.saveNotification(notificationDto);
                 return ResponseEntity.status(HttpStatus.OK).body("Post liked successfully");
             } else {
                 // Remove like

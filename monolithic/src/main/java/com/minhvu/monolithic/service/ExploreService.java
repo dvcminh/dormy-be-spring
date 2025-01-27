@@ -2,7 +2,8 @@ package com.minhvu.monolithic.service;
 
 
 import com.minhvu.monolithic.dto.PostResponseDto;
-import com.minhvu.monolithic.dto.UserDto;
+import com.minhvu.monolithic.dto.mapper.AppUserMapper;
+import com.minhvu.monolithic.dto.model.AppUserDto;
 import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.entity.Follow;
 import com.minhvu.monolithic.entity.Post;
@@ -12,7 +13,7 @@ import com.minhvu.monolithic.enums.PostType;
 import com.minhvu.monolithic.repository.FollowRepository;
 import com.minhvu.monolithic.repository.PostRepository;
 import com.minhvu.monolithic.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,18 +29,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ExploreService {
 
-    @Autowired
-    PostRepository postRepository;
+    private final PostRepository postRepository;
+    private final UserRepository userRepository;
+    private final FollowRepository followRepository;
 
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    FollowRepository followRepository;
-
-
+    private final AppUserMapper appUserMapper;
     public ResponseEntity<?> searchUser(String query, AppUser userDetails) {
 
         // Validate the query length
@@ -116,7 +113,7 @@ public class ExploreService {
         //creating response of post
         List<PostResponseDto> allPost = postPage.stream().map( post -> {
             PostResponseDto response = new PostResponseDto();
-            UserDto userResponse = new UserDto();
+            AppUserDto userResponse = new AppUserDto();
 
             response.setId(post.getId());
             response.setCaption(post.getCaption());
@@ -127,9 +124,10 @@ public class ExploreService {
 
             //we have to convert user to user dto
             userResponse.setId(post.getUser().getId());
-            userResponse.setUserName(post.getUser().getUsername());
+            userResponse.setUsername(post.getUser().getUsername());
             userResponse.setBio(post.getUser().getBio());
             userResponse.setGender(post.getUser().getGender());
+            userResponse.setProfilePicture(post.getUser().getProfilePicture());
 
             response.setUser(userResponse);
 
@@ -169,21 +167,23 @@ public class ExploreService {
             postInfo.setUpdatedAt(post.getUpdatedAt());
 
             // Map the user details to UserDto
-            UserDto userInfo = new UserDto();
+            AppUserDto userInfo = new AppUserDto();
             userInfo.setId(post.getUser().getId());
-            userInfo.setUserName(post.getUser().getUsername());
+            userInfo.setUsername(post.getUser().getUsername());
             userInfo.setBio(post.getUser().getBio());
             userInfo.setGender(post.getUser().getGender());
+            userInfo.setProfilePicture(post.getUser().getProfilePicture());
             postInfo.setUser(userInfo);
 
             // Map the tagged users
            if (postInfo.getTaggedUser() != null){
-               Set<UserDto> taggedUsers = postInfo.getTaggedUser().stream().map(taggedUser -> {
-                   UserDto taggedUserDto = new UserDto();
+               Set<AppUserDto> taggedUsers = postInfo.getTaggedUser().stream().map(taggedUser -> {
+                   AppUserDto taggedUserDto = new AppUserDto();
                    taggedUserDto.setId(taggedUser.getId());
-                   taggedUserDto.setUserName(taggedUser.getUserName());
+                   taggedUserDto.setUsername(taggedUser.getUsername());
                    taggedUserDto.setBio(taggedUser.getBio());
                    taggedUserDto.setGender(taggedUser.getGender());
+                   taggedUserDto.setProfilePicture(taggedUser.getProfilePicture());
                    return taggedUserDto;
                }).collect(Collectors.toSet());
                postInfo.setTaggedUser(taggedUsers);
@@ -222,21 +222,23 @@ public class ExploreService {
             reelInfo.setUpdatedAt(post.getUpdatedAt());
 
             // Map the user details to UserDto
-            UserDto userInfo = new UserDto();
+            AppUserDto userInfo = new AppUserDto();
             userInfo.setId(post.getUser().getId());
-            userInfo.setUserName(post.getUser().getUsername());
+            userInfo.setUsername(post.getUser().getUsername());
             userInfo.setBio(post.getUser().getBio());
             userInfo.setGender(post.getUser().getGender());
+            userInfo.setProfilePicture(post.getUser().getProfilePicture());
             reelInfo.setUser(userInfo);
 
             // Map the tagged users
             if (post.getTaggedUSer() != null && !post.getTaggedUSer().isEmpty()) {
-                Set<UserDto> taggedUsers = post.getTaggedUSer().stream().map(taggedUser -> {
-                    UserDto taggedUserDto = new UserDto();
+                Set<AppUserDto> taggedUsers = post.getTaggedUSer().stream().map(taggedUser -> {
+                    AppUserDto taggedUserDto = new AppUserDto();
                     taggedUserDto.setId(taggedUser.getId());
-                    taggedUserDto.setUserName(taggedUser.getUsername());
+                    taggedUserDto.setUsername(taggedUser.getUsername());
                     taggedUserDto.setBio(taggedUser.getBio());
                     taggedUserDto.setGender(taggedUser.getGender());
+                    taggedUserDto.setProfilePicture(taggedUser.getProfilePicture());
                     return taggedUserDto;
                 }).collect(Collectors.toSet());
                 reelInfo.setTaggedUser(taggedUsers);

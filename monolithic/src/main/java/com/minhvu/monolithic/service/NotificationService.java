@@ -19,5 +19,7 @@ public interface NotificationService {
 
     void sendNotificationToUser(UUID userId, Notification notification);
 
+    NotificationDto generateNotification(UUID toUserIds, String message, String description, String entityType, UUID entityId, UUID createdBy);
+
     void saveNotification(NotificationDto notification);
 }

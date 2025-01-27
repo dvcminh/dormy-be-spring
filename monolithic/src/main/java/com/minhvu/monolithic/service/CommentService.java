@@ -3,12 +3,13 @@ package com.minhvu.monolithic.service;
 
 import com.minhvu.monolithic.dto.CommentRequestDto;
 import com.minhvu.monolithic.dto.ReplyDto;
+import com.minhvu.monolithic.dto.model.NotificationDto;
 import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.entity.Comment;
 import com.minhvu.monolithic.entity.Post;
 import com.minhvu.monolithic.repository.CommentRepository;
 import com.minhvu.monolithic.repository.PostRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -19,14 +20,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class CommentService {
-
-    @Autowired
-    private CommentRepository commentRepository;
-
-    @Autowired
-    private PostRepository postRepository;
-
+    private final CommentRepository commentRepository;
+    private final PostRepository postRepository;
+    private final NotificationService notificationService;
 
     public ResponseEntity<String> addComment(CommentRequestDto commentDetails, AppUser userDetails) {
         if (userDetails.getId() == null){
@@ -57,6 +55,13 @@ public class CommentService {
 
         try{
             commentRepository.save(comment);
+            NotificationDto notificationDto = notificationService.generateNotification(existingPost.get().getUser().getId(),
+                    "New comment",
+                    "Some one just commented on your post",
+                    "comment",
+                    existingPost.get().getId(),
+                    userDetails.getId());
+            notificationService.saveNotification(notificationDto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("something went wrong please try again latter");
         }
@@ -97,6 +102,13 @@ public class CommentService {
 
         try {
             commentRepository.save(comment);
+            NotificationDto notificationDto = notificationService.generateNotification(existingComment.get().getUser().getId(),
+                    "New reply",
+                    "Some one just replied on your comment",
+                    "reply",
+                    existingComment.get().getId(),
+                    userDetails.getId());
+            notificationService.saveNotification(notificationDto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("something went wrong please try again latter");
         }

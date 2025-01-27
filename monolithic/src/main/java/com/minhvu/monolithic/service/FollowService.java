@@ -2,13 +2,14 @@ package com.minhvu.monolithic.service;
 
 
 import com.minhvu.monolithic.dto.PendingFollowRequest;
+import com.minhvu.monolithic.dto.model.NotificationDto;
 import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.entity.Follow;
 import com.minhvu.monolithic.enums.AccountType;
 import com.minhvu.monolithic.enums.FollowStatus;
 import com.minhvu.monolithic.repository.FollowRepository;
 import com.minhvu.monolithic.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -17,12 +18,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class FollowService {
-    @Autowired
-    FollowRepository followRepository;
-
-    @Autowired
-    UserRepository userRepository;
+    private final FollowRepository followRepository;
+    private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     public ResponseEntity<String> followUser(UUID userId, AppUser userPrinciple) {
 
@@ -41,16 +41,23 @@ public class FollowService {
         Follow follow = new Follow();
         follow.setFollowing(targetUser.get());
         follow.setFollower(userPrinciple);
+        NotificationDto notificationDto = new NotificationDto();
 
         // Set follow status based on account type
+
         if (targetUser.get().getAccountType().equals(AccountType.PUBLIC)) {
             follow.setStatus(FollowStatus.ACCEPTED);
+            notificationDto = notificationService.generateNotification(targetUser.get().getId(), "New follower",
+                    userPrinciple.getUsername() + " has follow you", "follow", targetUser.get().getId(), userPrinciple.getId());
         } else if (targetUser.get().getAccountType().equals(AccountType.PRIVATE)) {
             follow.setStatus(FollowStatus.PENDING);
+            notificationDto = notificationService.generateNotification(targetUser.get().getId(), "New follow request",
+                    userPrinciple.getUsername() + " has requested to follow you", "follow", targetUser.get().getId(), userPrinciple.getId());
         }
 
         try {
-            followRepository.save(follow);
+            followRepository.saveAndFlush(follow);
+            notificationService.saveNotification(notificationDto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).
                     body("Something went wrong,please try again letter");
@@ -214,6 +221,12 @@ public class FollowService {
 
         try {
             followRepository.save(request);
+            NotificationDto notificationDto = notificationService.generateNotification(request.getFollower().getId(), "Follow request accepted",
+                    userPrinciple.getUsername() + " has accepted your follow request",
+                    "follow",
+                    followRequest.get().getFollower().getId(),
+                    userPrinciple.getId());
+            notificationService.saveNotification(notificationDto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong please try again latter");
         }

@@ -5,7 +5,6 @@ import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.service.LikeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -15,6 +14,13 @@ import java.util.UUID;
 public class LikeController extends BaseController {
     @Autowired
     LikeService likeService;
+
+    @GetMapping("/post/like/check/{postId}")
+    private ResponseEntity<Boolean> checkIfUserLikedPost(@PathVariable UUID postId) {
+        AppUser userDetails = getCurrentUser();
+        return likeService.checkIfUserLikedPost(postId, userDetails);
+    }
+
     //api to like a post
     @PostMapping("/post/like/{postId}")
     private ResponseEntity<String> likePost(@PathVariable UUID postId){

@@ -4,13 +4,14 @@ package com.minhvu.monolithic.service;
 import com.minhvu.monolithic.dto.CreatePostRequestDto;
 import com.minhvu.monolithic.dto.PostResponseDto;
 import com.minhvu.monolithic.dto.UpdatePostRequestDto;
-import com.minhvu.monolithic.dto.UserDto;
+import com.minhvu.monolithic.dto.mapper.AppUserMapper;
+import com.minhvu.monolithic.dto.model.AppUserDto;
 import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.entity.Post;
 import com.minhvu.monolithic.repository.PostRepository;
 import com.minhvu.monolithic.repository.UserRepository;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -20,13 +21,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class PostService {
-    @Autowired
-    PostRepository postRepository;
-
-    @Autowired
-    UserRepository userRepository;
-
+    private final PostRepository postRepository;
+    private final UserRepository userRepository;
+    private final AppUserMapper appUserMapper;
 //    @Autowired
 //    CloudinaryService cloudinaryService;
 
@@ -125,10 +124,11 @@ public class PostService {
         postResponseDto.setPostType(post.getPostType());
 
         //setting user dto
-        UserDto userDto = new UserDto();
+        AppUserDto userDto = new AppUserDto();
         userDto.setId(post.getUser().getId());
-        userDto.setUserName(post.getUser().getUsername());
-        userDto.setFullName(post.getUser().getDisplayName());
+        userDto.setUsername(post.getUser().getUsername());
+        userDto.setDisplayName(post.getUser().getDisplayName());
+        userDto.setProfilePicture(post.getUser().getProfilePicture());
         userDto.setBio(post.getUser().getBio());
         userDto.setGender(post.getUser().getGender());
 
@@ -136,13 +136,14 @@ public class PostService {
 
 
         //handling tagged user
-        Set<UserDto> taggedUsersDto = post.getTaggedUSer()
+        Set<AppUserDto> taggedUsersDto = post.getTaggedUSer()
                 .stream()
                 .map(taggedUser -> {
-                    UserDto taggedUserDto = new UserDto();
+                    AppUserDto taggedUserDto = new AppUserDto();
                     taggedUserDto.setId(taggedUser.getId());
-                    taggedUserDto.setUserName(taggedUser.getUsername());
-                    taggedUserDto.setFullName(taggedUser.getDisplayName());
+                    taggedUserDto.setUsername(taggedUser.getUsername());
+                    taggedUserDto.setProfilePicture(taggedUser.getProfilePicture());
+                    taggedUserDto.setDisplayName(taggedUser.getDisplayName());
                     taggedUserDto.setBio(taggedUser.getBio());
                     taggedUserDto.setGender(taggedUser.getGender());
                     return taggedUserDto;
@@ -181,26 +182,19 @@ public class PostService {
                 postResponseDto.setUpdatedAt(post.getUpdatedAt());
 
                 // Setting UserDto for the post
-                UserDto userDto = new UserDto();
+                AppUserDto userDto = new AppUserDto();
                 userDto.setId(post.getUser().getId());
-                userDto.setUserName(post.getUser().getUsername());
-                userDto.setFullName(post.getUser().getDisplayName());
+                userDto.setUsername(post.getUser().getUsername());
+                userDto.setProfilePicture(post.getUser().getProfilePicture());
+                userDto.setDisplayName(post.getUser().getDisplayName());
                 userDto.setBio(post.getUser().getBio());
                 userDto.setGender(post.getUser().getGender());
                 postResponseDto.setUser(userDto);
 
                 // Handling Tagged Users
-                Set<UserDto> taggedUsersDto = post.getTaggedUSer()
+                Set<AppUserDto> taggedUsersDto = post.getTaggedUSer()
                         .stream()
-                        .map(taggedUser -> {
-                            UserDto taggedUserDto = new UserDto();
-                            taggedUserDto.setId(taggedUser.getId());
-                            taggedUserDto.setUserName(taggedUser.getUsername());
-                            taggedUserDto.setFullName(taggedUser.getDisplayName());
-                            taggedUserDto.setBio(taggedUser.getBio());
-                            taggedUserDto.setGender(taggedUser.getGender());
-                            return taggedUserDto;
-                        })
+                        .map(appUserMapper::toDto)
                         .collect(Collectors.toSet());
                 postResponseDto.setTaggedUser(taggedUsersDto);
 
@@ -213,5 +207,6 @@ public class PostService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong. Please try again later.");
         }
     }
+
 
 }

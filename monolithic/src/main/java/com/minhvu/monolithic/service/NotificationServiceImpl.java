@@ -1,5 +1,6 @@
 package com.minhvu.monolithic.service;
 
+import com.minhvu.monolithic.dto.model.NotificationComponentDto;
 import com.minhvu.monolithic.dto.model.NotificationDto;
 import com.minhvu.monolithic.dto.model.NotificationUserDto;
 import com.minhvu.monolithic.dto.model.NotificationUserResponseDto;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -82,6 +84,23 @@ public class NotificationServiceImpl implements NotificationService {
                 .isRead(false)
                 .build());
     }
+
+    @Override
+    public NotificationDto generateNotification(UUID toUserIds, String message, String description, String entityType, UUID entityId, UUID createdBy) {
+        Collection<UUID> userIds = new ArrayList<>();
+        userIds.add(toUserIds);
+        return NotificationDto.builder()
+                .message(message)
+                .description(description)
+                .component(NotificationComponentDto.builder()
+                        .entityType(entityType)
+                        .entityId(entityId)
+                        .build())
+                .toUserIds(userIds)
+                .createdBy(createdBy)
+                .build();
+    }
+
 
     @Override
     public void saveNotification(NotificationDto notificationDto) {
