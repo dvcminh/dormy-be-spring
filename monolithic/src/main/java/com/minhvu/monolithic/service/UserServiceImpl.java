@@ -6,11 +6,11 @@ import com.minhvu.monolithic.dto.model.AppUserDto;
 import com.minhvu.monolithic.dto.request.RegisterRequest;
 import com.minhvu.monolithic.dto.request.UpdateProfileRequest;
 import com.minhvu.monolithic.dto.response.page.PageData;
+import com.minhvu.monolithic.entity.AppUser;
+import com.minhvu.monolithic.entity.enums.RoleType;
 import com.minhvu.monolithic.enums.AccountType;
 import com.minhvu.monolithic.exception.BadRequestException;
 import com.minhvu.monolithic.exception.UnAuthorizedException;
-import com.minhvu.monolithic.entity.AppUser;
-import com.minhvu.monolithic.entity.enums.RoleType;
 import com.minhvu.monolithic.repository.AppUserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +62,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public AppUserDto save(UpdateProfileRequest profile, AppUser currentUser) {
         currentUser.setDisplayName(profile.getDisplayName());
+        currentUser.setBio(profile.getBio());
+        currentUser.setProfilePicture(profile.getProfilePicture());
+        currentUser.setGender(profile.getGender());
+
         AppUser savedUser = userRepository.save(currentUser);
         return mapper.toDto(savedUser);
     }
