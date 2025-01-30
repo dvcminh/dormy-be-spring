@@ -48,11 +48,11 @@ public class FollowService {
         if (targetUser.get().getAccountType().equals(AccountType.PUBLIC)) {
             follow.setStatus(FollowStatus.ACCEPTED);
             notificationDto = notificationService.generateNotification(targetUser.get().getId(), "New follower",
-                    userPrinciple.getUsername() + " has follow you", "follow", targetUser.get().getId(), userPrinciple.getId());
+                    userPrinciple.getUsername() + " has follow you", "follow", userPrinciple.getId(), userPrinciple.getId());
         } else if (targetUser.get().getAccountType().equals(AccountType.PRIVATE)) {
             follow.setStatus(FollowStatus.PENDING);
             notificationDto = notificationService.generateNotification(targetUser.get().getId(), "New follow request",
-                    userPrinciple.getUsername() + " has requested to follow you", "follow", targetUser.get().getId(), userPrinciple.getId());
+                    userPrinciple.getUsername() + " has requested to follow you", "follow", userPrinciple.getId(), userPrinciple.getId());
         }
 
         try {
