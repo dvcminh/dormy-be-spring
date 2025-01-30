@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -53,11 +52,12 @@ public class NotificationServiceImpl implements NotificationService {
                         .componentName(n.getNotification().getComponent().getComponentName())
                         .entityType(n.getNotification().getComponent().getEntityType())
                         .entityId(n.getNotification().getComponent().getEntityId())
-                        .userId(appUserMapper.toDto(n.getUser()))
+                        .sentTo(appUserMapper.toDto(n.getUser()))
                         .isRead(n.getIsRead())
                         .createdAt(n.getNotification().getCreatedAt())
                         .message(n.getNotification().getMessage())
                         .description(n.getNotification().getDescription())
+                        .createdBy(appUserMapper.toDto(n.getNotification().getCreatedBy()))
                         .build());
         return new PageData<>(notificationUserPage);
     }
@@ -85,6 +85,7 @@ public class NotificationServiceImpl implements NotificationService {
     public NotificationDto generateNotification(UUID toUserIds, String message, String description, String entityType, UUID entityId, UUID createdBy) {
         Collection<UUID> userIds = new ArrayList<>();
         userIds.add(toUserIds);
+        AppUser createdByUser = appUserRepository.findById(createdBy).orElseThrow(() -> new RuntimeException("User not found"));
         return NotificationDto.builder()
                 .message(message)
                 .description(description)
@@ -93,7 +94,7 @@ public class NotificationServiceImpl implements NotificationService {
                         .entityId(entityId)
                         .build())
                 .toUserIds(userIds)
-                .createdBy(createdBy)
+                .createdBy(appUserMapper.toDto(createdByUser))
                 .createdAt(LocalDateTime.now())
                 .build();
     }
@@ -105,20 +106,21 @@ public class NotificationServiceImpl implements NotificationService {
         Notification notification = new Notification();
         BeanUtils.copyProperties(notificationDto, notification, "component");
         notification.setComponent(notificationComponent);
+        AppUser createdBy = appUserRepository.findById(notificationDto.getCreatedBy().getId()).orElseThrow(() -> new RuntimeException("User not found"));
+        notification.setCreatedBy(createdBy);
         notificationRepository.save(notification);
         Collection<UUID> userIds = notificationDto.getToUserIds();
-        userIds.remove(notificationDto.getCreatedBy());
 
         log.info(userIds.toString());
         for (UUID userId : userIds) {
-            Optional<AppUser> user = appUserRepository.findById(userId);
+            AppUser user = appUserRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
             NotificationUser notificationUser = NotificationUser.builder()
                     .notification(notification)
-                    .user(user.get())
+                    .user(user)
                     .isRead(false)
                     .build();
             notificationUserRepository.save(notificationUser);
-            simpMessagingTemplate.convertAndSendToUser(String.valueOf(userId), "/private", notification);
+            simpMessagingTemplate.convertAndSendToUser(String.valueOf(userId), "/private-notification", notification);
         }
 
     }

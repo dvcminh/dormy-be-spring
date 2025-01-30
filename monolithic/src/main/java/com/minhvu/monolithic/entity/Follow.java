@@ -2,9 +2,9 @@ package com.minhvu.monolithic.entity;
 
 
 import com.minhvu.monolithic.enums.FollowStatus;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
 
@@ -17,7 +17,7 @@ public class Follow extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "following_id",nullable = false) // The user being followed
-    private  AppUser following;
+    private AppUser following;
 
     @ManyToOne
     @JoinColumn(name = "follower_id",nullable = false) // The user initiating the follow request

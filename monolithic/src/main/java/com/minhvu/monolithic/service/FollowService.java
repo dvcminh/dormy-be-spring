@@ -50,6 +50,11 @@ public class FollowService {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Already followed");
         }
 
+        // Check if the target user is the same as the current user
+        if (targetUser.get().getId().equals(userPrinciple.getId())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("You can't follow yourself");
+        }
+
         Follow follow = new Follow();
         follow.setFollowing(targetUser.get());
         follow.setFollower(userPrinciple);

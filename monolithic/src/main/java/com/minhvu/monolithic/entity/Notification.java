@@ -25,4 +25,7 @@ public class Notification {
     @Column(length = 10485760)
     private String description;
     private LocalDateTime createdAt;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by", referencedColumnName = "id")
+    private AppUser createdBy;
 }

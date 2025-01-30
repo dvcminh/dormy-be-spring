@@ -19,5 +19,5 @@ public class NotificationDto {
     private String description;
     private LocalDateTime createdAt;
     private Collection<UUID> toUserIds;
-    private UUID createdBy;
+    private AppUserDto createdBy;
 }

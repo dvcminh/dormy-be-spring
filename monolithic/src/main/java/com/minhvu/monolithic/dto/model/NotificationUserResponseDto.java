@@ -16,9 +16,10 @@ public class NotificationUserResponseDto {
     private String componentName;
     private String entityType;
     private UUID entityId;
-    private AppUserDto userId;
+    private AppUserDto sentTo;
     private Boolean isRead;
     private LocalDateTime createdAt;
     private String message;
     private String description;
+    private AppUserDto createdBy;
 }
