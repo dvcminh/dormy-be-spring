@@ -18,6 +18,12 @@ public class FollowController extends BaseController {
     @Autowired
     FollowService followService;
 
+    @GetMapping("/check/{followingId}")
+    public ResponseEntity<Boolean> checkIfUserFollows(@PathVariable UUID followingId) {
+        AppUser currentUser = getCurrentUser();
+        return followService.checkIfUserFollows(followingId, currentUser);
+    }
+
     //api to follow user
     @PostMapping("/{userId}")
     private ResponseEntity<String> followUser(@PathVariable UUID userId) {
