@@ -1,5 +1,6 @@
 package com.minhvu.monolithic.service;
 
+import com.minhvu.monolithic.dto.mapper.AppUserMapper;
 import com.minhvu.monolithic.dto.model.NotificationComponentDto;
 import com.minhvu.monolithic.dto.model.NotificationDto;
 import com.minhvu.monolithic.dto.model.NotificationUserDto;
@@ -10,6 +11,7 @@ import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.entity.Notification;
 import com.minhvu.monolithic.entity.NotificationComponent;
 import com.minhvu.monolithic.entity.NotificationUser;
+import com.minhvu.monolithic.repository.AppUserRepository;
 import com.minhvu.monolithic.repository.NotificationComponentRepository;
 import com.minhvu.monolithic.repository.NotificationRepository;
 import com.minhvu.monolithic.repository.NotificationUserRepository;
@@ -22,8 +24,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -34,11 +38,13 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final NotificationComponentRepository notificationComponentRepository;
+    private final AppUserMapper appUserMapper;
+    private final AppUserRepository appUserRepository;
 
     @Override
     public PageData<NotificationUserResponseDto> getNotificationUsers(PageLink pageLink, Boolean isRead, AppUser appUser) {
         Pageable pageable = PageRequest.of(pageLink.getPage(), pageLink.getPageSize());
-        Page<NotificationUser> notificationUser = notificationUserRepository.findByUserIdAndIsRead(
+        Page<NotificationUser> notificationUser = notificationUserRepository.findByUser_IdAndIsRead(
                 appUser.getId(),
                 isRead,
                 pageable);
@@ -47,9 +53,11 @@ public class NotificationServiceImpl implements NotificationService {
                         .componentName(n.getNotification().getComponent().getComponentName())
                         .entityType(n.getNotification().getComponent().getEntityType())
                         .entityId(n.getNotification().getComponent().getEntityId())
-                        .userId(n.getUserId())
+                        .userId(appUserMapper.toDto(n.getUser()))
                         .isRead(n.getIsRead())
                         .createdAt(n.getNotification().getCreatedAt())
+                        .message(n.getNotification().getMessage())
+                        .description(n.getNotification().getDescription())
                         .build());
         return new PageData<>(notificationUserPage);
     }
@@ -63,7 +71,7 @@ public class NotificationServiceImpl implements NotificationService {
         NotificationUser notificationUser = notificationUserRepository.findByNotificationAndUserId(notification, notificationUserDto.getUserId());
         notificationUser.setIsRead(notificationUserDto.getIsRead());
         notificationUserRepository.save(notificationUser);
-        simpMessagingTemplate.convertAndSendToUser(String.valueOf(notificationUser.getUserId()), "/notification", notification);
+        simpMessagingTemplate.convertAndSendToUser(String.valueOf(notificationUser.getUser()), "/notification", notification);
     }
 
     @Override
@@ -71,18 +79,6 @@ public class NotificationServiceImpl implements NotificationService {
         NotificationUser notificationUser = notificationUserRepository.findByIdAndUserId(id, appUser.getId());
         notificationUser.setIsRead(true);
         notificationUserRepository.save(notificationUser);
-    }
-
-    @Override
-    public void sendNotificationToUser(UUID userId, Notification notification) {
-        simpMessagingTemplate.convertAndSendToUser(userId.toString(), "/notification", notification);
-
-        notificationRepository.save(notification);
-        notificationUserRepository.save(NotificationUser.builder()
-                .notification(notification)
-                .userId(userId)
-                .isRead(false)
-                .build());
     }
 
     @Override
@@ -98,35 +94,32 @@ public class NotificationServiceImpl implements NotificationService {
                         .build())
                 .toUserIds(userIds)
                 .createdBy(createdBy)
+                .createdAt(LocalDateTime.now())
                 .build();
     }
 
-
     @Override
     public void saveNotification(NotificationDto notificationDto) {
-        NotificationComponent notificationComponent = notificationComponentRepository
-                .findByEntityId(notificationDto.getComponent().getEntityId());
+        NotificationComponent notificationComponent = new NotificationComponent();
+        BeanUtils.copyProperties(notificationDto.getComponent(), notificationComponent);
+        Notification notification = new Notification();
+        BeanUtils.copyProperties(notificationDto, notification, "component");
+        notification.setComponent(notificationComponent);
+        notificationRepository.save(notification);
+        Collection<UUID> userIds = notificationDto.getToUserIds();
+        userIds.remove(notificationDto.getCreatedBy());
 
-        if (notificationComponent == null) {
-            notificationComponent = new NotificationComponent();
-            BeanUtils.copyProperties(notificationDto.getComponent(), notificationComponent);
-            Notification notification = new Notification();
-            BeanUtils.copyProperties(notificationDto, notification, "component");
-            notification.setComponent(notificationComponent);
-            notificationRepository.save(notification);
-            Collection<UUID> userIds = notificationDto.getToUserIds();
-            userIds.remove(notificationDto.getCreatedBy());
-
-            log.info(userIds.toString());
-            for (UUID userId : userIds) {
-                NotificationUser notificationUser = NotificationUser.builder()
-                        .notification(notification)
-                        .userId(userId)
-                        .isRead(false)
-                        .build();
-                notificationUserRepository.save(notificationUser);
-                simpMessagingTemplate.convertAndSendToUser(String.valueOf(userId), "/private", notification);
-            }
+        log.info(userIds.toString());
+        for (UUID userId : userIds) {
+            Optional<AppUser> user = appUserRepository.findById(userId);
+            NotificationUser notificationUser = NotificationUser.builder()
+                    .notification(notification)
+                    .user(user.get())
+                    .isRead(false)
+                    .build();
+            notificationUserRepository.save(notificationUser);
+            simpMessagingTemplate.convertAndSendToUser(String.valueOf(userId), "/private", notification);
         }
+
     }
 }

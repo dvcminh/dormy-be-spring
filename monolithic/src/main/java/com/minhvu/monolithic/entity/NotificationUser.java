@@ -20,6 +20,8 @@ public class NotificationUser {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "notification_id", referencedColumnName = "id")
     private Notification notification;
-    private UUID userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private AppUser user;
     private Boolean isRead;
 }
