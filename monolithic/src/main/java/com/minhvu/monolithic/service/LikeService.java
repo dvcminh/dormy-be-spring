@@ -1,7 +1,7 @@
 package com.minhvu.monolithic.service;
 
 
-import com.minhvu.monolithic.dto.LikeDto;
+import com.minhvu.monolithic.dto.model.LikeDto;
 import com.minhvu.monolithic.dto.model.NotificationDto;
 import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.entity.Comment;

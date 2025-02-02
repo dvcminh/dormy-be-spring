@@ -1,9 +1,9 @@
 package com.minhvu.monolithic.service;
 
 
-import com.minhvu.monolithic.dto.PostResponseDto;
 import com.minhvu.monolithic.dto.mapper.AppUserMapper;
 import com.minhvu.monolithic.dto.model.AppUserDto;
+import com.minhvu.monolithic.dto.response.PostResponseDto;
 import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.entity.Follow;
 import com.minhvu.monolithic.entity.Post;
@@ -171,6 +171,8 @@ public class ExploreService {
             userInfo.setId(post.getUser().getId());
             userInfo.setUsername(post.getUser().getUsername());
             userInfo.setBio(post.getUser().getBio());
+            userInfo.setDisplayName(post.getUser().getDisplayName());
+            userInfo.setRole(post.getUser().getRole());
             userInfo.setGender(post.getUser().getGender());
             userInfo.setProfilePicture(post.getUser().getProfilePicture());
             postInfo.setUser(userInfo);
@@ -226,6 +228,8 @@ public class ExploreService {
             userInfo.setId(post.getUser().getId());
             userInfo.setUsername(post.getUser().getUsername());
             userInfo.setBio(post.getUser().getBio());
+            userInfo.setDisplayName(post.getUser().getDisplayName());
+            userInfo.setRole(post.getUser().getRole());
             userInfo.setGender(post.getUser().getGender());
             userInfo.setProfilePicture(post.getUser().getProfilePicture());
             reelInfo.setUser(userInfo);

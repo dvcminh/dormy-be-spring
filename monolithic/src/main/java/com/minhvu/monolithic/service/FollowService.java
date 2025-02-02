@@ -1,8 +1,8 @@
 package com.minhvu.monolithic.service;
 
 
-import com.minhvu.monolithic.dto.PendingFollowRequest;
 import com.minhvu.monolithic.dto.model.NotificationDto;
+import com.minhvu.monolithic.dto.request.PendingFollowRequest;
 import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.entity.Follow;
 import com.minhvu.monolithic.enums.AccountType;

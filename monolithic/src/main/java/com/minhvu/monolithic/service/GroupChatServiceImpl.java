@@ -1,5 +1,9 @@
 package com.minhvu.monolithic.service;
 
+import com.minhvu.monolithic.dto.mapper.AppUserMapper;
+import com.minhvu.monolithic.dto.mapper.GroupChatMapper;
+import com.minhvu.monolithic.dto.model.AppUserDto;
+import com.minhvu.monolithic.dto.response.GroupChatDto;
 import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.entity.GroupChat;
 import com.minhvu.monolithic.entity.UserGroup;
@@ -10,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,9 +24,11 @@ public class GroupChatServiceImpl implements GroupChatService {
     private final GroupChatRepository groupChatRepository;
     private final AppUserRepository appUserRepository;
     private final UserGroupRepository userGroupRepository;
+    private final GroupChatMapper groupChatMapper;
+    private final AppUserMapper appUserMapper;
 
     @Override
-    public void createGroupChat(String name, String image, List<UUID> userIds) {
+    public GroupChatDto createGroupChat(String name, String image, List<UUID> userIds) {
         GroupChat groupChat = GroupChat.builder()
                 .name(name)
                 .image(image)
@@ -37,6 +44,7 @@ public class GroupChatServiceImpl implements GroupChatService {
                     .build();
             userGroupRepository.save(userGroup);
         }
+        return groupChatMapper.toDto(groupChat);
     }
 
     @Override
@@ -71,5 +79,18 @@ public class GroupChatServiceImpl implements GroupChatService {
     public void deleteGroupChat(UUID groupId) {
         GroupChat groupChat = groupChatRepository.findById(groupId).orElseThrow(() -> new RuntimeException("Group chat not found"));
         groupChatRepository.delete(groupChat);
+    }
+
+    @Override
+    public List<GroupChat> getGroupChats(AppUser userPrinciple) {
+        List<UserGroup> userGroup = userGroupRepository.findByUser(userPrinciple);
+        return groupChatRepository.findByUserGroupsIn(Collections.singleton(userGroup));
+    }
+
+    @Override
+    public List<AppUserDto> getGroupChatUsers(UUID groupId) {
+        GroupChat groupChat = groupChatRepository.findById(groupId).orElseThrow(() -> new RuntimeException("Group chat not found"));
+        List<UserGroup> userGroups = userGroupRepository.findByGroupChat(groupChat);
+        return userGroups.stream().map(UserGroup::getUser).map(appUserMapper::toDto).toList();
     }
 }

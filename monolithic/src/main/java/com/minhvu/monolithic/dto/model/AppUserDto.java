@@ -1,6 +1,7 @@
 package com.minhvu.monolithic.dto.model;
 
 import com.minhvu.monolithic.entity.enums.RoleType;
+import com.minhvu.monolithic.enums.AccountType;
 import com.minhvu.monolithic.enums.Gender;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -24,4 +25,5 @@ public class AppUserDto {
     @Enumerated(EnumType.STRING)
     private RoleType role;
     private String profilePicture;
+    private AccountType accountType;
 }

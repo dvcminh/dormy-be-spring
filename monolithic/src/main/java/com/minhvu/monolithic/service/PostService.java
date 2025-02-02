@@ -1,11 +1,11 @@
 package com.minhvu.monolithic.service;
 
 
-import com.minhvu.monolithic.dto.CreatePostRequestDto;
-import com.minhvu.monolithic.dto.PostResponseDto;
-import com.minhvu.monolithic.dto.UpdatePostRequestDto;
 import com.minhvu.monolithic.dto.mapper.AppUserMapper;
 import com.minhvu.monolithic.dto.model.AppUserDto;
+import com.minhvu.monolithic.dto.request.CreatePostRequestDto;
+import com.minhvu.monolithic.dto.response.PostResponseDto;
+import com.minhvu.monolithic.dto.response.UpdatePostRequestDto;
 import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.entity.Post;
 import com.minhvu.monolithic.repository.PostRepository;

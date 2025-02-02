@@ -1,8 +1,8 @@
 package com.minhvu.monolithic.controller;
 
 
-import com.minhvu.monolithic.dto.CreatePostRequestDto;
-import com.minhvu.monolithic.dto.UpdatePostRequestDto;
+import com.minhvu.monolithic.dto.request.CreatePostRequestDto;
+import com.minhvu.monolithic.dto.response.UpdatePostRequestDto;
 import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,9 +1,9 @@
 package com.minhvu.monolithic.service;
 
 
-import com.minhvu.monolithic.dto.CommentRequestDto;
-import com.minhvu.monolithic.dto.ReplyDto;
 import com.minhvu.monolithic.dto.model.NotificationDto;
+import com.minhvu.monolithic.dto.model.ReplyDto;
+import com.minhvu.monolithic.dto.request.CommentRequestDto;
 import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.entity.Comment;
 import com.minhvu.monolithic.entity.Post;

@@ -1,4 +1,4 @@
-package com.minhvu.monolithic.dto;
+package com.minhvu.monolithic.dto.response;
 
 import com.minhvu.monolithic.dto.model.AppUserDto;
 import com.minhvu.monolithic.enums.PostType;

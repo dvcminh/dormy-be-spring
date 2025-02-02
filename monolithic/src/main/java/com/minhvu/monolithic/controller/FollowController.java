@@ -1,7 +1,7 @@
 package com.minhvu.monolithic.controller;
 
 
-import com.minhvu.monolithic.dto.PendingFollowRequest;
+import com.minhvu.monolithic.dto.request.PendingFollowRequest;
 import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.service.FollowService;
 import org.springframework.beans.factory.annotation.Autowired;

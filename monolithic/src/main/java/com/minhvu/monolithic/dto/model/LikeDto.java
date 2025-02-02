@@ -1,4 +1,4 @@
-package com.minhvu.monolithic.dto;
+package com.minhvu.monolithic.dto.model;
 
 
 import lombok.AllArgsConstructor;

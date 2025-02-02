@@ -15,5 +15,4 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
     List<Message> findByReceiverNameAndStatusAllIgnoreCaseOrderByDateAsc(String receiverName, Status status);
 
     List<Message> findBySenderNameAndReceiverNameAndStatusAllIgnoreCaseOrderByDateAsc(String senderName, String receiverName, Status status);
-
 }

@@ -1,7 +1,7 @@
 package com.minhvu.monolithic.controller;
 
 
-import com.minhvu.monolithic.dto.CommentRequestDto;
+import com.minhvu.monolithic.dto.request.CommentRequestDto;
 import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
