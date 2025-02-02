@@ -31,7 +31,7 @@ public class FollowService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
 
-        Follow existingFollow = followRepository.findByFollowerAndFollowing(followingUser.get(), currentUser).orElseThrow(() -> new RuntimeException("Follow not found"));
+        Follow existingFollow = followRepository.findByFollowerAndFollowing(currentUser, followingUser.get()).orElseThrow(() -> new RuntimeException("Follow not found"));
 
         return ResponseEntity.status(HttpStatus.OK).body(existingFollow.getStatus().toString());
     }
