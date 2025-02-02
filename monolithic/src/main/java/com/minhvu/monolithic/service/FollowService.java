@@ -24,16 +24,16 @@ public class FollowService {
     private final UserRepository userRepository;
     private final NotificationService notificationService;
 
-    public ResponseEntity<Boolean> checkIfUserFollows(UUID followingId, AppUser currentUser) {
+    public ResponseEntity<String> checkIfUserFollows(UUID followingId, AppUser currentUser) {
         Optional<AppUser> followingUser = userRepository.findById(followingId);
 
         if (followingUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
 
-        Boolean existingFollow = followRepository.existsByFollowing_IdAndFollower_Id(followingId, currentUser.getId());
+        Follow existingFollow = followRepository.findByFollowerAndFollowing(followingUser.get(), currentUser).orElseThrow(() -> new RuntimeException("Follow not found"));
 
-        return ResponseEntity.status(HttpStatus.OK).body(existingFollow);
+        return ResponseEntity.status(HttpStatus.OK).body(existingFollow.getStatus().toString());
     }
 
     public ResponseEntity<String> followUser(UUID userId, AppUser userPrinciple) {

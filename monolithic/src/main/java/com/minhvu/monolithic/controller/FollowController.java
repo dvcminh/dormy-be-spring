@@ -19,7 +19,7 @@ public class FollowController extends BaseController {
     FollowService followService;
 
     @GetMapping("/check/{followingId}")
-    public ResponseEntity<Boolean> checkIfUserFollows(@PathVariable UUID followingId) {
+    public ResponseEntity<String> checkIfUserFollows(@PathVariable UUID followingId) {
         AppUser currentUser = getCurrentUser();
         return followService.checkIfUserFollows(followingId, currentUser);
     }
