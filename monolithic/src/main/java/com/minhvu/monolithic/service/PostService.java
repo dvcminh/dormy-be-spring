@@ -209,4 +209,27 @@ public class PostService {
     }
 
 
+    public ResponseEntity<Integer> countPost(UUID userId) {
+        Optional<AppUser> userDetails = userRepository.findById(userId);
+
+        if (userDetails.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0);
+        }
+
+        AppUser user = userDetails.get();
+
+        try {
+            // Finding all posts related to a user
+            List<Post> allPost = postRepository.findAllByUser(user);
+
+            if (allPost == null || allPost.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.OK).body(0);
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).body(allPost.size());
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(0);
+        }
+    }
 }

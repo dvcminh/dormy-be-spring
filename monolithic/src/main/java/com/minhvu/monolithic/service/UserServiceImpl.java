@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -127,6 +128,12 @@ public class UserServiceImpl implements UserService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong, please try again letter");
         }
         return ResponseEntity.status(HttpStatus.OK).body("Account type changed successfully!");
+    }
+
+    @Override
+    public ResponseEntity<List<AppUserDto>> searchUser(String displayName) {
+        List<AppUser> users = userRepository.findByDisplayNameContainsIgnoreCaseOrderByDisplayNameAsc(displayName);
+        return ResponseEntity.ok(users.stream().map(mapper::toDto).toList());
     }
 
 }

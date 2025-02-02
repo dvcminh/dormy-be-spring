@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 
@@ -33,5 +34,11 @@ public class UserController extends BaseController{
     private ResponseEntity<String> changeAccountType(@PathVariable UUID id, @PathVariable AccountType type){
         AppUser userPrinciple = getCurrentUser();
         return userService.changeAccountType(id,type,userPrinciple);
+    }
+
+    //Api to search user
+    @GetMapping("/search")
+    private ResponseEntity<List<AppUserDto>> searchUser(@RequestParam String displayName) {
+        return userService.searchUser(displayName);
     }
 }

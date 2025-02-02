@@ -9,6 +9,7 @@ import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.enums.AccountType;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
@@ -27,5 +28,7 @@ public interface UserService {
     ResponseEntity<AppUserDto> getProfile(UUID id);
 
     ResponseEntity<String> changeAccountType(UUID id, AccountType type, AppUser userPrinciple);
+
+    ResponseEntity<List<AppUserDto>> searchUser(String query);
 }
 

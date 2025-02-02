@@ -60,4 +60,10 @@ public class PostController extends BaseController {
         AppUser userPrinciple = getCurrentUser();
         return postService.getAllPost(userPrinciple.getId());
     }
+
+    //api to see number of user's post
+    @GetMapping("/count/{userId}")
+    private ResponseEntity<Integer> countPost(@PathVariable UUID userId) {
+        return postService.countPost(userId);
+    }
 }

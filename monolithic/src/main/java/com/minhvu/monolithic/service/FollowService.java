@@ -311,5 +311,4 @@ public class FollowService {
         // Return the list of mutual followers
         return ResponseEntity.status(HttpStatus.OK).body(mutualFollowers);
     }
-
 }

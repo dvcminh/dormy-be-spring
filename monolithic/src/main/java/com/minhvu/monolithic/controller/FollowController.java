@@ -92,6 +92,4 @@ public class FollowController extends BaseController {
         AppUser userPrinciple = getCurrentUser();
         return followService.mutualFollowers(userId,userPrinciple);
     }
-
-
 }

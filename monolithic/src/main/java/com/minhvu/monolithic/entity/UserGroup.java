@@ -4,15 +4,19 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
 @Entity
 @Table(name = "user_group")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserGroup extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "group_chat_id")
