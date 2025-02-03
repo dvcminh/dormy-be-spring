@@ -14,4 +14,5 @@ public class PendingFollowRequest {
     private String userName;
     private String fullName;
     private String bio;
+    private String profilePicture;
 }

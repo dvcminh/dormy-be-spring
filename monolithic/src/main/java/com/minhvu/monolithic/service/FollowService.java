@@ -119,7 +119,8 @@ public class FollowService {
                         follow.getFollower().getId(),
                         follow.getFollower().getUsername(),
                         follow.getFollower().getDisplayName(),
-                        follow.getFollower().getBio()
+                        follow.getFollower().getBio(),
+                        follow.getFollower().getProfilePicture()
                 )
         ).toList();
 
@@ -179,7 +180,8 @@ public class FollowService {
                         follow.getFollower().getId(),
                         follow.getFollower().getUsername(),
                         follow.getFollower().getDisplayName(),
-                        follow.getFollower().getBio()
+                        follow.getFollower().getBio(),
+                        follow.getFollower().getProfilePicture()
                 )).toList();
 
         return ResponseEntity.status(HttpStatus.OK).body(followers);
@@ -210,7 +212,8 @@ public class FollowService {
                         follow.getFollowing().getId(),
                         follow.getFollowing().getUsername(),
                         follow.getFollowing().getDisplayName(),
-                        follow.getFollowing().getBio()
+                        follow.getFollowing().getBio(),
+                        follow.getFollower().getProfilePicture()
                 )).toList();
 
         return ResponseEntity.status(HttpStatus.OK).body(following);
@@ -304,7 +307,8 @@ public class FollowService {
                         follow.getFollower().getId(),
                         follow.getFollower().getUsername(),
                         follow.getFollower().getDisplayName(),
-                        follow.getFollower().getBio()
+                        follow.getFollower().getBio(),
+                        follow.getFollower().getProfilePicture()
                 ))
                 .toList();
 
