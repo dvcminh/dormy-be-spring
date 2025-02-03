@@ -30,5 +30,7 @@ public interface UserService {
     ResponseEntity<String> changeAccountType(UUID id, AccountType type, AppUser userPrinciple);
 
     ResponseEntity<List<AppUserDto>> searchUser(String query);
+
+    ResponseEntity<String> banUser(UUID id, AppUser userPrinciple, Boolean ban);
 }
 

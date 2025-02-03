@@ -84,6 +84,7 @@ public class UserServiceImpl implements UserService {
                         .accountType(AccountType.PUBLIC)
                         .displayName(registerRequest.getUsername())
                         .bio("Hello, I'm new here!")
+                        .isBanned(false)
                         .build()
         );
 
@@ -136,6 +137,21 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.ok(users.stream().map(mapper::toDto).toList());
     }
 
+    @Override
+    public ResponseEntity<String> banUser(UUID id, AppUser userPrinciple, Boolean isBanned) {
+        if (!checkIfAdmin(userPrinciple)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You do not have permission to do this action");
+        }
+
+        Optional<AppUser> user = userRepository.findById(id);
+        if (user.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+        user.get().setIsBanned(isBanned);
+        userRepository.save(user.get());
+
+        return ResponseEntity.status(HttpStatus.OK).body("User banned property updated successfully");
+    }
 }
 
 

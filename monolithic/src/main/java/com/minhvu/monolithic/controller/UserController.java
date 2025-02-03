@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @RequestMapping("/api/v1/user")
 @RestController
-public class UserController extends BaseController{
+public class UserController extends BaseController {
 
     @Autowired
     private UserService userService;
@@ -25,20 +25,27 @@ public class UserController extends BaseController{
 
     //Api to View Profile
     @GetMapping("/{id}")
-    private ResponseEntity<AppUserDto> getProfile(@PathVariable UUID id){
+    private ResponseEntity<AppUserDto> getProfile(@PathVariable UUID id) {
         return userService.getProfile(id);
     }
 
     //Api to convert account type
     @PutMapping("/{id}/{type}")
-    private ResponseEntity<String> changeAccountType(@PathVariable UUID id, @PathVariable AccountType type){
+    private ResponseEntity<String> changeAccountType(@PathVariable UUID id, @PathVariable AccountType type) {
         AppUser userPrinciple = getCurrentUser();
-        return userService.changeAccountType(id,type,userPrinciple);
+        return userService.changeAccountType(id, type, userPrinciple);
     }
 
     //Api to search user
     @GetMapping("/search")
     private ResponseEntity<List<AppUserDto>> searchUser(@RequestParam String displayName) {
         return userService.searchUser(displayName);
+    }
+
+    //Api for unban and ban user
+    @PutMapping("/ban/{id}")
+    private ResponseEntity<String> banUser(@PathVariable UUID id, @RequestParam Boolean ban) {
+        AppUser userPrinciple = getCurrentUser();
+        return userService.banUser(id, userPrinciple, ban);
     }
 }
