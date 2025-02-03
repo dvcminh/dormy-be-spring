@@ -1,7 +1,7 @@
 package com.minhvu.monolithic.service;
 
 import com.minhvu.monolithic.entity.Message;
-import com.minhvu.monolithic.entity.Status;
+import com.minhvu.monolithic.entity.enums.Status;
 import com.minhvu.monolithic.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

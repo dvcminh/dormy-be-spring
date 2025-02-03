@@ -1,5 +1,6 @@
 package com.minhvu.monolithic.entity;
 
+import com.minhvu.monolithic.entity.enums.Status;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;

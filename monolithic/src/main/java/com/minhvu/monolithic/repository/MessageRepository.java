@@ -1,7 +1,7 @@
 package com.minhvu.monolithic.repository;
 
 import com.minhvu.monolithic.entity.Message;
-import com.minhvu.monolithic.entity.Status;
+import com.minhvu.monolithic.entity.enums.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
