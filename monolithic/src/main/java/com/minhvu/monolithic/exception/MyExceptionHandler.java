@@ -12,11 +12,6 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 @RestControllerAdvice
 public class MyExceptionHandler {
 
-    @ResponseStatus(value = HttpStatus.OK)
-    public Response handleOk(NotFoundException exception) {
-        return new Response(exception.getLocalizedMessage());
-    }
-
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<String> handleMaxSizeException(MaxUploadSizeExceededException ex) {
         return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
