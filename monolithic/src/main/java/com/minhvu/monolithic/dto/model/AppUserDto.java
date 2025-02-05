@@ -26,4 +26,5 @@ public class AppUserDto {
     private RoleType role;
     private String profilePicture;
     private AccountType accountType;
+    private Boolean isBanned;
 }

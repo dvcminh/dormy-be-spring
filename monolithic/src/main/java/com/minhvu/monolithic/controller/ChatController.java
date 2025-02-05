@@ -56,9 +56,9 @@ public class ChatController extends BaseController {
         return ResponseEntity.ok().body(groupChatService.getGroupChatUsers(groupId));
     }
 
-    @GetMapping("/group-chat/{groupId}/messages")
-    public ResponseEntity<List<Message>> getGroupChatMessages(@PathVariable UUID groupId) {
-        return ResponseEntity.ok().body(messageService.getGroupChatMessages(groupId));
+    @GetMapping("/group-chat/{groupName}/messages")
+    public ResponseEntity<List<Message>> getGroupChatMessages(@PathVariable String groupName) {
+        return ResponseEntity.ok().body(messageService.getGroupChatMessages(groupName));
     }
 
     @GetMapping("/private-messages/{senderName}/{receiverName}")
@@ -67,9 +67,9 @@ public class ChatController extends BaseController {
         return ResponseEntity.ok(messages);
     }
 
-    @MessageMapping("/group-message/{groupId}")
-    @SendTo("/chatroom/group/{groupId}")
-    public Message receiveGroupMessage(@DestinationVariable UUID groupId, @Payload Message message) {
+    @MessageMapping("/group-message/{groupName}")
+    @SendTo("/chatroom/group/{groupName}")
+    public Message receiveGroupMessage(@DestinationVariable String groupName, @Payload Message message) {
         messageService.saveMessage(message);
         return message;
     }
@@ -78,7 +78,6 @@ public class ChatController extends BaseController {
     public Message recMessage(@Payload Message message) {
         messageService.saveMessage(message);
         simpMessagingTemplate.convertAndSendToUser(message.getReceiverName(), "/private", message);
-        System.out.println(message);
         return message;
     }
 }

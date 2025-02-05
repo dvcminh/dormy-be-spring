@@ -3,6 +3,7 @@ package com.minhvu.monolithic.controller;
 
 import com.minhvu.monolithic.dto.mapper.AppUserMapper;
 import com.minhvu.monolithic.dto.model.AppUserDto;
+import com.minhvu.monolithic.dto.response.page.PageData;
 import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.enums.AccountType;
 import com.minhvu.monolithic.service.UserService;
@@ -22,6 +23,14 @@ public class UserController extends BaseController {
     private UserService userService;
     @Autowired
     private AppUserMapper appUserMapper;
+
+    //Api to get all users
+    @GetMapping
+    private ResponseEntity<PageData<AppUserDto>> getUsers(@RequestParam(required = false, defaultValue = "0") int page,
+                                                          @RequestParam(required = false, defaultValue = "10") int pageSize) {
+        AppUser userPrinciple = getCurrentUser();
+        return ResponseEntity.ok(userService.findUsers(page, pageSize, userPrinciple));
+    }
 
     //Api to View Profile
     @GetMapping("/{id}")

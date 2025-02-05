@@ -12,8 +12,8 @@ import com.minhvu.monolithic.enums.AccountType;
 import com.minhvu.monolithic.exception.BadRequestException;
 import com.minhvu.monolithic.exception.UnAuthorizedException;
 import com.minhvu.monolithic.repository.AppUserRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,17 +27,11 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final AppUserRepository userRepository;
     private final UserCredentialService userCredentialService;
     private final AppUserMapper mapper;
-
-    @Autowired
-    public UserServiceImpl(AppUserRepository userRepository, UserCredentialService userCredentialService, AppUserMapper mapper) {
-        this.userRepository = userRepository;
-        this.userCredentialService = userCredentialService;
-        this.mapper = mapper;
-    }
 
     @Override
     public PageData<AppUserDto> findUsers(int page, int pageSize, AppUser currentUser) {
