@@ -22,4 +22,6 @@ public interface LikeRepository extends JpaRepository<Like, UUID> {
     List<Like> findByPost(Post id);
 
     List<Like> findByComment(Comment comment);
+
+    long countByPost_Id(UUID id);
 }
