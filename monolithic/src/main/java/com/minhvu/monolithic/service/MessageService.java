@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +33,7 @@ public class MessageService {
     }
 
 
-    public List<Message> getGroupChatMessages(String groupName) {
-        return messageRepository.findByReceiverNameAndStatusAllIgnoreCaseOrderByDateAsc(groupName, Status.MESSAGE);
+    public List<Message> getGroupChatMessages(UUID groupName) {
+        return messageRepository.findByReceiverNameAndStatusAllIgnoreCaseOrderByDateAsc(String.valueOf(groupName), Status.MESSAGE);
     }
 }

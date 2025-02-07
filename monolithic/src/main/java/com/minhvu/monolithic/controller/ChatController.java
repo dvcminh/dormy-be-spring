@@ -58,9 +58,9 @@ public class ChatController extends BaseController {
         return ResponseEntity.ok().body(groupChatService.getGroupChatUsers(groupId));
     }
 
-    @GetMapping("/group-chat/{groupName}/messages")
-    public ResponseEntity<List<Message>> getGroupChatMessages(@PathVariable String groupName) {
-        return ResponseEntity.ok().body(messageService.getGroupChatMessages(groupName));
+    @GetMapping("/group-chat/{groupId}/messages")
+    public ResponseEntity<List<Message>> getGroupChatMessages(@PathVariable UUID groupId) {
+        return ResponseEntity.ok().body(messageService.getGroupChatMessages(groupId));
     }
 
     @GetMapping("/private-messages/{senderName}/{receiverName}")
@@ -69,9 +69,9 @@ public class ChatController extends BaseController {
         return ResponseEntity.ok(messages);
     }
 
-    @MessageMapping("/group-message/{groupName}")
-    @SendTo("/chatroom/group/{groupName}")
-    public Message receiveGroupMessage(@DestinationVariable String groupName, @Payload Message message) {
+    @MessageMapping("/group-message/{groupID}")
+    @SendTo("/chatroom/group/{groupID}")
+    public Message receiveGroupMessage(@DestinationVariable String groupID, @Payload Message message) {
         messageService.saveMessage(message);
         return message;
     }
