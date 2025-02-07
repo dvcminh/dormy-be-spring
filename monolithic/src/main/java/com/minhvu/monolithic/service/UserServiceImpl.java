@@ -78,6 +78,8 @@ public class UserServiceImpl implements UserService {
                         .accountType(AccountType.PUBLIC)
                         .displayName(registerRequest.getUsername())
                         .bio("Hello, I'm new here!")
+                        .gender(registerRequest.getGender())
+                        .profilePicture(registerRequest.getProfile())
                         .isBanned(false)
                         .build()
         );

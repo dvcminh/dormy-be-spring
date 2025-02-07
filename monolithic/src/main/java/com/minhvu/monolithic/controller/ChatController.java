@@ -29,8 +29,10 @@ public class ChatController extends BaseController {
     private final GroupChatService groupChatService;
 
     @PostMapping("/create-group-chat")
-    public ResponseEntity<GroupChatDto> createGroupChat(@RequestBody List<UUID> userids) {
-        return ResponseEntity.ok().body(groupChatService.createGroupChat("Group Chat", "https://www.google.com", userids));
+    public ResponseEntity<GroupChatDto> createGroupChat(@RequestBody List<UUID> userids,
+                                                        @RequestParam String groupName,
+                                                        @RequestParam String groupImage) {
+        return ResponseEntity.ok().body(groupChatService.createGroupChat(groupName, groupImage, userids));
     }
 
     @PostMapping("/add-user-to-group-chat")

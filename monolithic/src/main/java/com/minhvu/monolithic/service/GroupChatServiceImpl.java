@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -84,7 +83,7 @@ public class GroupChatServiceImpl implements GroupChatService {
     @Override
     public List<GroupChat> getGroupChats(AppUser userPrinciple) {
         List<UserGroup> userGroup = userGroupRepository.findByUser(userPrinciple);
-        return groupChatRepository.findByUserGroupsIn(Collections.singleton(userGroup));
+        return userGroup.stream().map(UserGroup::getGroupChat).toList();
     }
 
     @Override
