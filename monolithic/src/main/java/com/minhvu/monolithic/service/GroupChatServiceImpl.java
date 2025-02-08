@@ -81,9 +81,10 @@ public class GroupChatServiceImpl implements GroupChatService {
     }
 
     @Override
-    public List<GroupChat> getGroupChats(AppUser userPrinciple) {
+    public List<GroupChatDto> getGroupChats(AppUser userPrinciple) {
         List<UserGroup> userGroup = userGroupRepository.findByUser(userPrinciple);
-        return userGroup.stream().map(UserGroup::getGroupChat).toList();
+        List<GroupChat> groupChats = userGroup.stream().map(UserGroup::getGroupChat).toList();
+        return groupChats.stream().map(groupChatMapper::toDto).toList();
     }
 
     @Override

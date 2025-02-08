@@ -26,7 +26,7 @@ public class UserController extends BaseController {
 
     //Api to get all users
     @GetMapping
-    private ResponseEntity<PageData<AppUserDto>> getUsers(@RequestParam(required = false, defaultValue = "0") int page,
+    public ResponseEntity<PageData<AppUserDto>> getUsers(@RequestParam(required = false, defaultValue = "0") int page,
                                                           @RequestParam(required = false, defaultValue = "10") int pageSize) {
         AppUser userPrinciple = getCurrentUser();
         return ResponseEntity.ok(userService.findUsers(page, pageSize, userPrinciple));
@@ -34,27 +34,32 @@ public class UserController extends BaseController {
 
     //Api to View Profile
     @GetMapping("/{id}")
-    private ResponseEntity<AppUserDto> getProfile(@PathVariable UUID id) {
+    public ResponseEntity<AppUserDto> getProfile(@PathVariable UUID id) {
         return userService.getProfile(id);
     }
 
     //Api to convert account type
     @PutMapping("/{id}/{type}")
-    private ResponseEntity<String> changeAccountType(@PathVariable UUID id, @PathVariable AccountType type) {
+    public ResponseEntity<String> changeAccountType(@PathVariable UUID id, @PathVariable AccountType type) {
         AppUser userPrinciple = getCurrentUser();
         return userService.changeAccountType(id, type, userPrinciple);
     }
 
     //Api to search user
     @GetMapping("/search")
-    private ResponseEntity<List<AppUserDto>> searchUser(@RequestParam String displayName) {
+    public ResponseEntity<List<AppUserDto>> searchUser(@RequestParam String displayName) {
         return userService.searchUser(displayName);
     }
 
     //Api for unban and ban user
     @PutMapping("/ban/{id}")
-    private ResponseEntity<String> banUser(@PathVariable UUID id, @RequestParam Boolean ban) {
+    public ResponseEntity<String> banUser(@PathVariable UUID id, @RequestParam Boolean ban) {
         AppUser userPrinciple = getCurrentUser();
         return userService.banUser(id, userPrinciple, ban);
+    }
+
+    @GetMapping("/email/{userEmail}")
+    public ResponseEntity<AppUserDto> getUser(@PathVariable String userEmail) {
+        return ResponseEntity.ok().body(appUserMapper.toDto(userService.getUser(userEmail)));
     }
 }

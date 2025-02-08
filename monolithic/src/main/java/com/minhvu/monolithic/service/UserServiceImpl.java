@@ -10,6 +10,7 @@ import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.entity.enums.RoleType;
 import com.minhvu.monolithic.enums.AccountType;
 import com.minhvu.monolithic.exception.BadRequestException;
+import com.minhvu.monolithic.exception.NotFoundException;
 import com.minhvu.monolithic.exception.UnAuthorizedException;
 import com.minhvu.monolithic.repository.AppUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -147,6 +148,11 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user.get());
 
         return ResponseEntity.status(HttpStatus.OK).body("User banned property updated successfully");
+    }
+
+    @Override
+    public AppUser getUser(String userEmail) {
+        return userRepository.findByUsername(userEmail).orElseThrow(() -> new NotFoundException("User not found"));
     }
 }
 

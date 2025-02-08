@@ -3,7 +3,6 @@ package com.minhvu.monolithic.controller;
 import com.minhvu.monolithic.dto.model.AppUserDto;
 import com.minhvu.monolithic.dto.response.GroupChatDto;
 import com.minhvu.monolithic.entity.AppUser;
-import com.minhvu.monolithic.entity.GroupChat;
 import com.minhvu.monolithic.entity.Message;
 import com.minhvu.monolithic.service.GroupChatService;
 import com.minhvu.monolithic.service.MessageService;
@@ -48,7 +47,7 @@ public class ChatController extends BaseController {
     }
 
     @GetMapping("/group-chats")
-    public ResponseEntity<List<GroupChat>> getGroupChats() {
+    public ResponseEntity<List<GroupChatDto>> getGroupChats() {
         AppUser userPrinciple = getCurrentUser();
         return ResponseEntity.ok().body(groupChatService.getGroupChats(userPrinciple));
     }

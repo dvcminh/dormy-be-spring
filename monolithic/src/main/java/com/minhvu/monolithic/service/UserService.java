@@ -32,5 +32,7 @@ public interface UserService {
     ResponseEntity<List<AppUserDto>> searchUser(String query);
 
     ResponseEntity<String> banUser(UUID id, AppUser userPrinciple, Boolean ban);
+
+    AppUser getUser(String userEmail);
 }
 
