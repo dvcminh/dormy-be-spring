@@ -70,8 +70,9 @@ public class ChatController extends BaseController {
     }
 
     @GetMapping("/chat-list")
-    public List<ChatList> getChatList(@RequestParam String username) {
-        return messageService.getUserChatList(username);
+    public List<ChatList> getChatList() {
+        AppUser user = getCurrentUser();
+        return messageService.getUserChatList(user.getUsername());
     }
 
     @PostMapping("/mark-as-read")

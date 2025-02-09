@@ -25,6 +25,7 @@ public class MessageService {
     private final AppUserRepository appUserRepository;
     private final ChatListRepository chatListRepository;
 
+
     public Message saveMessage(Message message) {
         message.setDate(LocalDateTime.now().toString());
 
