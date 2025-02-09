@@ -4,6 +4,7 @@ import com.minhvu.monolithic.entity.enums.Status;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Table(name = "messages")
+@Builder
 public class Message extends BaseEntity {
     private String senderName;
     private String receiverName;

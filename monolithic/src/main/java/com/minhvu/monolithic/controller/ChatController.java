@@ -3,6 +3,7 @@ package com.minhvu.monolithic.controller;
 import com.minhvu.monolithic.dto.model.AppUserDto;
 import com.minhvu.monolithic.dto.response.GroupChatDto;
 import com.minhvu.monolithic.entity.AppUser;
+import com.minhvu.monolithic.entity.ChatList;
 import com.minhvu.monolithic.entity.Message;
 import com.minhvu.monolithic.service.GroupChatService;
 import com.minhvu.monolithic.service.MessageService;
@@ -66,6 +67,16 @@ public class ChatController extends BaseController {
     public ResponseEntity<List<Message>> getPrivateMessages(@PathVariable String senderName, @PathVariable String receiverName) {
         List<Message> messages = messageService.loadPrivateMessages(senderName, receiverName);
         return ResponseEntity.ok(messages);
+    }
+
+    @GetMapping("/chat-list")
+    public List<ChatList> getChatList(@RequestParam String username) {
+        return messageService.getUserChatList(username);
+    }
+
+    @PostMapping("/mark-as-read")
+    public void markAsRead(@RequestParam String user, @RequestParam String contact) {
+        messageService.markMessagesAsRead(user, contact);
     }
 
     @MessageMapping("/group-message/{groupID}")
