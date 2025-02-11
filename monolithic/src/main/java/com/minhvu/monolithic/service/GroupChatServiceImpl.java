@@ -27,12 +27,15 @@ public class GroupChatServiceImpl implements GroupChatService {
     private final AppUserMapper appUserMapper;
 
     @Override
-    public GroupChatDto createGroupChat(String name, String image, List<UUID> userIds) {
+    public GroupChatDto createGroupChat(String name, String image, List<UUID> userIds, AppUser groupHost) {
+
         GroupChat groupChat = GroupChat.builder()
                 .name(name)
                 .image(image)
+                .host(groupHost)
                 .build();
         groupChatRepository.save(groupChat);
+
 
         for (UUID userId : userIds) {
             AppUser user = appUserRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
@@ -92,5 +95,12 @@ public class GroupChatServiceImpl implements GroupChatService {
         GroupChat groupChat = groupChatRepository.findById(groupId).orElseThrow(() -> new RuntimeException("Group chat not found"));
         List<UserGroup> userGroups = userGroupRepository.findByGroupChat(groupChat);
         return userGroups.stream().map(UserGroup::getUser).map(appUserMapper::toDto).toList();
+    }
+
+    @Override
+    public String getHostOfGroup(UUID groupId) {
+        GroupChat groupChat = groupChatRepository.findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+        return groupChat.getHost().getUsername();
     }
 }

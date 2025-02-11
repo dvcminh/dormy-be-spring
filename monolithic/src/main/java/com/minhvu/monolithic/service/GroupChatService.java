@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface GroupChatService {
-    GroupChatDto createGroupChat(String name, String image, List<UUID> userIds);
+    GroupChatDto createGroupChat(String name, String image, List<UUID> userIds, AppUser groupHost);
 
     void addUserToGroupChat(UUID groupId, UUID userId);
 
@@ -21,4 +21,6 @@ public interface GroupChatService {
     List<GroupChatDto> getGroupChats(AppUser userPrinciple);
 
     List<AppUserDto> getGroupChatUsers(UUID groupId);
+
+    String getHostOfGroup(UUID groupId);
 }

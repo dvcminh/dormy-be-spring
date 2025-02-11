@@ -32,7 +32,12 @@ public class ChatController extends BaseController {
     public ResponseEntity<GroupChatDto> createGroupChat(@RequestBody List<UUID> userids,
                                                         @RequestParam String groupName,
                                                         @RequestParam String groupImage) {
-        return ResponseEntity.ok().body(groupChatService.createGroupChat(groupName, groupImage, userids));
+        return ResponseEntity.ok().body(groupChatService.createGroupChat(groupName, groupImage, userids, getCurrentUser()));
+    }
+
+    @GetMapping("/{groupId}/host")
+    public String getHost(@PathVariable UUID groupId) {
+        return groupChatService.getHostOfGroup(groupId);
     }
 
     @PostMapping("/add-user-to-group-chat")
