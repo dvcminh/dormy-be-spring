@@ -21,6 +21,7 @@ public class PostController extends BaseController {
     //api to create post
     @PostMapping
     private ResponseEntity<String> addPost(@RequestBody CreatePostRequestDto postDetails) {
+        System.out.println("Received post request: " + postDetails);
         AppUser userPrinciple = getCurrentUser();
         return postService.addPost(postDetails, userPrinciple);
     }

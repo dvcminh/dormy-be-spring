@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +31,9 @@ public class FollowService {
         if (followingUser.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
+        Logger logger = Logger.getLogger(FollowService.class.getName());
+        logger.info("Following user: " + followingUser.get().getUsername());
+        logger.info("Current user: " + currentUser.getUsername());
 
         Follow existingFollow = followRepository.findByFollowerAndFollowing(currentUser, followingUser.get()).orElseThrow(() -> new RuntimeException("Follow not found"));
 
@@ -116,6 +120,7 @@ public class FollowService {
         // Map the Follow entities to PendingFollowRequest DTOs
         List<PendingFollowRequest> pendingFollowRequests = pendingRequest.stream().map(follow ->
                 new PendingFollowRequest(
+                        follow.getId(),
                         follow.getFollower().getId(),
                         follow.getFollower().getUsername(),
                         follow.getFollower().getDisplayName(),
@@ -177,6 +182,7 @@ public class FollowService {
         //Map the Follow entities to PendingFollowRequest DTOs
         List<PendingFollowRequest> followers = allFollowers.stream().map(follow ->
                 new PendingFollowRequest(
+                        follow.getId(),
                         follow.getFollower().getId(),
                         follow.getFollower().getUsername(),
                         follow.getFollower().getDisplayName(),
@@ -209,6 +215,7 @@ public class FollowService {
 
         List<PendingFollowRequest> following = allFollowing.stream().map(follow ->
                 new PendingFollowRequest(
+                        follow.getId(),
                         follow.getFollowing().getId(),
                         follow.getFollowing().getUsername(),
                         follow.getFollowing().getDisplayName(),
@@ -304,6 +311,7 @@ public class FollowService {
         List<PendingFollowRequest> mutualFollowers = targetUserFollowers.stream()
                 .filter(follow -> currentUserFollowingIds.contains(follow.getFollower().getId()))
                 .map(follow -> new PendingFollowRequest(
+                        follow.getId(),
                         follow.getFollower().getId(),
                         follow.getFollower().getUsername(),
                         follow.getFollower().getDisplayName(),

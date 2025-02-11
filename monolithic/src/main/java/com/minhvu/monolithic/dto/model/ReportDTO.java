@@ -15,4 +15,5 @@ public class ReportDTO {
     private UUID reportedContentId;
     private String reportedContentType; // POST, COMMENT, MESSAGE
     private ReportReason reason;
+    private String additionalText;
 }

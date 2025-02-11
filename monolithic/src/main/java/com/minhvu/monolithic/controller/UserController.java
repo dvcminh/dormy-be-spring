@@ -5,9 +5,11 @@ import com.minhvu.monolithic.dto.mapper.AppUserMapper;
 import com.minhvu.monolithic.dto.model.AppUserDto;
 import com.minhvu.monolithic.dto.response.page.PageData;
 import com.minhvu.monolithic.entity.AppUser;
+import com.minhvu.monolithic.entity.enums.RoleType;
 import com.minhvu.monolithic.enums.AccountType;
 import com.minhvu.monolithic.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +32,28 @@ public class UserController extends BaseController {
                                                           @RequestParam(required = false, defaultValue = "10") int pageSize) {
         AppUser userPrinciple = getCurrentUser();
         return ResponseEntity.ok(userService.findUsers(page, pageSize, userPrinciple));
+    }
+
+    @GetMapping("/active")
+    public ResponseEntity<List<AppUserDto>> getActiveUsers() {
+        AppUser userPrinciple = getCurrentUser();
+        if (!checkIfAdmin(userPrinciple)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(userService.getActiveUsers());
+    }
+
+    @GetMapping("/banned")
+    public ResponseEntity<List<AppUserDto>> getBannedUsers() {
+        AppUser userPrinciple = getCurrentUser();
+        if (!checkIfAdmin(userPrinciple)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(userService.getBannedUsers());
+    }
+
+    private boolean checkIfAdmin(AppUser user) {
+        return user.getRole() == RoleType.ADMIN;
     }
 
     //Api to View Profile
@@ -56,6 +80,15 @@ public class UserController extends BaseController {
     public ResponseEntity<String> banUser(@PathVariable UUID id, @RequestParam Boolean ban) {
         AppUser userPrinciple = getCurrentUser();
         return userService.banUser(id, userPrinciple, ban);
+    }
+
+    @PutMapping("/ban/batch")
+    public ResponseEntity<String> batchBanUsers(
+        @RequestParam Boolean ban,
+        @RequestBody List<UUID> userIds
+    ) {
+        AppUser userPrinciple = getCurrentUser();
+        return userService.batchBanUsers(userIds, userPrinciple, ban);
     }
 
     @GetMapping("/email/{userEmail}")

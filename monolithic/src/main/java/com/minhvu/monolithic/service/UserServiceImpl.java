@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -44,6 +45,22 @@ public class UserServiceImpl implements UserService {
         Page<AppUserDto> userDtoPage = userRepository.findAllByRole(RoleType.USER, pageable)
                 .map(mapper::toDto);
         return new PageData<>(userDtoPage);
+    }
+
+    @Override
+    public List<AppUserDto> getActiveUsers() {
+        return userRepository.findActiveUsersByRole(RoleType.USER)
+            .stream()
+            .map(mapper::toDto)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AppUserDto> getBannedUsers() {
+        return userRepository.findByIsBannedTrueAndRole(RoleType.USER)
+            .stream()
+            .map(mapper::toDto)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -77,7 +94,7 @@ public class UserServiceImpl implements UserService {
                         .username(registerRequest.getUsername())
                         .role(RoleType.USER)
                         .accountType(AccountType.PUBLIC)
-                        .displayName(registerRequest.getUsername())
+                        .displayName(registerRequest.getDisplayName())
                         .bio("Hello, I'm new here!")
                         .gender(registerRequest.getGender())
                         .profilePicture(registerRequest.getProfile())
@@ -148,6 +165,27 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user.get());
 
         return ResponseEntity.status(HttpStatus.OK).body("User banned property updated successfully");
+    }
+
+    @Override
+    public ResponseEntity<String> batchBanUsers(List<UUID> userIds, AppUser userPrinciple, Boolean isBanned) {
+        if (!checkIfAdmin(userPrinciple)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body("You do not have permission to do this action");
+        }
+
+        int successCount = 0;
+        for (UUID id : userIds) {
+            Optional<AppUser> user = userRepository.findById(id);
+            if (user.isPresent()) {
+                user.get().setIsBanned(isBanned);
+                userRepository.save(user.get());
+                successCount++;
+            }
+        }
+
+        return ResponseEntity.ok(String.format("Successfully updated %d/%d users",
+            successCount, userIds.size()));
     }
 
     @Override

@@ -10,6 +10,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Data
 public class PendingFollowRequest {
+    private UUID requestId;
     private UUID id;
     private String userName;
     private String fullName;

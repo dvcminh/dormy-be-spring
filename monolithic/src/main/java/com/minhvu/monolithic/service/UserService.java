@@ -4,6 +4,7 @@ package com.minhvu.monolithic.service;
 import com.minhvu.monolithic.dto.model.AppUserDto;
 import com.minhvu.monolithic.dto.request.RegisterRequest;
 import com.minhvu.monolithic.dto.request.UpdateProfileRequest;
+import com.minhvu.monolithic.dto.response.LoginResponse;
 import com.minhvu.monolithic.dto.response.page.PageData;
 import com.minhvu.monolithic.entity.AppUser;
 import com.minhvu.monolithic.enums.AccountType;
@@ -20,6 +21,11 @@ public interface UserService {
     );
 
     AppUserDto getUserProfile(UUID id, AppUser currentUser);
+
+    List<AppUserDto> getActiveUsers();
+    List<AppUserDto> getBannedUsers();
+
+    ResponseEntity<String> batchBanUsers(List<UUID> userIds, AppUser userPrinciple, Boolean isBanned);
 
     AppUserDto save(UpdateProfileRequest profile, AppUser currentUser);
 

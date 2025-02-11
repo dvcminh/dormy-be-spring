@@ -26,20 +26,30 @@ public class MessageService {
     private final ChatListRepository chatListRepository;
 
 
-    public Message saveMessage(Message message) {
-        message.setDate(LocalDateTime.now().toString());
+public Message saveMessage(Message message) {
+    message.setDate(LocalDateTime.now().toString());
 
-        AppUser sender = appUserRepository.findByUsername(message.getSenderName())
-                .orElseThrow(() -> new RuntimeException("Sender not found"));
+    // Get sender
+    AppUser sender = appUserRepository.findByUsername(message.getSenderName())
+            .orElseThrow(() -> new RuntimeException("Sender not found"));
+
+    // Check if this is a group message by trying to parse receiverName as UUID
+    try {
+        UUID groupId = UUID.fromString(message.getReceiverName());
+        // This is a group message, just save it without updating chat list
+        return messageRepository.save(message);
+    } catch (IllegalArgumentException e) {
+        // This is a private message
         AppUser receiver = appUserRepository.findByUsername(message.getReceiverName())
                 .orElseThrow(() -> new RuntimeException("Receiver not found"));
 
+        // Update chat lists for private messages
         updateChatList(sender, receiver, message.getMessage(), false);
-
         updateChatList(receiver, sender, message.getMessage(), true);
 
         return messageRepository.save(message);
     }
+}
 
     private void updateChatList(AppUser user, AppUser contact, String message, boolean incrementUnread) {
         Optional<ChatList> chatListOpt = chatListRepository.findByUserAndContact(user, contact);

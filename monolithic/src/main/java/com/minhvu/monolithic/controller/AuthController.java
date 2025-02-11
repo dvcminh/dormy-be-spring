@@ -1,11 +1,16 @@
 package com.minhvu.monolithic.controller;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.minhvu.monolithic.dto.model.AppUserDto;
 import com.minhvu.monolithic.dto.request.ChangePasswordRequest;
 import com.minhvu.monolithic.dto.request.RegisterRequest;
 import com.minhvu.monolithic.dto.request.UpdateProfileRequest;
 import com.minhvu.monolithic.dto.response.LoginResponse;
 import com.minhvu.monolithic.entity.AppUser;
+import com.minhvu.monolithic.exception.InvalidUsernameOrPassword;
 import com.minhvu.monolithic.security.model.SecurityUser;
 import com.minhvu.monolithic.security.model.token.JwtGenerator;
 import com.minhvu.monolithic.security.service.RefreshTokenService;
@@ -22,6 +27,9 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+
+import java.util.Collections;
+import java.util.Map;
 
 @RestController
 @SecurityRequirement(name = "Bearer Authentication")

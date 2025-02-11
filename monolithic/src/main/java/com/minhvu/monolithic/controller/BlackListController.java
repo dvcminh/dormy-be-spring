@@ -34,6 +34,12 @@ public class BlackListController extends BaseController {
         return ResponseEntity.ok(blocklistService.isBlocked(blockerId, blockedUserId));
     }
 
+    @GetMapping("/isBlockedByUser/{blockedUserId}")
+    public ResponseEntity<Boolean> isBlockedByUser(@PathVariable UUID blockedUserId) {
+        UUID blockerId = getCurrentUser().getId();
+        return ResponseEntity.ok(blocklistService.isBlocked(blockedUserId, blockerId));
+    }
+
     @GetMapping("/blocklist")
     public ResponseEntity<?> getBlockList(@RequestParam(required = false, defaultValue = "0") int page,
                                           @RequestParam(required = false, defaultValue = "10") int size) {

@@ -19,6 +19,7 @@ public class ReportResponse {
     private AppUserDto reportedUserId;
     private UUID reportedContentId;
     private String reportedContentType;
+    private String additionalText;
     private ReportReason reason;
     private ReportStatus status;
     private String resolution;

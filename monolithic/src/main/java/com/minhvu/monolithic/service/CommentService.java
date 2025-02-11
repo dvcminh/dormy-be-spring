@@ -142,7 +142,7 @@ public class CommentService {
              replies.setText(comment.getText());
              replies.setCreatedAt(comment.getCreatedAt());
              replies.setUserId(comment.getUser().getId());
-             replies.setUserName(comment.getUser().getUsername());
+             replies.setUserName(comment.getUser().getDisplayName());
              replies.setUserprofilePicture(comment.getUser().getProfilePicture());
              replies.setParentCommentId(comment.getParentComment().getId());
              return  replies;

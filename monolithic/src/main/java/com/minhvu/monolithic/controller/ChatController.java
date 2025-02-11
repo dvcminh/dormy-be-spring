@@ -21,7 +21,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/chat")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = {"http://localhost:5173", "http://192.168.1.15", "http://10.0.2.2"})
 @RequiredArgsConstructor
 public class ChatController extends BaseController {
     private final SimpMessagingTemplate simpMessagingTemplate;
@@ -65,6 +65,7 @@ public class ChatController extends BaseController {
 
     @GetMapping("/group-chat/{groupId}/messages")
     public ResponseEntity<List<Message>> getGroupChatMessages(@PathVariable UUID groupId) {
+        System.out.println("Getting group chat messages");
         return ResponseEntity.ok().body(messageService.getGroupChatMessages(groupId));
     }
 
@@ -88,12 +89,20 @@ public class ChatController extends BaseController {
     @MessageMapping("/group-message/{groupID}")
     @SendTo("/chatroom/group/{groupID}")
     public Message receiveGroupMessage(@DestinationVariable String groupID, @Payload Message message) {
-        messageService.saveMessage(message);
-        return message;
+        System.out.println("Received group message: " + message);
+        try {
+            UUID.fromString(groupID);
+            message.setReceiverName(groupID);
+            // Save message
+            return messageService.saveMessage(message);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid group ID format");
+        }
     }
 
     @MessageMapping("/private-message")
     public Message recMessage(@Payload Message message) {
+        System.out.println("Received message: " + message);
         messageService.saveMessage(message);
         simpMessagingTemplate.convertAndSendToUser(message.getReceiverName(), "/private", message);
         return message;

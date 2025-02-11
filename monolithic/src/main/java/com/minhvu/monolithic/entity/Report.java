@@ -26,6 +26,7 @@ public class Report extends BaseEntity {
 
     private UUID reportedContentId; // Post/Comment ID
     private String reportedContentType; // POST, COMMENT, MESSAGE
+    private String additionalText;
 
     @Enumerated(EnumType.STRING)
     private ReportReason reason;

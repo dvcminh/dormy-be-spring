@@ -1,8 +1,14 @@
 package com.minhvu.monolithic.controller;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.minhvu.monolithic.dto.request.LoginRequest;
 import com.minhvu.monolithic.dto.request.RefreshTokenRequest;
 import com.minhvu.monolithic.dto.response.LoginResponse;
+import com.minhvu.monolithic.entity.AppUser;
+import com.minhvu.monolithic.entity.enums.RoleType;
 import com.minhvu.monolithic.exception.InvalidUsernameOrPassword;
 import com.minhvu.monolithic.repository.AppUserRepository;
 import com.minhvu.monolithic.security.exception.TokenRefreshException;
@@ -28,6 +34,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+
+import java.util.Collections;
+import java.util.Map;
 
 
 @Slf4j
@@ -86,5 +95,50 @@ public class LoginController extends BaseController {
                             "Refresh token is not found!"
                     );
                 });
+    }
+
+    @PostMapping("login/google")
+    @Operation(summary = "Login with Google using ID Token")
+    public ResponseEntity<LoginResponse> loginWithGoogle(@RequestBody Map<String, String> request) {
+        String idTokenString = request.get("idToken");
+
+        try {
+            // Xác thực ID Token với Google
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
+                    .setAudience(Collections.singletonList("YOUR_GOOGLE_CLIENT_ID")) // Google Client ID
+                    .build();
+
+            GoogleIdToken idToken = verifier.verify(idTokenString);
+            if (idToken != null) {
+                GoogleIdToken.Payload payload = idToken.getPayload();
+
+                // Lấy thông tin từ Google
+                String email = payload.getEmail();
+                String name = (String) payload.get("name");
+                String pictureUrl = (String) payload.get("picture");
+
+                // Kiểm tra xem người dùng đã tồn tại chưa
+                AppUser user = appUserRepository.findByUsername(email).orElseGet(() -> {
+                    // Nếu chưa tồn tại, tạo tài khoản mới
+                    AppUser newUser = new AppUser();
+                    newUser.setUsername(email);
+                    newUser.setDisplayName(name);
+                    newUser.setRole(RoleType.USER);
+                    appUserRepository.save(newUser);
+                    return newUser;
+                });
+
+                // Tạo JWT token
+                SecurityUser securityUser = securityUserService.loadUserByUsername(user.getUsername());
+                String token = jwtGenerator.generateToken(securityUser, jwtExp);
+                String refreshToken = jwtGenerator.generateToken(securityUser, jwtRefreshExp);
+
+                return ResponseEntity.ok(new LoginResponse(token, refreshToken, jwtExp));
+            } else {
+                throw new InvalidUsernameOrPassword("Invalid Google ID Token");
+            }
+        } catch (Exception e) {
+            throw new InvalidUsernameOrPassword("Google Login failed: " + e.getMessage());
+        }
     }
 }
